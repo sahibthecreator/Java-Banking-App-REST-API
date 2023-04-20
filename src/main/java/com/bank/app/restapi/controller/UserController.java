@@ -53,11 +53,11 @@ public class UserController {
     }
 
     @DeleteMapping("/delete_user/{userId}")
-    public ResponseEntity<Object> delete_user(@PathVariable long userId){
+    public ResponseEntity<Object> delete_user(@PathVariable UUID userId){
         try{
-            boolean res = service.delete(userId);
+            service.delete(userId);
             return ResponseEntity.status(200).body(
-                    new HttpBody<>(true, res)
+                    new HttpBody<>(true, userId)
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -67,10 +67,10 @@ public class UserController {
 
     //retrieve info by user_id
     @GetMapping("/user_info/{userId}")
-    public ResponseEntity<Object> user_info_by_id(@PathVariable long userId){
+    public ResponseEntity<Object> user_info_by_id(@PathVariable UUID userId){
             return  ResponseEntity.status(200).body(
                     //custom http body, takes a success boolean and Class<T> as body
-                    new HttpBody<>(true, service.getById(userId)));
+                    new HttpBody<>(true, service.findById(userId)));
     }
 
 }

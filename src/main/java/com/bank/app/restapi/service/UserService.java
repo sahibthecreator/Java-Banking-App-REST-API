@@ -28,8 +28,8 @@ public class UserService {
         return this.userRepository.saveAndFlush(user);
     }
 
-    public boolean delete(long id){
-        this.userRepository.deleteById(id);
+    public boolean delete(UUID uuid){
+        this.userRepository.deleteByUuid(uuid);
         return true;
     }
 
@@ -38,7 +38,7 @@ public class UserService {
         return true;
     }
 
-    public User getById(long id){
-        return userRepository.findById(id).get();
+    public User findById(UUID id){
+        return userRepository.findByUuid(id);
     }
 }
