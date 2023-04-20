@@ -1,20 +1,27 @@
 package com.bank.app.restapi.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+
+import java.util.UUID;
 
 @Data
 @ToString
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name="users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    @Column(name = "UUID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID uuid;
 
     @Column(name = "firstName")
     private String firstName;
