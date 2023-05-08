@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -44,4 +46,7 @@ public class User {
 
     @Column(name = "dayLitransactionLimitmit")
     private float transactionLimit;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Account> accounts = new HashSet<>();
 }
