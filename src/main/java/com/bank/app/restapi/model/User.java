@@ -2,10 +2,8 @@ package com.bank.app.restapi.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -34,4 +32,16 @@ public class User {
 
     @Column(name = "bsn")
     private String bsn;
+
+    @Column(name = "dateOfBirth")
+    private LocalDate dateOfBirth;
+
+    @Column(name = "typeOfUser")
+    private UserType typeOfUser;
+
+    @Column(name = "dayLimit")
+    private float dayLimit;
+
+    @Column(name = "dayLitransactionLimitmit")
+    private float transactionLimit;
 }
