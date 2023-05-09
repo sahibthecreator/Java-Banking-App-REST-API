@@ -1,5 +1,6 @@
 package com.bank.app.restapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -47,6 +48,7 @@ public class User {
     @Column(name = "dayLitransactionLimitmit")
     private float transactionLimit;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "users")
+    @JsonIgnoreProperties("users")
     private Set<Account> accounts = new HashSet<>();
 }

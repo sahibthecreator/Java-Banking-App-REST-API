@@ -1,5 +1,6 @@
 package com.bank.app.restapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +30,8 @@ public class Account {
     private AccountType typeOfAccount;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId", referencedColumnName = "uuid")
+    @JsonIgnoreProperties("accounts")
     private User user;
 
     @Column(name = "dateOfOpening")
