@@ -31,7 +31,7 @@ public class UserService {
     public User register(User user) {
 
         //append uuid to user
-        user.setRole(UserType.USER);
+        //user.setRole(UserType.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUuid(UUID.randomUUID());
         return this.userRepository.saveAndFlush(user);
