@@ -6,11 +6,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.bank.app.restapi.model.User;
 
+import lombok.ToString;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+@ToString()
 public class UserData implements UserDetails {
 
 
@@ -21,7 +25,7 @@ public class UserData implements UserDetails {
     public UserData(User user) {
         username=user.getEmail();
         password=user.getPassword();
-        authorities= Arrays.stream(user.getRole().toString().split(","))
+        authorities= Arrays.stream(user.getRole().name().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }

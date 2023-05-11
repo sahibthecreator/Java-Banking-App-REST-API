@@ -1,6 +1,7 @@
 package com.bank.app.restapi.service;
 
 import com.bank.app.restapi.model.User;
+import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class UserService {
     public User register(User user) {
 
         //append uuid to user
+        user.setRole(UserType.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUuid(UUID.randomUUID());
         return this.userRepository.saveAndFlush(user);
