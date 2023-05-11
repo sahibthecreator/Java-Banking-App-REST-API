@@ -39,8 +39,8 @@ public class User {
     @Column(name = "dateOfBirth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "typeOfUser")
-    private UserType typeOfUser;
+    @Column(name = "role")
+    private UserType role;
 
     @Column(name = "dayLimit")
     private float dayLimit;

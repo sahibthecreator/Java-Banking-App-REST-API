@@ -6,6 +6,7 @@ import com.bank.app.restapi.service.UserService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -22,6 +23,7 @@ public class UserController {
     }
 
     @GetMapping("")
+    //@PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity all_users(){
         try{
             return ResponseEntity.status(200).body(
