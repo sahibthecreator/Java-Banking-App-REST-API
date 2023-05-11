@@ -45,10 +45,10 @@ public class User {
     @Column(name = "dayLimit")
     private float dayLimit;
 
-    @Column(name = "dayLitransactionLimitmit")
+    @Column(name = "transactionLimit")
     private float transactionLimit;
 
-    @OneToMany(mappedBy = "users")
-    @JsonIgnoreProperties("users")
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties("user")
     private Set<Account> accounts = new HashSet<>();
 }

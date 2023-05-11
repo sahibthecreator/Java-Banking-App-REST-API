@@ -43,4 +43,7 @@ public class Account {
     @Column(name = "isActive")
     private boolean isActive;
 
+    public void setActive(boolean active) {
+        isActive = active;
+    }
 }
