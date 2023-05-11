@@ -23,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    //@PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity all_users(){
         try{
             return ResponseEntity.status(200).body(

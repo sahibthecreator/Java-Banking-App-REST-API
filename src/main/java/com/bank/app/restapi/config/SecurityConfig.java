@@ -24,39 +24,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private static final String[] SECURED_URLs = { "/users/**" };
+
+    private static final String[] UN_SECURED_URLs = {
+            "/auth/**"
+    };
+
     @Autowired
     private JwtAuthFilter authFilter;
 
-    @Bean
-    // authentication
-    public UserDetailsService userDetailsService() {
-        UserDetails admin = User.withUsername("Basant")
-                .password(passwordEncoder().encode("Pwd1"))
-                .roles("ADMIN")
-                .build();
-        UserDetails user = User.withUsername("John")
-                .password(passwordEncoder().encode("Pwd2"))
-                .roles("USER", "ADMIN", "HR")
-                .build();
-        return new InMemoryUserDetailsManager(admin, user);
-        // return new UserDataService();
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/auth/**").permitAll()
-                .and()
-                .authorizeHttpRequests().requestMatchers("/users/**")
-                .authenticated().and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+    @Autowired
+    private UserDataService userDataService; // TODO: implement instead of userDetailsService()
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -72,8 +51,39 @@ public class SecurityConfig {
     }
 
     @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http.csrf().disable()
+                .authorizeHttpRequests()
+                .requestMatchers(UN_SECURED_URLs).permitAll()
+                .and()
+                .authorizeHttpRequests().requestMatchers(SECURED_URLs)
+                .authenticated()
+                .and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    // authentication
+    public UserDetailsService userDetailsService() {
+        UserDetails admin = User.withUsername("Basant")
+                .password(passwordEncoder().encode("Pwd1"))
+                .roles("ADMIN")
+                .build();
+        UserDetails user = User.withUsername("John")
+                .password(passwordEncoder().encode("Pwd2"))
+                .roles("USER", "ADMIN", "HR")
+                .build();
+        return new InMemoryUserDetailsManager(admin, user);
+        // return new UserDataService();
     }
 
 }
