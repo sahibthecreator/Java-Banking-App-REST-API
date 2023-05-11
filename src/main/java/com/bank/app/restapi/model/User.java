@@ -39,8 +39,8 @@ public class User {
     @Column(name = "dateOfBirth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "typeOfUser")
-    private UserType typeOfUser;
+    @Column(name = "role")
+    private UserType role;
 
     @Column(name = "dayLimit")
     private float dayLimit;
@@ -48,7 +48,7 @@ public class User {
     @Column(name = "dayLitransactionLimitmit")
     private float transactionLimit;
 
-    @OneToMany(mappedBy = "users")
-    @JsonIgnoreProperties("users")
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties("user")
     private Set<Account> accounts = new HashSet<>();
 }
