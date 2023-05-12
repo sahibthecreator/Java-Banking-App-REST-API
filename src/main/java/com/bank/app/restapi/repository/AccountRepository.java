@@ -12,8 +12,10 @@ import java.util.UUID;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, UUID> {
 
-    @Query("SELECT a FROM Account a JOIN a.user u WHERE CONCAT(u.firstName, ' ', u.lastName) = :username")
-    List<Account> findByUsername(@Param("username") String username);
+    @Query("SELECT a.IBAN FROM Account a JOIN a.user u WHERE CONCAT(u.firstName, ' ', u.lastName) = :username")
+    List<String>  findIBANByUsername(@Param("username") String username);
 
     Account findByIban(String iban);
+
+    float findBalanceByIBAN(String iban);
 }

@@ -26,11 +26,15 @@ public class AccountService {
         accountRepository.saveAndFlush(account);
     }
 
-    public List<Account> getAccountsByUsername(String username) {
-        return accountRepository.findByUsername(username);
+    public List<String> getIBANByUsername(String username) {
+        return accountRepository.findIBANByUsername(username);
     }
 
-    public Account getAccountByIban(String iban) {
+    public Account getAccountByIBAN(String iban) {
         return accountRepository.findByIban(iban);
     }
+    public float getBalanceByIBAN(String iban){
+        return accountRepository.findBalanceByIBAN(iban);
+    }
+
 }

@@ -20,7 +20,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @Column(name = "iban")
+    @Column(name = "IBAN")
     private String iban;
 
     @Column(name = "balance")
