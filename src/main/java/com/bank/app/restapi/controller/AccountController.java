@@ -31,7 +31,7 @@ public class AccountController {
     public ResponseEntity get_iban_by_username(@PathVariable String userName){
         try{
             return ResponseEntity.status(200).body(
-                    new HttpBody<>(true, service.getIBANByUsername(userName)));
+                    new HttpBody<>(true, service.getIbanByUsername(userName)));
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -42,7 +42,7 @@ public class AccountController {
     public ResponseEntity get_accountInfo(@PathVariable String iban){
         try{
             return ResponseEntity.status(200).body(
-                    new HttpBody<>(true, service.getAccountByIBAN(iban)));
+                    new HttpBody<>(true, service.getAccountByIban(iban)));
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -53,7 +53,7 @@ public class AccountController {
     public ResponseEntity get_accountBalance(@PathVariable String iban){
         try{
             return ResponseEntity.status(200).body(
-                    new HttpBody<>(true, service.getBalanceByIBAN(iban)));
+                    new HttpBody<>(true, service.getBalanceByIban(iban)));
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
@@ -72,9 +72,9 @@ public class AccountController {
     }
 
     @PatchMapping("deactivate_account/{iban}")
-    public ResponseEntity deactivate_account(@PathVariable String iban, @RequestBody Account account){
+    public ResponseEntity deactivate_account(@PathVariable String iban){
         try{
-            Account existingAccount = service.getAccountByIBAN(iban);
+            Account existingAccount = service.getAccountByIban(iban);
             if(existingAccount == null){
                 return ResponseEntity.status(404).body(
                         new HttpBody<>(false, "Account not found"));

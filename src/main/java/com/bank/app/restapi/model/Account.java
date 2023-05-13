@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 @Data
 @ToString
@@ -20,7 +22,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @Column(name = "IBAN")
+    @Column(name = "iban")
     private String iban;
 
     @Column(name = "balance")

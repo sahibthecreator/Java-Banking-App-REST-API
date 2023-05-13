@@ -23,11 +23,11 @@ public class Transaction {
     private UUID uuid;
 
     @ManyToOne
-    @JoinColumn(name = "fromIBAN", referencedColumnName = "IBAN")
+    @JoinColumn(name = "fromIban", referencedColumnName = "iban")
     private Account fromIban;
 
     @ManyToOne
-    @JoinColumn(name = "toIBAN", referencedColumnName = "IBAN")
+    @JoinColumn(name = "toIban", referencedColumnName = "iban")
     private Account toIban;
 
     @Column(name = "amount")
