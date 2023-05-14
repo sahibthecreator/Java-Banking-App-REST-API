@@ -18,9 +18,9 @@ import java.util.UUID;
 @Table(name="transactions")
 public class Transaction {
     @Id
-    @Column(name = "uuid")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID uuid;
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "fromIban", referencedColumnName = "iban")

@@ -18,9 +18,9 @@ import java.util.UUID;
 @Table (name="accounts")
 public class Account {
     @Id
-    @Column(name = "uuid")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID uuid;
+    private UUID id;
 
     @Column(name = "iban")
     private String iban;
@@ -28,6 +28,7 @@ public class Account {
     @Column(name = "balance")
     private float balance;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "typeOfAccount")
     private AccountType typeOfAccount;
 
