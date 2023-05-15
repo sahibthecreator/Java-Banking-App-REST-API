@@ -33,7 +33,7 @@ public class Account {
     private AccountType typeOfAccount;
 
     @ManyToOne
-    @JoinColumn(name = "userId", referencedColumnName = "uuid")
+    @JoinColumn(name = "userId", referencedColumnName = "id")
     @JsonIgnoreProperties("accounts")
     private User user;
 

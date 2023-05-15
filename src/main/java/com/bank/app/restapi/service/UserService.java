@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,15 +31,14 @@ public class UserService {
 
     public User register(User user) {
 
-        //append uuid to user
         //user.setRole(UserType.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
         return this.userRepository.saveAndFlush(user);
     }
 
-    public boolean delete(UUID uuid){
-        this.userRepository.deleteByUuid(uuid);
+    public boolean delete(UUID id){
+        this.userRepository.deleteById(id);
         return true;
     }
 
@@ -47,7 +47,7 @@ public class UserService {
         return true;
     }
 
-    public User findById(UUID id){
-        return userRepository.findByUuid(id);
+    public Optional<User> findById(UUID id){
+        return userRepository.findById(id);
     }
 }
