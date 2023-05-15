@@ -31,23 +31,27 @@ public class UserService {
 
     public User register(User user) {
 
-        //user.setRole(UserType.USER);
+        // user.setRole(UserType.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
         return this.userRepository.saveAndFlush(user);
     }
 
-    public boolean delete(UUID id){
+    public boolean delete(UUID id) {
         this.userRepository.deleteById(id);
         return true;
     }
 
+    public boolean matchEmailwithId(String email, UUID id) {
+        return userRepository.matchEmailwithId(email, id);
+    }
+
     public boolean verifyCredentials(String email, String passwd) {
-        //TODO: implement credential verification
+        // TODO: implement credential verification
         return true;
     }
 
-    public Optional<User> findById(UUID id){
+    public Optional<User> findById(UUID id) {
         return userRepository.findById(id);
     }
 }
