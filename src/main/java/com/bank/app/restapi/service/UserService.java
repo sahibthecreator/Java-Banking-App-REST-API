@@ -4,7 +4,9 @@ import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.UserRepository;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,11 +32,28 @@ public class UserService {
     }
 
     public User register(User user) {
-
         // user.setRole(UserType.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
         return this.userRepository.saveAndFlush(user);
+    }
+
+    public User update(UUID userId, User user){
+        try {
+            Optional<User> existingUserOptional = userRepository.findById(userId);
+            if (existingUserOptional.isPresent()) {
+                User existingUser = existingUserOptional.get();
+                BeanUtils.copyProperties(user, existingUser, "id"); // Exclude copying the "id" property
+                System.out.println(existingUser.toString());
+
+                User savedUser = userRepository.save(existingUser);
+                return savedUser;
+            } else {
+               return null;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean delete(UUID id) {

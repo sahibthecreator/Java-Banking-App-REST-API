@@ -45,7 +45,7 @@ public class UserController {
         JwtService jwtService = new JwtService();
         String email = jwtService.extractUsername(token);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
+
         boolean hasEmployeeAuthority = authentication != null
                 && authentication.getAuthorities().contains(new SimpleGrantedAuthority("EMPLOYEE"));
         boolean isAuthorized = hasEmployeeAuthority || service.matchEmailwithId(email, userId);
@@ -57,11 +57,47 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Boolean> deleteUser(@PathVariable UUID userId) {
+    @PutMapping("/{userId}")
+    public ResponseEntity updateUser(@PathVariable UUID userId, @RequestBody User u, HttpServletRequest request) {
         try {
-            service.delete(userId);
-            return ResponseEntity.status(200).body(service.delete(userId));
+
+            String token = extractTokenFromRequest(request);
+            JwtService jwtService = new JwtService();
+            String email = jwtService.extractUsername(token);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            boolean hasEmployeeAuthority = authentication != null
+                    && authentication.getAuthorities().contains(new SimpleGrantedAuthority("EMPLOYEE"));
+            boolean isAuthorized = hasEmployeeAuthority || service.matchEmailwithId(email, userId);
+
+            if (isAuthorized) {
+                return ResponseEntity.status(201).body(service.update(userId, u));
+            } else {
+                return ResponseEntity.status(403).body(null);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Boolean> deleteUser(@PathVariable UUID userId, HttpServletRequest request) {
+        try {
+            String token = extractTokenFromRequest(request);
+            JwtService jwtService = new JwtService();
+            String email = jwtService.extractUsername(token);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            boolean hasEmployeeAuthority = authentication != null
+                    && authentication.getAuthorities().contains(new SimpleGrantedAuthority("EMPLOYEE"));
+            boolean isAuthorized = hasEmployeeAuthority || service.matchEmailwithId(email, userId);
+
+            if (isAuthorized) {
+                service.delete(userId);
+                return ResponseEntity.status(200).build();
+            } else {
+                return ResponseEntity.status(403).build();
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
