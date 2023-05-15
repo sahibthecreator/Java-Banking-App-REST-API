@@ -18,16 +18,16 @@ import java.util.UUID;
 @Table(name="transactions")
 public class Transaction {
     @Id
-    @Column(name = "uuid")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID uuid;
+    private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "fromIBAN", referencedColumnName = "IBAN")
+    @JoinColumn(name = "fromIban", referencedColumnName = "iban")
     private Account fromIban;
 
     @ManyToOne
-    @JoinColumn(name = "toIBAN", referencedColumnName = "IBAN")
+    @JoinColumn(name = "toIban", referencedColumnName = "iban")
     private Account toIban;
 
     @Column(name = "amount")

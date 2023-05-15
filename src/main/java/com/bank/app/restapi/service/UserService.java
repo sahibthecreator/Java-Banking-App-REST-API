@@ -33,7 +33,7 @@ public class UserService {
         //append uuid to user
         //user.setRole(UserType.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setUuid(UUID.randomUUID());
+        user.setId(UUID.randomUUID());
         return this.userRepository.saveAndFlush(user);
     }
 

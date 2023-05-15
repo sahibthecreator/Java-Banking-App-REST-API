@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 @Data
 @ToString
@@ -16,16 +18,17 @@ import java.util.UUID;
 @Table (name="accounts")
 public class Account {
     @Id
-    @Column(name = "uuid")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID uuid;
+    private UUID id;
 
-    @Column(name = "IBAN")
+    @Column(name = "iban")
     private String iban;
 
     @Column(name = "balance")
     private float balance;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "typeOfAccount")
     private AccountType typeOfAccount;
 
