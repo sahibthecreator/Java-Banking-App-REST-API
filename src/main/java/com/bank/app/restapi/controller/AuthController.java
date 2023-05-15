@@ -41,6 +41,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity add_user(@RequestBody User u) {
         try {
+
             return ResponseEntity.status(201).body(
                     // custom http body, takes a success boolean and Class<T> as body
                     userService.register(u));
