@@ -1,21 +1,20 @@
 package com.bank.app.restapi.controller;
 
+import com.bank.app.restapi.dto.UserDTO;
+import com.bank.app.restapi.dto.mapper.UserDTOMapper;
 import com.bank.app.restapi.http.HttpBody;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.JwtService;
 import com.bank.app.restapi.service.UserService;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletRequest;
-
-import org.hibernate.mapping.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,15 +24,26 @@ public class UserController {
 
     private final UserService service;
 
-    public UserController(UserService service) {
+    private UserDTOMapper mapper;
+
+    public UserController(UserService service, UserDTOMapper mapper){
         this.service = service;
+        this.mapper = mapper;
     }
 
     @GetMapping("")
-    public ResponseEntity<java.util.List<User>> getAll() {
-        try {
-            return ResponseEntity.status(200).body(service.getAll());
-        } catch (Exception e) {
+    //@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity all_users(){
+        try{
+            List<User> users = service.getAll();
+
+            List<UserDTO> bodyD = users.stream().map(mapper::convertToDto).toList();
+
+
+
+            return ResponseEntity.status(200).body(
+                    new HttpBody<>(true, bodyD));
+        }catch (Exception e){
             System.out.println(e.getMessage());
         }
         return null;

@@ -8,11 +8,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="restapi" />
+        <module name="Java-Banking-App-REST-API" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Java-Banking-App-REST-API" options="-parameters" />
       <module name="restapi" options="-parameters" />
     </option>
   </component>
