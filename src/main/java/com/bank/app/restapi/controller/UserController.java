@@ -6,28 +6,17 @@ import com.bank.app.restapi.http.HttpBody;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.JwtService;
 import com.bank.app.restapi.service.UserService;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.micrometer.observation.ObservationFilter;
 import jakarta.servlet.http.HttpServletRequest;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.ui.ModelMap;
 
-import org.hibernate.mapping.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("users")
