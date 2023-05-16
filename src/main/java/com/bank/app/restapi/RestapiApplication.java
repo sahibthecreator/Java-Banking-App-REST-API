@@ -1,6 +1,6 @@
 package com.bank.app.restapi;
 
-import com.bank.app.restapi.dto.mapper.UserDTOMapper;
+import com.bank.app.restapi.dto.mapper.UserMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,7 +20,7 @@ public class RestapiApplication {
 		return new ModelMapper();
 	}
 	@Bean
-	public UserDTOMapper userDTOMapper() {
-		return new UserDTOMapper();
+	public UserMapper userDTOMapper() {
+		return new UserMapper();
 	}
 }

@@ -1,7 +1,7 @@
 package com.bank.app.restapi.controller;
 
 import com.bank.app.restapi.dto.UserDTO;
-import com.bank.app.restapi.dto.mapper.UserDTOMapper;
+import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.http.HttpBody;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.JwtService;
@@ -26,9 +26,9 @@ public class UserController {
 
     private final UserService service;
 
-    private UserDTOMapper mapper;
+    private UserMapper mapper;
 
-    public UserController(UserService service, UserDTOMapper mapper) {
+    public UserController(UserService service, UserMapper mapper) {
         this.service = service;
         this.mapper = mapper;
     }
@@ -36,7 +36,7 @@ public class UserController {
     @GetMapping("")
     public ResponseEntity getAll() {
         try {
-            List<UserDTO> users = service.getAll().stream().map(mapper::convertToDto).toList();
+            List<UserDTO> users = service.getAll().stream().map(mapper::toDTO).toList();
 
             return ResponseEntity.status(200).body(users);
         } catch (Exception e) {

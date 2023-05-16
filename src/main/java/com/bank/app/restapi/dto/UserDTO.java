@@ -2,6 +2,7 @@ package com.bank.app.restapi.dto;
 
 import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.UserType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,12 +18,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class UserDTO {
-
 
     @JsonIgnore
     private UUID id;
@@ -33,20 +35,18 @@ public class UserDTO {
 
     private String email;
 
-
-    @JsonProperty
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private String bsn;
 
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dateOfBirth;
 
     private UserType role;
 
     private float dayLimit;
     private float transactionLimit;
-
 
     @JsonIgnore
     private Set<Account> accounts = new HashSet<>();
