@@ -38,7 +38,7 @@ public class UserService {
         return this.userRepository.saveAndFlush(user);
     }
 
-    public User update(UUID userId, User user){
+    public User update(UUID userId, User user) {
         try {
             Optional<User> existingUserOptional = userRepository.findById(userId);
             if (existingUserOptional.isPresent()) {
@@ -49,7 +49,7 @@ public class UserService {
                 User savedUser = userRepository.save(existingUser);
                 return savedUser;
             } else {
-               return null;
+                return null;
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -63,6 +63,14 @@ public class UserService {
 
     public boolean matchEmailwithId(String email, UUID id) {
         return userRepository.matchEmailwithId(email, id);
+    }
+
+    public boolean userIdExists(UUID id) {
+        Optional<User> user = userRepository.findById(id);
+        System.out.println(id);
+        System.out.println(user.isPresent());
+
+        return user.isPresent();
     }
 
     public boolean verifyCredentials(String email, String passwd) {
