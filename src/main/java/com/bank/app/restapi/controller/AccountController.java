@@ -17,7 +17,7 @@ public class AccountController {
     }
 
     @GetMapping("")
-    public ResponseEntity all_accounts(){
+    public ResponseEntity allAccounts(){
         try{
             return ResponseEntity.status(200).body(
                     new HttpBody<>(true, service.getAllAccounts()));
@@ -27,41 +27,8 @@ public class AccountController {
         return null;
     }
 
-    @GetMapping("get_iban_by_username/{userName}")
-    public ResponseEntity get_iban_by_username(@PathVariable String userName){
-        try{
-            return ResponseEntity.status(200).body(
-                    new HttpBody<>(true, service.getIbanByUsername(userName)));
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-        return null;
-    }
-
-    @GetMapping("get_accountInfo/{iban}")
-    public ResponseEntity get_accountInfo(@PathVariable String iban){
-        try{
-            return ResponseEntity.status(200).body(
-                    new HttpBody<>(true, service.getAccountByIban(iban)));
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-        return null;
-    }
-
-    @GetMapping("get_accountBalance/{iban}")
-    public ResponseEntity get_accountBalance(@PathVariable String iban){
-        try{
-            return ResponseEntity.status(200).body(
-                    new HttpBody<>(true, service.getBalanceByIban(iban)));
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-        return null;
-    }
-
-    @PostMapping("create_account")
-    public ResponseEntity create_account(@RequestBody Account account){
+    @PostMapping("/accounts")
+    public ResponseEntity createAccount(@RequestBody Account account){
         try{
             return ResponseEntity.status(201).body(
                     new HttpBody<>(true, service.createAccount(account)));
@@ -71,8 +38,30 @@ public class AccountController {
         return null;
     }
 
-    @PatchMapping("deactivate_account/{iban}")
-    public ResponseEntity deactivate_account(@PathVariable String iban){
+    @GetMapping("/accounts/{iban}/info")
+    public ResponseEntity accountInfo(@PathVariable String iban){
+        try{
+            return ResponseEntity.status(200).body(
+                    new HttpBody<>(true, service.getAccountByIban(iban)));
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    @GetMapping("/accounts/{iban}/info-balance")
+    public ResponseEntity accountBalance(@PathVariable String iban){
+        try{
+            return ResponseEntity.status(200).body(
+                    new HttpBody<>(true, service.getBalanceByIban(iban)));
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    @PatchMapping("/accounts/{iban}/deactivate")
+    public ResponseEntity deactivateAccount(@PathVariable String iban){
         try{
             Account existingAccount = service.getAccountByIban(iban);
             if(existingAccount == null){
@@ -87,4 +76,16 @@ public class AccountController {
         }
         return null;
     }
+
+//    @GetMapping("/accounts/{userName}/iban")
+//    public ResponseEntity ibanByUsername(@PathVariable String userName){
+//        try{
+//            return ResponseEntity.status(200).body(
+//                    new HttpBody<>(true, service.getIbanByUsername(userName)));
+//        }catch (Exception e){
+//            System.out.println(e.getMessage());
+//        }
+//        return null;
+//    }
+
 }
