@@ -2,15 +2,11 @@ package com.bank.app.restapi.controller;
 
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
-import com.bank.app.restapi.http.HttpBody;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.JwtService;
 import com.bank.app.restapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-
-import org.aspectj.weaver.ast.Instanceof;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.core.Authentication;
@@ -65,7 +61,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Optional<User>> getById(@PathVariable String userId, HttpServletRequest request) {
+    public ResponseEntity<Optional<UserDTO>> getById(@PathVariable String userId, HttpServletRequest request) {
         if (!isValidUUID(userId)) {
             return ResponseEntity.status(400).build();
         }
@@ -74,7 +70,7 @@ public class UserController {
             return ResponseEntity.status(404).build();
         }
         if (isAuthorized(request, id)) {
-            return ResponseEntity.status(200).body(userService.findById(id));
+            return ResponseEntity.status(200).body(userService.findById(id).map(userMapper::toDTO));
         } else {
             return ResponseEntity.status(403).build();
         }

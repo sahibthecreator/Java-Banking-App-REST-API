@@ -46,8 +46,6 @@ public class UserDTO {
     private UserType role;
 
     private float dayLimit;
-    private float transactionLimit;
 
-    @JsonIgnore
-    private Set<Account> accounts = new HashSet<>();
+    private float transactionLimit;
 }

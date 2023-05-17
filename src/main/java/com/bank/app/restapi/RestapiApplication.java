@@ -1,9 +1,6 @@
 package com.bank.app.restapi;
 
 import com.bank.app.restapi.dto.mapper.UserMapper;
-import com.bank.app.restapi.model.User;
-import com.bank.app.restapi.repository.UserRepository;
-import com.bank.app.restapi.service.UserService;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
@@ -24,6 +21,12 @@ public class RestapiApplication {
 
 	@Bean
 	public UserMapper userDTOMapper() {
-		return new UserMapper();
+		return new UserMapper(modelMapper());
+	}
+
+
+	//generates some predefined data in DB - dev version only
+	@Bean void createDBData(){
+
 	}
 }

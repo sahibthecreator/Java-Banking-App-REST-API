@@ -53,7 +53,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserDTO userDTO) {
         try {
-            userDTO.setRole(UserType.USER);
             if (!userMapper.isValidDTO(userDTO)) {
                 return ResponseEntity.status(400).body("Invalid data"); // Return 400 for bad request
             }
