@@ -7,8 +7,10 @@ import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.JwtService;
 import com.bank.app.restapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
 
 import org.aspectj.weaver.ast.Instanceof;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.core.Authentication;
@@ -21,27 +23,44 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("users")
 public class UserController {
 
-    private final UserService service;
+    private final UserService userService;
 
-    private UserMapper mapper;
-
-    public UserController(UserService service, UserMapper mapper) {
-        this.service = service;
-        this.mapper = mapper;
-    }
+    private UserMapper userMapper;
 
     @GetMapping("")
     public ResponseEntity getAll() {
         try {
-            List<UserDTO> users = service.getAll().stream().map(mapper::toDTO).toList();
+            List<UserDTO> users = userService.getAll().stream().map(userMapper::toDTO).toList();
 
             return ResponseEntity.status(200).body(users);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(500).build(); // if something goes wrong return 500 - internal server error
+        }
+    }
+
+    @PostMapping("")
+    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
+        try {
+            if (!userMapper.isValidDTO(userDTO)) {
+                return ResponseEntity.status(400).body("Invalid request body"); // Return 400 for bad request
+            }
+            User user = userMapper.toEntity(userDTO);
+            User createdUser = userService.register(user);
+            UserDTO createdUserDTO = userMapper.toDTO(createdUser);
+            return ResponseEntity.status(201).body(createdUserDTO);
+        } catch (Exception e) {
+            if (e instanceof IllegalArgumentException) {
+                return ResponseEntity.status(400).body("Invalid request body" + e.getMessage()); // Return 400 for bad
+                                                                                                 // request
+            } else {
+                return ResponseEntity.status(500).body("An error occurred: " + e.getMessage()); // Return 500 Internal
+                                                                                                // Server Error
+            }
         }
     }
 
@@ -51,28 +70,35 @@ public class UserController {
             return ResponseEntity.status(400).build();
         }
         UUID id = UUID.fromString(userId);
-        if (!service.userIdExists(id)) {
+        if (!userService.userIdExists(id)) {
             return ResponseEntity.status(404).build();
         }
         if (isAuthorized(request, id)) {
-            return ResponseEntity.status(200).body(service.findById(id));
+            return ResponseEntity.status(200).body(userService.findById(id));
         } else {
             return ResponseEntity.status(403).build();
         }
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity updateUser(@PathVariable String userId, @RequestBody User u, HttpServletRequest request) {
+    public ResponseEntity updateUser(@PathVariable String userId, @RequestBody UserDTO userDTO,
+            HttpServletRequest request) {
         try {
+            if (!userMapper.isValidDTO(userDTO)) {
+                return ResponseEntity.status(400).body("Invalid request body"); // Return 400 for bad request
+            }
             if (!isValidUUID(userId)) {
-                return ResponseEntity.status(400).build();
+                return ResponseEntity.status(400).body("UserId is not valid"); // Return 400 for bad request
             }
             UUID id = UUID.fromString(userId);
-            if (!service.userIdExists(id)) {
+            if (!userService.userIdExists(id)) {
                 return ResponseEntity.status(404).build();
             }
             if (isAuthorized(request, id)) {
-                return ResponseEntity.status(200).body(service.update(id, u));
+                User user = userMapper.toEntity(userDTO);
+                UserDTO createdUserDTO = userMapper.toDTO(userService.update(id, user));
+
+                return ResponseEntity.status(200).body(createdUserDTO);
             } else {
                 return ResponseEntity.status(403).body(null);
             }
@@ -89,11 +115,11 @@ public class UserController {
                 return ResponseEntity.status(400).build();
             }
             UUID id = UUID.fromString(userId);
-            if (!service.userIdExists(id)) {
+            if (!userService.userIdExists(id)) {
                 return ResponseEntity.status(404).build();
             }
             if (isAuthorized(request, id)) {
-                service.delete(id);
+                userService.delete(id);
                 return ResponseEntity.status(200).build();
             } else {
                 return ResponseEntity.status(403).build();
@@ -122,7 +148,7 @@ public class UserController {
 
         boolean isEmployee = authentication != null
                 && authentication.getAuthorities().contains(new SimpleGrantedAuthority("EMPLOYEE"));
-        boolean isAuthorized = isEmployee || service.matchEmailwithId(email, userId);
+        boolean isAuthorized = isEmployee || userService.matchEmailwithId(email, userId);
         return isAuthorized;
     }
 

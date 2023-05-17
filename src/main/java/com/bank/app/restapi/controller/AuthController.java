@@ -4,6 +4,7 @@ import com.bank.app.restapi.dto.LoginDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.User;
+import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.service.JwtService;
 import com.bank.app.restapi.service.UserService;
 
@@ -34,7 +35,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginDTO authRequest) {
         try {
             if (authRequest.getUsername() == null || authRequest.getPassword() == null) {
-                return ResponseEntity.status(400).body("Invalid request body data:"); // Return 400 for bad request
+                return ResponseEntity.status(400).body("Invalid request body data"); // Return 400 for bad request
             }
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
@@ -49,21 +50,10 @@ public class AuthController {
         }
     }
 
-    // @PostMapping("/register")
-    // public ResponseEntity add_user(@RequestBody User u) {
-    // try {
-
-    // return ResponseEntity.status(201).body(
-    // // custom http body, takes a success boolean and Class<T> as body
-    // userService.register(u));
-    // } catch (Exception e) {
-    // throw new RuntimeException(e);
-    // }
-    // }
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserDTO userDTO) {
         try {
+            userDTO.setRole(UserType.USER);
             if (!userMapper.isValidDTO(userDTO)) {
                 return ResponseEntity.status(400).body("Invalid data"); // Return 400 for bad request
             }

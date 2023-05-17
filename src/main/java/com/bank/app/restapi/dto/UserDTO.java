@@ -26,7 +26,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Builder
 public class UserDTO {
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
     private String firstName;

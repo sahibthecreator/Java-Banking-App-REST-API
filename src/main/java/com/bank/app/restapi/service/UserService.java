@@ -32,7 +32,6 @@ public class UserService {
     }
 
     public User register(User user) {
-        // user.setRole(UserType.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
         return this.userRepository.saveAndFlush(user);
@@ -44,7 +43,7 @@ public class UserService {
             if (existingUserOptional.isPresent()) {
                 User existingUser = existingUserOptional.get();
                 BeanUtils.copyProperties(user, existingUser, "id"); // Exclude copying the "id" property
-                System.out.println(existingUser.toString());
+                existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
                 User savedUser = userRepository.save(existingUser);
                 return savedUser;
