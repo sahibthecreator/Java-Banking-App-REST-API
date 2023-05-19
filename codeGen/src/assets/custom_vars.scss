@@ -1,0 +1,56 @@
+// File: custom.scss
+
+// Define your variable overrides here
+
+
+//custom css vars
+:root {
+  --black: #0A0A0A;
+  --gray-black: #141414;
+  --gray-dark: #3F3F3F;
+  --gray-light: #A3A3A3;
+  --white: #ffffff;
+  --blue-light: #00D4FF;
+
+  --border-radius: 7px;
+}
+
+
+$enable-shadows: true;
+$enable-gradients: true;
+$grid-breakpoints: (
+  xs: 0,
+  sm: 456px,
+  md: 789px,
+  lg: 999px,
+  xl: 1234px
+);
+$bv-enable-table-stacked: false;
+
+@import '/node_modules/bootstrap/scss/bootstrap.scss';
+@import '/node_modules/bootstrap-vue/src/index.scss';
+
+// General style overrides and custom classes
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--white);
+}
+
+body::-webkit-scrollbar{
+    display: none;
+  }
+
+
+#content {
+  width: 700px;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  
+}
+
+
