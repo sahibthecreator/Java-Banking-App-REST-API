@@ -28,7 +28,7 @@ public class UserController {
     private UserMapper userMapper;
 
     @GetMapping("/")
-    public ResponseEntity getAll() {
+    public ResponseEntity<?> getAll() {
         try {
             List<UserDTO> users = userService.getAll().stream().map(userMapper::toDTO).toList();
 
@@ -61,7 +61,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Optional<UserDTO>> getById(@PathVariable String userId, HttpServletRequest request) {
+    public ResponseEntity<UserDTO> getById(@PathVariable String userId, HttpServletRequest request) {
         if (!isValidUUID(userId)) {
             return ResponseEntity.status(400).build();
         }
@@ -70,14 +70,14 @@ public class UserController {
             return ResponseEntity.status(404).build();
         }
         if (isAuthorized(request, id)) {
-            return ResponseEntity.status(200).body(userService.findById(id).map(userMapper::toDTO));
+            return ResponseEntity.status(200).body(userService.getUserDTOById(id));
         } else {
             return ResponseEntity.status(403).build();
         }
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity updateUser(@PathVariable String userId, @RequestBody UserDTO userDTO,
+    public ResponseEntity<?> updateUser(@PathVariable String userId, @RequestBody UserDTO userDTO,
             HttpServletRequest request) {
         try {
             if (!userMapper.isValidDTO(userDTO)) {
@@ -104,7 +104,7 @@ public class UserController {
         }
     }
 
-    //User can't delete himself - TODO
+    // User can't delete himself - TODO
     @DeleteMapping("/{userId}")
     public ResponseEntity<Boolean> deleteUser(@PathVariable String userId, HttpServletRequest request) {
         try {
@@ -123,7 +123,7 @@ public class UserController {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return ResponseEntity.status(500).build(); // if something goes wrong return 500 - internal server error=
+            return ResponseEntity.status(500).build(); // if something goes wrong return 500 - internal server error
         }
     }
 

@@ -2,20 +2,30 @@
   <div class="wrapper">
     <div class="section" id="left"></div>
     <div class="section right" id="right">
-      <div class="content m-auto">
+      <div class="content mx-auto" :class="{ 'mt-0': !isLogin }">
         <div class="login">
           <div class="logoWrapper">
             <img src="@/assets/Logo.svg" alt="logo" id="logo" />
             <span id="logoTitle">WAVR</span>
           </div>
           <div class="selectionType py-4">
-            <button>Login</button>
-            <button>Register</button>
+            <button :class="{ 'selected': isLogin }" @click="isLogin = true">Login</button>
+            <button :class="{ 'selected': !isLogin }" @click="isLogin = false">Register</button>
           </div>
-          <div class="loginWrapper">
-            <input type="text" v-model="username" placeholder="email" />
-            <input type="password" v-model="password" placeholder="password" />
+          <div class="loginWrapper" v-if="isLogin">
+            <input type="text" v-model="username" placeholder="Email" class="text-dark" />
+            <input type="password" v-model="password" placeholder="Password" class="text-dark" />
             <button type="button" @click="($event) => login()">Log in</button>
+          </div>
+          <div class="loginWrapper" v-else>
+            <input type="text" v-model="firstName" placeholder="First Name" class="text-dark" />
+            <input type="text" v-model="lastName" placeholder="Last Name" class="text-dark" />
+            <input type="text" v-model="username" placeholder="Email" class="text-dark" />
+            <input type="password" v-model="password" placeholder="Password" class="text-dark" />
+            <input type="text" v-model="bsn" placeholder="BSN" class="text-dark" />
+            <input type="text" v-model="bsn" placeholder="Date of Birth" class="text-dark" />
+            
+            <button type="button" @click="($event) => login()">Register</button>
           </div>
         </div>
       </div>
@@ -36,6 +46,7 @@ export default {
   name: 'login',
   data() {
     return {
+      isLogin: true,
       username: '',
       password: '',
     };
@@ -67,6 +78,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 40px;
+  margin-top: 15%;
 }
 
 #left {
@@ -105,7 +117,7 @@ export default {
   gap: 20px;
 }
 
-.loginWrapper > input {
+.loginWrapper>input {
   background-color: var(--white);
   height: 40px;
   padding: 10px;
@@ -118,7 +130,8 @@ export default {
 ::placeholder {
   color: var(--gray-dark);
 }
-.loginWrapper > button {
+
+.loginWrapper>button {
   height: 50px;
   border: none;
   border-radius: 7px;
@@ -126,11 +139,15 @@ export default {
   color: var(--gray-light);
 }
 
+.loginWrapper>button:hover {
+  filter: opacity(0.9);
+}
+
 .selectionType {
   width: 100%;
 }
 
-.selectionType > button {
+.selectionType>button {
   width: 50%;
   padding: 10px;
   border: none;
@@ -139,7 +156,7 @@ export default {
   border-bottom: 1px var(--white) solid;
 }
 
-.selectionType > button:first-child {
+.selectionType>.selected {
   border-bottom: 2px var(--gray-dark) solid;
 }
 </style>

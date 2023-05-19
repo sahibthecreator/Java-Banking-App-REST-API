@@ -1,8 +1,12 @@
 package com.bank.app.restapi.service;
 
+import com.bank.app.restapi.dto.UserDTO;
+import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.UserRepository;
+
+import lombok.AllArgsConstructor;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +20,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
 
+    private final UserMapper userMapper;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     public List<User> getAll() {
         return new ArrayList<User>(this.userRepository.findAll());
@@ -66,18 +70,11 @@ public class UserService {
 
     public boolean userIdExists(UUID id) {
         Optional<User> user = userRepository.findById(id);
-        System.out.println(id);
-        System.out.println(user.isPresent());
-
         return user.isPresent();
     }
 
-    public boolean verifyCredentials(String email, String passwd) {
-        // TODO: implement credential verification
-        return true;
-    }
-
-    public Optional<User> findById(UUID id) {
-        return userRepository.findById(id);
+    public UserDTO getUserDTOById(UUID id) {
+        User user = userRepository.findById(id).get();
+        return userMapper.toDTO(user);
     }
 }
