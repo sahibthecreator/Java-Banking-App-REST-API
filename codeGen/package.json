@@ -1,0 +1,23 @@
+{
+  "name": "codegen",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vue/compat": "^3.3.2",
+    "axios": "^1.4.0",
+    "bootstrap-vue": "^2.23.1",
+    "pinia": "^2.0.36",
+    "sass": "^1.62.1",
+    "vue": "^3.3.2",
+    "vue-router": "^4.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.1",
+    "vite": "^4.3.4"
+  }
+}
