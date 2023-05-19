@@ -1,5 +1,6 @@
 package com.bank.app.restapi;
 
+import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 
 import org.modelmapper.ModelMapper;
@@ -22,6 +23,11 @@ public class RestapiApplication {
 	@Bean
 	public UserMapper userDTOMapper() {
 		return new UserMapper(modelMapper());
+	}
+
+	@Bean
+	public AccountMapper AccountDTOMapper() {
+		return new AccountMapper(modelMapper());
 	}
 
 

@@ -27,7 +27,7 @@ public class UserController {
 
     private UserMapper userMapper;
 
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity getAll() {
         try {
             List<UserDTO> users = userService.getAll().stream().map(userMapper::toDTO).toList();
@@ -39,7 +39,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("")
+    @PostMapping("/")
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
         try {
             if (!userMapper.isValidDTO(userDTO)) {
@@ -104,6 +104,7 @@ public class UserController {
         }
     }
 
+    //User can't delete himself - TODO
     @DeleteMapping("/{userId}")
     public ResponseEntity<Boolean> deleteUser(@PathVariable String userId, HttpServletRequest request) {
         try {

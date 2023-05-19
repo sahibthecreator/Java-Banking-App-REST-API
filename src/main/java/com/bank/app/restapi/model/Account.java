@@ -1,5 +1,6 @@
 package com.bank.app.restapi.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -38,7 +40,7 @@ public class Account {
     private User user;
 
     @Column(name = "dateOfOpening")
-    private String dateOfOpening;
+    private LocalDate dateOfOpening;
 
     @Column(name = "absoluteLimit")
     private float absoluteLimit;
@@ -46,7 +48,4 @@ public class Account {
     @Column(name = "isActive")
     private boolean isActive;
 
-    public void setActive(boolean active) {
-        isActive = active;
-    }
 }
