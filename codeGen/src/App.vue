@@ -40,6 +40,7 @@ export default {
 <style scoped>
 
 
+
 #header {
   line-height: 1.5;
   grid-column: 1 / 3;

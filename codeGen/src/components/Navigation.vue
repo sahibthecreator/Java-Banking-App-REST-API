@@ -38,7 +38,7 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0 100px;
+  padding: 0 200px;
 }
 
 #list {

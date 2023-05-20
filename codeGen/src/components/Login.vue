@@ -2,7 +2,7 @@
   <div class="wrapper">
     <div class="section" id="left"></div>
     <div class="section right" id="right">
-      <div class="content mx-auto" :class="{ 'mt-0': !isLogin }">
+      <div class="content mx-auto">
         <div class="login">
           <div class="logoWrapper">
             <img src="@/assets/Logo.svg" alt="logo" id="logo" />
