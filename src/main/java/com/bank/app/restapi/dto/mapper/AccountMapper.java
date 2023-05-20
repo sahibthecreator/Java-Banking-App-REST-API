@@ -25,18 +25,18 @@ public class AccountMapper {
         // set custom vars here
 
         // if (accountDTO.getId() != null) {
-        //     // get user by id
-        //     // set other fields only retrievable from service here
+        // // get user by id
+        // // set other fields only retrievable from service here
         // }
         return account;
     }
 
-     public boolean isValidDTO(AccountDTO accountDTO) {
-         boolean ibanIsValid = accountDTO.getIban() != null && !accountDTO.getIban().isEmpty();
-         boolean balanceIsValid = accountDTO.getBalance() >= 0.0;
-         boolean dateOfOpeningIsValid = accountDTO.getDateOfOpening() != null && !accountDTO.getDateOfOpening().isBefore(LocalDate.now());
-         boolean absoluteLimitIsValid = accountDTO.getAbsoluteLimit() >= 0.0;
+    public boolean isValidDTO(AccountDTO accountDTO) {
+        boolean balanceIsValid = accountDTO.getBalance() >= 0.0;
+        boolean typeOfAccountIsValid = accountDTO.getTypeOfAccount() != null;
+        boolean userIdIsValid = accountDTO.getUserId() != null;
+        boolean absoluteLimitIsValid = accountDTO.getAbsoluteLimit() >= 0.0;
 
-         return ibanIsValid && balanceIsValid && dateOfOpeningIsValid && absoluteLimitIsValid;
-     }
+        return balanceIsValid && typeOfAccountIsValid && userIdIsValid && absoluteLimitIsValid;
+    }
 }

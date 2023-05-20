@@ -1,30 +1,41 @@
 package com.bank.app.restapi.service;
 
+import com.bank.app.restapi.dto.AccountDTO;
+import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.repository.AccountRepository;
+
+import lombok.AllArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
+
+    private final AccountMapper accountMapper;
 
     public List<Account> getAllAccounts() {
         return new ArrayList<Account>(accountRepository.findAll());
     }
 
-    public Account createAccount(Account account) {
-        account.setIban(generateDutchIban());
-        account.setBalance(0);
-        account.setDateOfOpening(LocalDate.now());
-        account.setActive(true);
-        return accountRepository.saveAndFlush(account);
+    public AccountDTO createAccount(AccountDTO accountDTO) throws ParseException {
+        accountDTO.setIban(generateDutchIban());
+        accountDTO.setDateOfOpening(LocalDate.now());
+        accountDTO.setActive(true);
+        Account account = accountMapper.toEntity(accountDTO);
+        account = accountRepository.saveAndFlush(account);
+        
+        return accountMapper.toDTO(account);
     }
 
     public void deactivateAccount(Account account) {
@@ -39,7 +50,8 @@ public class AccountService {
     public Account getAccountByIban(String iban) {
         return accountRepository.findByIban(iban);
     }
-    public float getBalanceByIban(String iban){
+
+    public float getBalanceByIban(String iban) {
         return accountRepository.findBalanceByIban(iban);
     }
 
@@ -58,7 +70,7 @@ public class AccountService {
         // calculate the actual check digit using the MOD-97 algorithm
         String checkDigit = calculateCheckDigit(incompleteIban);
 
-        //concatenate the strings to form the complete IBAN
+        // concatenate the strings to form the complete IBAN
 
         return countryCode + checkDigit + accountNumber;
     }

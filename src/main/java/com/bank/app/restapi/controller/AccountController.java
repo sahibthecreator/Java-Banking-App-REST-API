@@ -25,8 +25,6 @@ public class AccountController {
 
     private final AccountMapper accountMapper;
 
-   
-
     @GetMapping("/")
     public ResponseEntity<?> getAll() {
         try {
@@ -49,22 +47,14 @@ public class AccountController {
             if (!accountMapper.isValidDTO(accountDTO)) {
                 return ResponseEntity.status(400).body("Invalid request body"); // Return 400 for bad request
             }
-            // map request body to entity
-            Account account = accountMapper.toEntity(accountDTO);
 
             // check if user exists
-            if (accountDTO.getUser() != null) {
-                UUID userId = accountDTO.getUser().getId();
-                User user = userService.getUserById(userId);
-                if (user == null) {
-                    return ResponseEntity.status(404).body("User with following id not found");
-                }
-                account.setUser(user);
+            if (!userService.userIdExists(accountDTO.getUserId())) {
+                return ResponseEntity.status(404).body("User with following id not found");
             }
 
-            Account newAccount = accountService.createAccount(account);
-            AccountDTO newAccountDTO = accountMapper.toDTO(newAccount);
-            return ResponseEntity.status(201).body(newAccountDTO);
+            AccountDTO createdAccountDTO = accountService.createAccount(accountDTO);
+            return ResponseEntity.status(201).body(createdAccountDTO);
 
         } catch (Exception e) {
             if (e instanceof IllegalArgumentException) {
@@ -82,7 +72,7 @@ public class AccountController {
         try {
             Account account = accountService.getAccountByIban(iban);
 
-            if(account == null) {
+            if (account == null) {
                 return ResponseEntity.status(404).body("Account with following Iban not found");
             }
 
@@ -99,7 +89,7 @@ public class AccountController {
         try {
             double balance = accountService.getBalanceByIban(iban);
 
-            if(balance == -1) {
+            if (balance == -1) {
                 return ResponseEntity.status(404).body("Account with following Iban not found");
             }
 
@@ -129,14 +119,14 @@ public class AccountController {
     }
 
     // TODO: 20-May-23 review this method
-    //  do I need to check if user exists and return 404 if not?
-    //  or I should return 204 if no accounts found for this username?
+    // do I need to check if user exists and return 404 if not?
+    // or I should return 204 if no accounts found for this username?
     @GetMapping("/{userName}/iban")
     public ResponseEntity<?> getIbanByUsername(@PathVariable String userName) {
         try {
             List<String> ibans = accountService.getIbanByUsername(userName);
 
-            if(ibans.isEmpty()) {
+            if (ibans.isEmpty()) {
                 return ResponseEntity.status(204).body("No IBANs found for this username");
             }
 
