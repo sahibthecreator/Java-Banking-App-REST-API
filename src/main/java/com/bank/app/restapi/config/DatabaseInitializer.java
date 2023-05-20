@@ -45,7 +45,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         user = userService.register(user);
 
         Account account1 = new Account();
-        account1.setIban("12345678976543234567");
+        account1.setIban("NL01ABNA1032456789");
         account1.setBalance(20);
         account1.setTypeOfAccount(AccountType.CURRENT);
         account1.setUser(user);
@@ -56,7 +56,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         accountService.createAccount(account1);
 
         Account account2 = new Account();
-        account2.setIban("21000000000000000000");
+        account2.setIban("NL01ABNA0123456789");
         account2.setBalance(20);
         account2.setTypeOfAccount(AccountType.CURRENT);
         account2.setUser(user);

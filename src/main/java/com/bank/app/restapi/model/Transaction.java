@@ -24,12 +24,12 @@ public class Transaction {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "fromIban", referencedColumnName = "iban", nullable = false)
+    @JoinColumn(name = "from_iban", referencedColumnName = "iban", nullable = false)
     @JsonIgnoreProperties("sentTransactions")
     private Account fromAccount;
 
     @ManyToOne
-    @JoinColumn(name = "toIban", referencedColumnName = "iban", nullable = false)
+    @JoinColumn(name = "to_iban", referencedColumnName = "iban", nullable = false)
     @JsonIgnoreProperties("receivedTransactions")
     private Account toAccount;
 
@@ -44,7 +44,7 @@ public class Transaction {
     private LocalDateTime dateOfExecution;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId") // userId for consistency 
+    @JoinColumn(name = "user_id")
     @JsonIgnoreProperties("transactions")
     private User performingUser;
 
