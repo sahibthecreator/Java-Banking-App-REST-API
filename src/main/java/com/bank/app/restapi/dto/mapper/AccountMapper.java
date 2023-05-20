@@ -1,9 +1,7 @@
 package com.bank.app.restapi.dto.mapper;
 
 import com.bank.app.restapi.dto.AccountDTO;
-import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.model.Account;
-import com.bank.app.restapi.model.User;
 import org.modelmapper.ModelMapper;
 
 import java.text.ParseException;
@@ -33,20 +31,12 @@ public class AccountMapper {
         return account;
     }
 
-    // public boolean isValidDTO(UserDTO userDTO) {
-    //     boolean firstNameIsValid = userDTO.getFirstName() != null && !userDTO.getFirstName().isEmpty();
-    //     boolean lastNameIsValid = userDTO.getLastName() != null && !userDTO.getLastName().isEmpty();
-    //     boolean emailIsValid = userDTO.getEmail() != null && !userDTO.getEmail().isEmpty();
-    //     boolean passwordIsValid = userDTO.getPassword() != null && !userDTO.getPassword().isEmpty();
-    //     boolean bsnIsValid = userDTO.getBsn() != null && !userDTO.getBsn().isEmpty();
-    //     boolean dateOfBirthIsValid = userDTO.getDateOfBirth() != null
-    //             && userDTO.getDateOfBirth().isBefore(LocalDate.now());
+     public boolean isValidDTO(AccountDTO accountDTO) {
+         boolean ibanIsValid = accountDTO.getIban() != null && !accountDTO.getIban().isEmpty();
+         boolean balanceIsValid = accountDTO.getBalance() >= 0.0;
+         boolean dateOfOpeningIsValid = accountDTO.getDateOfOpening() != null && !accountDTO.getDateOfOpening().isBefore(LocalDate.now());
+         boolean absoluteLimitIsValid = accountDTO.getAbsoluteLimit() >= 0.0;
 
-    //     // !!!!!!ONLY FOR TESTING PHASE ONLY!!!!!
-    //     // Ye, This looks horrible XD - Yvan
-    //     boolean roleIsValid = userDTO.getRole() != null;
-
-    //     return firstNameIsValid && lastNameIsValid && emailIsValid && passwordIsValid && bsnIsValid
-    //             && dateOfBirthIsValid && roleIsValid;
-    // }
+         return ibanIsValid && balanceIsValid && dateOfOpeningIsValid && absoluteLimitIsValid;
+     }
 }

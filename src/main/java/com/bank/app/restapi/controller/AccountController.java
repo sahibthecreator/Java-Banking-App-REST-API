@@ -3,14 +3,17 @@ package com.bank.app.restapi.controller;
 import com.bank.app.restapi.dto.AccountDTO;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.model.Account;
+import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.AccountService;
 
+import com.bank.app.restapi.service.UserService;
 import lombok.AllArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
@@ -18,6 +21,7 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    private final UserService userService;
 
     private final AccountMapper accountMapper;
 
@@ -27,7 +31,12 @@ public class AccountController {
     public ResponseEntity<?> getAll() {
         try {
             List<AccountDTO> accounts = accountService.getAllAccounts().stream().map(accountMapper::toDTO).toList();
+            if (accounts.isEmpty()) {
+                return ResponseEntity.status(404).body("No accounts found");
+            }
+
             return ResponseEntity.status(200).body(accounts);
+
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
@@ -35,14 +44,28 @@ public class AccountController {
 
     @PostMapping("/")
     public ResponseEntity<?> createAccount(@RequestBody AccountDTO accountDTO) {
-        // TODO: fix userId field, remove extra "active" field
-        // TODO: Check if userId from request body is actually exists
-        // TODO: Initialize Iban automatically
         try {
+            // check if request body is valid
+            if (!accountMapper.isValidDTO(accountDTO)) {
+                return ResponseEntity.status(400).body("Invalid request body"); // Return 400 for bad request
+            }
+            // map request body to entity
             Account account = accountMapper.toEntity(accountDTO);
+
+            // check if user exists
+            if (accountDTO.getUser() != null) {
+                UUID userId = accountDTO.getUser().getId();
+                User user = userService.getUserById(userId);
+                if (user == null) {
+                    return ResponseEntity.status(404).body("User with following id not found");
+                }
+                account.setUser(user);
+            }
+
             Account newAccount = accountService.createAccount(account);
             AccountDTO newAccountDTO = accountMapper.toDTO(newAccount);
             return ResponseEntity.status(201).body(newAccountDTO);
+
         } catch (Exception e) {
             if (e instanceof IllegalArgumentException) {
                 return ResponseEntity.status(400).body("Invalid request body" + e.getMessage()); // Return 400 for bad
@@ -57,10 +80,15 @@ public class AccountController {
     @GetMapping("/{iban}")
     public ResponseEntity<?> accountInfo(@PathVariable String iban) {
         try {
-            // Check if account with iban exists, if not return 404
             Account account = accountService.getAccountByIban(iban);
+
+            if(account == null) {
+                return ResponseEntity.status(404).body("Account with following Iban not found");
+            }
+
             AccountDTO accountDTO = accountMapper.toDTO(account);
             return ResponseEntity.status(200).body(accountDTO);
+
         } catch (Exception e) {
             return ResponseEntity.status(500).body(e.getMessage());
         }
@@ -69,9 +97,14 @@ public class AccountController {
     @GetMapping("/{iban}/balance")
     public ResponseEntity<?> accountBalance(@PathVariable String iban) {
         try {
-            // Check if account with iban exists, if not return 404
             double balance = accountService.getBalanceByIban(iban);
+
+            if(balance == -1) {
+                return ResponseEntity.status(404).body("Account with following Iban not found");
+            }
+
             return ResponseEntity.status(200).body(balance);
+
         } catch (Exception e) {
             return ResponseEntity.status(500).body(e.getMessage());
         }
@@ -81,19 +114,37 @@ public class AccountController {
     public ResponseEntity<?> deactivateAccount(@PathVariable String iban) {
         try {
             Account account = accountService.getAccountByIban(iban);
+
             if (account == null) {
                 return ResponseEntity.status(404).body("Account with following Iban not found");
             }
 
             accountService.deactivateAccount(account);
             return ResponseEntity.status(200).body("Account deactivated");
+
         } catch (Exception e) {
             return ResponseEntity
                     .status(500).body(e.getMessage());
         }
     }
 
-    // GET account IBAN by full name 
-    // /accounts/iban/{fullname}
+    // TODO: 20-May-23 review this method
+    //  do I need to check if user exists and return 404 if not?
+    //  or I should return 204 if no accounts found for this username?
+    @GetMapping("/{userName}/iban")
+    public ResponseEntity<?> getIbanByUsername(@PathVariable String userName) {
+        try {
+            List<String> ibans = accountService.getIbanByUsername(userName);
+
+            if(ibans.isEmpty()) {
+                return ResponseEntity.status(204).body("No IBANs found for this username");
+            }
+
+            return ResponseEntity.status(200).body(ibans);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
 
 }
