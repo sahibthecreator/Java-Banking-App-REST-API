@@ -1,5 +1,6 @@
 package com.bank.app.restapi.config;
 
+import com.bank.app.restapi.dto.AccountDTO;
 import com.bank.app.restapi.dto.TransactionDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.model.*;
@@ -13,6 +14,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -31,7 +33,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws ParseException {
         User user = new User();
         user.setFirstName("Root");
         user.setLastName("Admin");
@@ -44,22 +46,22 @@ public class DatabaseInitializer implements CommandLineRunner {
         
         user = userService.register(user);
 
-        Account account1 = new Account();
+        AccountDTO account1 = new AccountDTO();
         account1.setIban("NL01ABNA1032456789");
         account1.setBalance(20);
         account1.setTypeOfAccount(AccountType.CURRENT);
-        account1.setUser(user);
+        account1.setUserId(user.getId());
         account1.setDateOfOpening(LocalDate.now());
         account1.setAbsoluteLimit(0);
         account1.setActive(true);
 
         accountService.createAccount(account1);
 
-        Account account2 = new Account();
+        AccountDTO account2 = new AccountDTO();
         account2.setIban("NL01ABNA0123456789");
         account2.setBalance(20);
         account2.setTypeOfAccount(AccountType.CURRENT);
-        account2.setUser(user);
+        account2.setUserId(user.getId());
         account2.setDateOfOpening(LocalDate.now());
         account2.setAbsoluteLimit(0);
         account2.setActive(true);
