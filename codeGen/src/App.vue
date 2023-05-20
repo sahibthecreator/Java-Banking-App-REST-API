@@ -3,9 +3,6 @@ import Navigation from './components/Navigation.vue'
 </script>
 
 <template>
-  <div id="header">
-    <navigation />
-  </div>
   <div id="content">
     <router-view />
   </div>
@@ -16,8 +13,6 @@ import Navigation from './components/Navigation.vue'
 
 <script>
 import { useUserStore } from '../src/stores/user';
-import router from './router'
-
 
 export default {
   setup() {

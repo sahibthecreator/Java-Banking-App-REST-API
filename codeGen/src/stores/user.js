@@ -14,14 +14,19 @@ export const useUserStore = defineStore('counter', {
   },
   actions: {
     autoLogin() {
-      if (localStorage["jwt"]) {
+
+      try {
+        if (localStorage["jwt"]) {
         this.jwt = localStorage["jwt"];
         axios.defaults.headers.common['Authorisation'] = "Bearer " + res.data.jwt;
+        }
+      } catch (error) {
+        
       }
     },
     login(username, password) {
       return new Promise((resolve, reject) => {
-        axios.post('/auth/login', {
+        axios.post('auth/login', {
           username: username,
           password: password
         }).then(res => {
@@ -31,8 +36,6 @@ export const useUserStore = defineStore('counter', {
           this.expireAt = res.data.expireAt;
 
           axios.defaults.headers.common['Authorisation'] = "Bearer " + res.data.jwt;
-          console.log('logged in as ' + this.username);
-
           resolve();
         }).catch(error => {
           console.log(error);

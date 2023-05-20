@@ -1,6 +1,13 @@
-<script setup></script>
+<script setup>
+import Navigation from '@/components/Navigation.vue'
+</script>
 
 <template>
+  <div id="header">
+    <navigation />
+  </div>
+
+
   <div class="homePage">
     <div class="panel" id="leftHome">
       <div class="homeWrapper">

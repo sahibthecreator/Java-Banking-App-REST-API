@@ -1,4 +1,12 @@
+<script setup>
+import Navigation from '@/components/Navigation.vue'
+</script>
+
 <template>
+<div id="header">
+    <navigation />
+  </div>
+
   <div class="wrapper">
     <div class="section" id="left"></div>
     <div class="section right" id="right">
@@ -78,7 +86,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 40px;
-  margin-top: 15%;
+  margin-top: 20%;
 }
 
 #left {

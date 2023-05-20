@@ -20,14 +20,15 @@ import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("users")
+@CrossOrigin
+@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
 
     private UserMapper userMapper;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<?> getAll() {
         try {
             List<UserDTO> users = userService.getAll().stream().map(userMapper::toDTO).toList();
@@ -39,7 +40,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
         try {
             if (!userMapper.isValidDTO(userDTO)) {
