@@ -22,7 +22,8 @@ public class AccountDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    //@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    //Removed read-only to test transactions
     private String iban;
 
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)

@@ -1,6 +1,6 @@
 package com.bank.app.restapi.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 @Data
 @ToString
@@ -47,5 +46,13 @@ public class Account {
 
     @Column(name = "isActive")
     private boolean isActive;
+
+    @OneToMany(mappedBy = "fromAccount")
+    @JsonIgnore
+    private List<Transaction> sentTransactions;
+
+    @OneToMany(mappedBy = "toAccount")
+    @JsonIgnore
+    private List<Transaction> receivedTransactions;
 
 }

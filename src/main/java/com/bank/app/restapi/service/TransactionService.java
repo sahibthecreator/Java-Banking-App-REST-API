@@ -1,85 +1,113 @@
 package com.bank.app.restapi.service;
 
+import com.bank.app.restapi.dto.TransactionDTO;
 import com.bank.app.restapi.model.Transaction;
 import com.bank.app.restapi.model.TransactionType;
+import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.repository.TransactionRepository;
+import com.bank.app.restapi.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
 
-    private final TransactionRepository transactionRepository;
+    private TransactionRepository transactionRepository;
+    private AccountRepository accountRepository;
+    private UserRepository userRepository;
 
-    public TransactionService(TransactionRepository transactionRepository) {
+    public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository, UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
+        this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
     }
 
-    public List<Transaction> getTransactions(UUID userId, String iban, LocalDate startDate, LocalDate endDate, Float minAmount, Float maxAmount, Float exactAmount, TransactionType typeOfTransaction) {
+    public List<Transaction> getTransactions(String iban, Float minAmount, Float maxAmount, Float exactAmount, TransactionType typeOfTransaction, LocalDate startDate, LocalDate endDate) {
+        Specification<Transaction> specification = Specification.where(null);
 
-        List<Transaction> transactions = transactionRepository.findAll();
-
-        // Filter based on the provided parameters
-        if (userId != null) {
-            transactions = transactions.stream()
-                    .filter(transaction -> transaction.getPerformingUser().getId().equals(userId))
-                    .collect(Collectors.toList());
-        }
-
-        if (iban != null) {
-            transactions = transactions.stream()
-                    .filter(transaction -> transaction.getFromIban().getIban().equals(iban) || transaction.getToIban().getIban().equals(iban))
-                    .collect(Collectors.toList());
-        }
-
-        if (startDate != null) {
-            transactions = transactions.stream()
-                    .filter(transaction -> transaction.getDateOfExecution().toLocalDate().isEqual(startDate) || transaction.getDateOfExecution().toLocalDate().isAfter(startDate))
-                    .collect(Collectors.toList());
-        }
-
-        if (endDate != null) {
-            transactions = transactions.stream()
-                    .filter(transaction -> transaction.getDateOfExecution().toLocalDate().isEqual(endDate) || transaction.getDateOfExecution().toLocalDate().isBefore(endDate))
-                    .collect(Collectors.toList());
-        }
-
-        if (minAmount != null) {
-            transactions = transactions.stream()
-                    .filter(transaction -> transaction.getAmount() >= minAmount)
-                    .collect(Collectors.toList());
-        }
-
-        if (maxAmount != null) {
-            transactions = transactions.stream()
-                    .filter(transaction -> transaction.getAmount() <= maxAmount)
-                    .collect(Collectors.toList());
+        if (iban != null && !iban.isEmpty()) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.or(
+                            criteriaBuilder.equal(root.get("fromAccount").get("iban"), iban),
+                            criteriaBuilder.equal(root.get("toAccount").get("iban"), iban)
+                    )
+            );
         }
 
         if (exactAmount != null) {
-            transactions = transactions.stream()
-                    .filter(transaction -> transaction.getAmount() == exactAmount)
-                    .collect(Collectors.toList());
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("amount"), exactAmount)
+            );
+        } else if (minAmount != null && maxAmount != null) {
+            if (minAmount <= maxAmount) {
+                specification = specification.and((root, query, criteriaBuilder) ->
+                        criteriaBuilder.between(root.get("amount"), minAmount, maxAmount)
+                );
+            } else {
+                throw new IllegalArgumentException("minAmount should be less than or equal to maxAmount.");
+            }
+        } else if (minAmount != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("amount"), minAmount)
+            );
+        } else if (maxAmount != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(root.get("amount"), maxAmount)
+            );
         }
 
         if (typeOfTransaction != null) {
-            transactions = transactions.stream()
-                    .filter(transaction -> transaction.getTypeOfTransaction().equals(typeOfTransaction))
-                    .collect(Collectors.toList());
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("typeOfTransaction"), typeOfTransaction)
+            );
         }
 
-        return transactions;
+        if (startDate != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(
+                            criteriaBuilder.function("date", LocalDate.class, root.get("dateOfExecution")),
+                            startDate
+                    )
+            );
+        }
+
+        if (endDate != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(
+                            criteriaBuilder.function("date", LocalDate.class, root.get("dateOfExecution")),
+                            endDate
+                    )
+            );
+        }
+
+        return transactionRepository.findAll();
     }
 
     public Transaction getTransactionById(UUID transactionId) {
-        return transactionRepository.findById(transactionId)
-                .orElse(null);
+        return transactionRepository.findById(transactionId).orElseThrow(
+                () -> new EntityNotFoundException("Transaction not found")
+        );
+    }
+
+    public Transaction addTransaction(TransactionDTO dto, TransactionType type) { return transactionRepository.save(this.mapDtoToTransaction(dto, type)); }
+
+    private Transaction mapDtoToTransaction(TransactionDTO dto, TransactionType type) {
+        Transaction t = new Transaction();
+        t.setFromAccount(accountRepository.findByIban(dto.getFromAccount()));
+        t.setToAccount(accountRepository.findByIban(dto.getToAccount()));
+        t.setAmount(dto.getAmount());
+        t.setTypeOfTransaction(type);
+        t.setDateOfExecution(LocalDateTime.now());
+        t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow());
+        t.setDescription(dto.getDescription());
+
+        return t;
     }
 
 }
-
-
