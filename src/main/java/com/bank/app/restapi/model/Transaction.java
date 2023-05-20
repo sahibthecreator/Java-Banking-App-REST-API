@@ -17,27 +17,30 @@ import java.util.UUID;
 @Entity
 @Table(name="transactions")
 public class Transaction {
+
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "fromIban", referencedColumnName = "iban")
-    private Account fromIban;
+    @JoinColumn(name = "fromIban", referencedColumnName = "iban", nullable = false)
+    @JsonIgnoreProperties("sentTransactions")
+    private Account fromAccount;
 
     @ManyToOne
-    @JoinColumn(name = "toIban", referencedColumnName = "iban")
-    private Account toIban;
+    @JoinColumn(name = "toIban", referencedColumnName = "iban", nullable = false)
+    @JsonIgnoreProperties("receivedTransactions")
+    private Account toAccount;
 
-    @Column(name = "amount")
+    @Column(name = "amount", nullable = false)
     private float amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "typeOfTransaction")
+    @Column(name = "typeOfTransaction", nullable = false)
     private TransactionType typeOfTransaction;
 
-    @Column(name = "dateOfExecution")
+    @Column(name = "dateOfExecution", nullable = false)
     private LocalDateTime dateOfExecution;
 
     @ManyToOne(fetch = FetchType.LAZY)

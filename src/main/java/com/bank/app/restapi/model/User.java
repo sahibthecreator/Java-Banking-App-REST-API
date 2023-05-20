@@ -1,5 +1,6 @@
 package com.bank.app.restapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -50,5 +51,6 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonIgnoreProperties("user")
+    @JsonIgnore
     private Set<Account> accounts = new HashSet<>();
 }
