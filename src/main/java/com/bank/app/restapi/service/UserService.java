@@ -77,4 +77,13 @@ public class UserService {
         User user = userRepository.findById(id).get();
         return userMapper.toDTO(user);
     }
+
+    public User getUserById(UUID id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return user.get();
+        } else {
+            throw new UsernameNotFoundException("User not found");
+        }
+    }
 }

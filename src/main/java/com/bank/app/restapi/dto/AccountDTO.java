@@ -27,6 +27,7 @@ public class AccountDTO {
     //Removed read-only to test transactions
     private String iban;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private float balance;
 
     private AccountType typeOfAccount;
