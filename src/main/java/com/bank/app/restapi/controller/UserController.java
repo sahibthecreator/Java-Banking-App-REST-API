@@ -159,4 +159,10 @@ public class UserController {
         }
     }
 
+    // @GetMapping("*")
+    // @PostMapping("*")
+    // public ResponseEntity<?> handle404() {
+    //     return ResponseEntity.status(404).build(); // if something goes wrong return 500 - internal server error
+    // }
+
 }

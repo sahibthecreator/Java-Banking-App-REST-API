@@ -3,22 +3,18 @@ import Navigation from '@/components/Navigation.vue'
 </script>
 
 <template>
-<div id="header">
-    <navigation />
-  </div>
-
   <div class="wrapper">
     <div class="section" id="left"></div>
     <div class="section right" id="right">
-      <div class="content mx-auto">
+      <div class="content m-auto">
         <div class="login">
           <div class="logoWrapper">
             <img src="@/assets/Logo.svg" alt="logo" id="logo" />
             <span id="logoTitle">WAVR</span>
           </div>
           <div class="selectionType py-4">
-            <button :class="{ 'selected': isLogin }" @click="isLogin = true">Login</button>
-            <button :class="{ 'selected': !isLogin }" @click="isLogin = false">Register</button>
+            <button :class="{ 'selected': isLogin }" @click="isLogin = true" class="unselected">Login</button>
+            <button :class="{ 'selected': !isLogin }" @click="isLogin = false" class="unselected">Register</button>
           </div>
           <div class="loginWrapper" v-if="isLogin">
             <input type="text" v-model="username" placeholder="Email" class="text-dark" />
@@ -32,7 +28,7 @@ import Navigation from '@/components/Navigation.vue'
             <input type="password" v-model="password" placeholder="Password" class="text-dark" />
             <input type="text" v-model="bsn" placeholder="BSN" class="text-dark" />
             <input type="text" v-model="bsn" placeholder="Date of Birth" class="text-dark" />
-            
+
             <button type="button" @click="($event) => login()">Register</button>
           </div>
         </div>
@@ -86,7 +82,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 40px;
-  margin-top: 20%;
 }
 
 #left {
@@ -167,4 +162,5 @@ export default {
 .selectionType>.selected {
   border-bottom: 2px var(--gray-dark) solid;
 }
+
 </style>

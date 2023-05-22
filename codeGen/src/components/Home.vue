@@ -15,10 +15,9 @@ import Navigation from '@/components/Navigation.vue'
       </div>
     </div>
     <div class="panel" id="rightHome">
-      <div class="homeBG"></div>
-      <div class="activity"></div>
-      <div class="account"></div>
-
+      <img src="@/assets/HomeBG.svg" class="homeBG" />
+      <img src="@/assets/HomeActivityPanel.svg" class="activity" />
+      <img src="@/assets/AccountPanel.svg" class="account" />
     </div>
   </div>
 </template>
@@ -63,27 +62,28 @@ export default {
 
 .homeBG {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  background: url('../assets/HomeBG.svg');
-  background-repeat: no-repeat;
-  transform: translateX(+170px);
+  width: fit-content;
+  height: fit-content;
+  transform: translateX(-10%);
+  /* background-repeat: no-repeat; */
+  /* transform: translateX(-170px); */
+  z-index: 0;
 }
 
 .activity {
-  background: url('../assets/HomeActivityPanel.svg');
-  background-repeat: no-repeat;
-  width: auto;
-  height: 300px;
-  transform: translate(600px, 400px);
+  position: absolute;
+  width: 60%;
   border-radius: 7px;
+  bottom: 0px;
+  right: -20px;
+  z-index: 100000;
 }
 
 .account {
-  background: url('../assets/AccountPanel.svg');
-  background-repeat: no-repeat;
-  width: auto;
-  transform: translate(400px, -100px);
-  height: 80px;
+  position: absolute;
+  width: 50%;
+  top: 10%;
+  right: 0px;
+  z-index: 100000;
 }
 </style>

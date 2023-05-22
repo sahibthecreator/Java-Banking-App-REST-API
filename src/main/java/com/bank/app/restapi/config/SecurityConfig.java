@@ -29,7 +29,7 @@ public class SecurityConfig {
 
     private static final String[] UN_SECURED_URLs = {
             "/auth/**",
-            "/users/{userId}"
+            "/users/{userId}",
     };
 
     @Autowired
