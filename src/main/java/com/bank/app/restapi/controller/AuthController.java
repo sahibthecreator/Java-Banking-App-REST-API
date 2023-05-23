@@ -52,9 +52,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserDTO userDTO) {
         try {
-            if (!userMapper.isValidDTO(userDTO)) {
-                return ResponseEntity.status(400).body("Invalid data"); // Return 400 for bad request
-            }
+            userMapper.isValidDTO(userDTO);
             User user = userMapper.toEntity(userDTO);
             User createdUser = userService.register(user);
             UserDTO createdUserDTO = userMapper.toDTO(createdUser);

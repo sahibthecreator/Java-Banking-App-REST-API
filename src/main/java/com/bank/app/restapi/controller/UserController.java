@@ -5,8 +5,13 @@ import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.JwtService;
 import com.bank.app.restapi.service.UserService;
+
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.core.Authentication;
@@ -15,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -30,46 +34,22 @@ public class UserController {
 
     @GetMapping("")
     public ResponseEntity<?> getAll() {
-        try {
-            List<UserDTO> users = userService.getAll().stream().map(userMapper::toDTO).toList();
+        List<UserDTO> users = userService.getAll().stream().map(userMapper::toDTO).toList();
 
-            return ResponseEntity.status(200).body(users);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(500).build(); // if something goes wrong return 500 - internal server error
-        }
+        return ResponseEntity.status(200).body(users);
     }
 
     @PostMapping("")
     public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
-        try {
-            if (!userMapper.isValidDTO(userDTO)) {
-                return ResponseEntity.status(400).body("Invalid request body"); // Return 400 for bad request
-            }
-            User user = userMapper.toEntity(userDTO);
-            User createdUser = userService.register(user);
-            UserDTO createdUserDTO = userMapper.toDTO(createdUser);
-            return ResponseEntity.status(201).body(createdUserDTO);
-        } catch (Exception e) {
-            if (e instanceof IllegalArgumentException) {
-                return ResponseEntity.status(400).body("Invalid request body" + e.getMessage()); // Return 400 for bad
-                                                                                                 // request
-            } else {
-                return ResponseEntity.status(500).body("An error occurred: " + e.getMessage()); // Return 500 Internal
-                                                                                                // Server Error
-            }
-        }
+        User user = userMapper.toEntity(userDTO);
+        User createdUser = userService.register(user);
+        UserDTO createdUserDTO = userMapper.toDTO(createdUser);
+        return ResponseEntity.status(201).body(createdUserDTO);
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserDTO> getById(@PathVariable String userId, HttpServletRequest request) {
-        if (!isValidUUID(userId)) {
-            return ResponseEntity.status(400).build();
-        }
         UUID id = UUID.fromString(userId);
-        if (!userService.userIdExists(id)) {
-            return ResponseEntity.status(404).build();
-        }
         if (isAuthorized(request, id)) {
             return ResponseEntity.status(200).body(userService.getUserDTOById(id));
         } else {
@@ -80,51 +60,27 @@ public class UserController {
     @PutMapping("/{userId}")
     public ResponseEntity<?> updateUser(@PathVariable String userId, @RequestBody UserDTO userDTO,
             HttpServletRequest request) {
-        try {
-            if (!userMapper.isValidDTO(userDTO)) {
-                return ResponseEntity.status(400).body("Invalid request body"); // Return 400 for bad request
-            }
-            if (!isValidUUID(userId)) {
-                return ResponseEntity.status(400).body("UserId is not valid"); // Return 400 for bad request
-            }
-            UUID id = UUID.fromString(userId);
-            if (!userService.userIdExists(id)) {
-                return ResponseEntity.status(404).build();
-            }
-            if (isAuthorized(request, id)) {
-                User user = userMapper.toEntity(userDTO);
-                UserDTO createdUserDTO = userMapper.toDTO(userService.update(id, user));
 
-                return ResponseEntity.status(200).body(createdUserDTO);
-            } else {
-                return ResponseEntity.status(403).body(null);
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(500).build(); // if something goes wrong return 500 - internal server error
+        UUID id = UUID.fromString(userId);
+        if (isAuthorized(request, id)) {
+            User user = userMapper.toEntity(userDTO);
+            UserDTO createdUserDTO = userMapper.toDTO(userService.update(id, user));
+
+            return ResponseEntity.status(200).body(createdUserDTO);
+        } else {
+            return ResponseEntity.status(403).body(null);
         }
     }
 
     // User can't delete himself - TODO
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Boolean> deleteUser(@PathVariable String userId, HttpServletRequest request) {
-        try {
-            if (!isValidUUID(userId)) {
-                return ResponseEntity.status(400).build();
-            }
-            UUID id = UUID.fromString(userId);
-            if (!userService.userIdExists(id)) {
-                return ResponseEntity.status(404).build();
-            }
-            if (isAuthorized(request, id)) {
-                userService.delete(id);
-                return ResponseEntity.status(200).build();
-            } else {
-                return ResponseEntity.status(403).build();
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(500).build(); // if something goes wrong return 500 - internal server error
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable String userId, HttpServletRequest request) {
+        UUID id = UUID.fromString(userId);
+        if (isAuthorized(request, id)) {
+            userService.delete(id);
+            return ResponseEntity.status(200).build();
+        } else {
+            return ResponseEntity.status(403).build();
         }
     }
 
@@ -150,19 +106,11 @@ public class UserController {
         return isAuthorized;
     }
 
-    private boolean isValidUUID(String uuid) {
-        try {
-            UUID.fromString(uuid);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
     // @GetMapping("*")
     // @PostMapping("*")
     // public ResponseEntity<?> handle404() {
-    //     return ResponseEntity.status(404).build(); // if something goes wrong return 500 - internal server error
+    // return ResponseEntity.status(404).build(); // if something goes wrong return
+    // 500 - internal server error
     // }
 
 }

@@ -6,6 +6,7 @@ import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.BeanUtils;
@@ -30,7 +31,6 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     public List<User> getAll() {
         return new ArrayList<User>(this.userRepository.findAll());
     }
@@ -41,25 +41,24 @@ public class UserService {
         return this.userRepository.saveAndFlush(user);
     }
 
-    public User update(UUID userId, User user) {
-        try {
-            Optional<User> existingUserOptional = userRepository.findById(userId);
-            if (existingUserOptional.isPresent()) {
-                User existingUser = existingUserOptional.get();
-                BeanUtils.copyProperties(user, existingUser, "id"); // Exclude copying the "id" property
-                existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+    public User update(UUID userId, User user) throws EntityNotFoundException {
+        Optional<User> existingUserOptional = userRepository.findById(userId);
+        if (existingUserOptional.isPresent()) {
+            User existingUser = existingUserOptional.get();
+            BeanUtils.copyProperties(user, existingUser, "id"); // Exclude copying the "id" property
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
-                User savedUser = userRepository.save(existingUser);
-                return savedUser;
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            User savedUser = userRepository.save(existingUser);
+            return savedUser;
+        } else {
+            throw new EntityNotFoundException("No user with following id " + userId + " exists");
         }
     }
 
-    public boolean delete(UUID id) {
+    public boolean delete(UUID id) throws EntityNotFoundException {
+        if (!userRepository.findById(id).isPresent()) {
+            throw new EntityNotFoundException("No user with following id " + id + " exists");
+        }
         this.userRepository.deleteById(id);
         return true;
     }
@@ -73,17 +72,11 @@ public class UserService {
         return user.isPresent();
     }
 
-    public UserDTO getUserDTOById(UUID id) {
-        User user = userRepository.findById(id).get();
-        return userMapper.toDTO(user);
-    }
-
-    public User getUserById(UUID id) {
+    public UserDTO getUserDTOById(UUID id) throws EntityNotFoundException {
         Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            throw new UsernameNotFoundException("User not found");
+        if (!user.isPresent()) {
+            throw new EntityNotFoundException("No user with following id " + id + " exists");
         }
+        return userMapper.toDTO(user.get());
     }
 }
