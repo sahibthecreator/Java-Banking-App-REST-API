@@ -26,7 +26,8 @@ public class DatabaseInitializer implements CommandLineRunner {
     private final TransactionService transactionService;
 
     @Autowired
-    public DatabaseInitializer(UserService userService, AccountService accountService, TransactionService transactionService) {
+    public DatabaseInitializer(UserService userService, AccountService accountService,
+            TransactionService transactionService) {
         this.userService = userService;
         this.accountService = accountService;
         this.transactionService = transactionService;
@@ -43,7 +44,6 @@ public class DatabaseInitializer implements CommandLineRunner {
         user.setDateOfBirth(LocalDate.of(2004, 3, 23));
         user.setRole(UserType.EMPLOYEE);
 
-        
         user = userService.register(user);
 
         AccountDTO account1 = new AccountDTO();
@@ -73,6 +73,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         transaction.setToAccount(account2.getIban());
         transaction.setAmount(69);
         transaction.setPerformingUser(user.getId());
+        transaction.setTypeOfTransaction(TransactionType.DEPOSIT);
         transaction.setDescription("Bla bla");
 
         transactionService.addTransaction(transaction, TransactionType.DEPOSIT);

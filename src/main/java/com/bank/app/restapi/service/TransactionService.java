@@ -1,6 +1,7 @@
 package com.bank.app.restapi.service;
 
 import com.bank.app.restapi.dto.TransactionDTO;
+import com.bank.app.restapi.dto.mapper.TransactionMapper;
 import com.bank.app.restapi.model.Transaction;
 import com.bank.app.restapi.model.TransactionType;
 import com.bank.app.restapi.repository.AccountRepository;
@@ -23,15 +24,19 @@ public class TransactionService {
     private AccountRepository accountRepository;
     private UserRepository userRepository;
 
+    private TransactionMapper transactionMapper;
+
     public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, TransactionMapper transactionMapper) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+        this.transactionMapper = transactionMapper;
     }
 
-    public List<Transaction> getTransactions(String iban, Float minAmount, Float maxAmount, Float exactAmount,
+    public List<TransactionDTO> getTransactions(String iban, Float minAmount, Float maxAmount, Float exactAmount,
             TransactionType typeOfTransaction, LocalDate startDate, LocalDate endDate) {
+
         Specification<Transaction> specification = Specification.where(null);
 
         if (iban != null && !iban.isEmpty()) {
@@ -76,29 +81,34 @@ public class TransactionService {
                             root.get("dateOfExecution")),
                     endDate));
         }
-        return transactionRepository.findAll();
+
+        return transactionRepository.findAll().stream().map(transactionMapper::toDTO).toList();
     }
 
-    public Transaction getTransactionById(UUID transactionId) {
-        return transactionRepository.findById(transactionId).orElseThrow(
+    public TransactionDTO getTransactionById(UUID transactionId) {
+        return transactionRepository.findById(transactionId).map(transactionMapper::toDTO).orElseThrow(
                 () -> new EntityNotFoundException("Transaction not found"));
     }
 
-    public Transaction addTransaction(TransactionDTO dto, TransactionType type) {
-        return transactionRepository.save(this.mapDtoToTransaction(dto, type));
+    public TransactionDTO addTransaction(TransactionDTO dto, TransactionType type) {
+        dto.setDateOfExecution(LocalDateTime.now());
+        Transaction transaction = transactionMapper.toEntity(dto);
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        return transactionMapper.toDTO(savedTransaction);
     }
 
-    private Transaction mapDtoToTransaction(TransactionDTO dto, TransactionType type) {
-        Transaction t = new Transaction();
-        t.setFromAccount(accountRepository.findByIban(dto.getFromAccount()));
-        t.setToAccount(accountRepository.findByIban(dto.getToAccount()));
-        t.setAmount(dto.getAmount());
-        t.setTypeOfTransaction(type);
-        t.setDateOfExecution(LocalDateTime.now());
-        t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow());
-        t.setDescription(dto.getDescription());
+    // private Transaction mapDtoToTransaction(TransactionDTO dto, TransactionType
+    // type) {
+    // Transaction t = new Transaction();
+    // t.setFromAccount(accountRepository.findByIban(dto.getFromAccount()));
+    // t.setToAccount(accountRepository.findByIban(dto.getToAccount()));
+    // t.setAmount(dto.getAmount());
+    // t.setTypeOfTransaction(type);
+    // t.setDateOfExecution(LocalDateTime.now());
+    // t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow());
+    // t.setDescription(dto.getDescription());
 
-        return t;
-    }
+    // return t;
+    // }
 
 }
