@@ -43,7 +43,7 @@ public class Transaction {
     @Column(name = "dateOfExecution", nullable = false)
     private LocalDateTime dateOfExecution;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "user_id")
     @JsonIgnoreProperties("transactions")
     private User performingUser;
