@@ -3,17 +3,13 @@ package com.bank.app.restapi.controller;
 import com.bank.app.restapi.dto.AccountDTO;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.model.Account;
-import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.AccountService;
-
 import com.bank.app.restapi.service.UserService;
 import lombok.AllArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @AllArgsConstructor

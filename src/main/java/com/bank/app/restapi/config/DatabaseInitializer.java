@@ -2,21 +2,19 @@ package com.bank.app.restapi.config;
 
 import com.bank.app.restapi.dto.AccountDTO;
 import com.bank.app.restapi.dto.TransactionDTO;
-import com.bank.app.restapi.dto.UserDTO;
-import com.bank.app.restapi.model.*;
-import com.bank.app.restapi.repository.UserRepository;
+import com.bank.app.restapi.model.AccountType;
+import com.bank.app.restapi.model.TransactionType;
+import com.bank.app.restapi.model.User;
+import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.service.AccountService;
 import com.bank.app.restapi.service.TransactionService;
 import com.bank.app.restapi.service.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Component
 public class DatabaseInitializer implements CommandLineRunner {

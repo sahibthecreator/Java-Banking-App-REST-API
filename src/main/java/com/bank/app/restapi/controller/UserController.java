@@ -5,15 +5,10 @@ import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.JwtService;
 import com.bank.app.restapi.service.UserService;
-
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;

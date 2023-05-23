@@ -5,7 +5,6 @@ import com.bank.app.restapi.model.Account;
 import org.modelmapper.ModelMapper;
 
 import java.text.ParseException;
-import java.time.LocalDate;
 
 public class AccountMapper {
 
