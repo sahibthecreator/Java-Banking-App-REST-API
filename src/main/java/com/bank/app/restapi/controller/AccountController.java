@@ -21,7 +21,7 @@ public class AccountController {
 
     private final AccountMapper accountMapper;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<?> getAll() {
         try {
             List<AccountDTO> accounts = accountService.getAllAccounts().stream().map(accountMapper::toDTO).toList();
@@ -36,7 +36,7 @@ public class AccountController {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> createAccount(@RequestBody AccountDTO accountDTO) {
         try {
             // check if request body is valid
