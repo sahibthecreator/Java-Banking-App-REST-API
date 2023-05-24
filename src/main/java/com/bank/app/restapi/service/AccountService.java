@@ -5,9 +5,12 @@ import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.repository.AccountRepository;
 
+import com.sun.jdi.request.InvalidRequestStateException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -15,6 +18,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -22,24 +26,38 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private UserService userService;
+
     private final AccountMapper accountMapper;
 
     public List<Account> getAllAccounts() {
         return new ArrayList<Account>(accountRepository.findAll());
     }
 
-    public AccountDTO createAccount(AccountDTO accountDTO) throws ParseException {
+    public AccountDTO createAccount(AccountDTO accountDTO){
+
+        if (!accountMapper.isValidDTO(accountDTO)) {
+            throw new InvalidRequestStateException("Invalid request body"); // Return 400 for bad request
+        }
+
+        UUID userId = accountDTO.getUserId();
+        if (!userService.userIdExists(userId)) {
+            throw new EntityNotFoundException("User with following id: "+ userId +" not found");
+        }
+
         accountDTO.setIban(generateDutchIban());
         accountDTO.setDateOfOpening(LocalDate.now());
-        accountDTO.setActive(true);
+//        accountDTO.setActive(true);
         Account account = accountMapper.toEntity(accountDTO);
         account = accountRepository.saveAndFlush(account);
         
         return accountMapper.toDTO(account);
     }
 
-    public void deactivateAccount(Account account) {
-        account.setActive(false);
+    public void deactivateAccount(AccountDTO accountDTO){
+        Account account = accountMapper.toEntity(accountDTO);
+        accountDTO.setActive(false);
         accountRepository.saveAndFlush(account);
     }
 
@@ -47,8 +65,10 @@ public class AccountService {
         return accountRepository.findIbanByUsername(username);
     }
 
-    public Account getAccountByIban(String iban) {
-        return accountRepository.findByIban(iban);
+    public AccountDTO getAccountByIban(String iban) {
+        Account account = accountRepository.findByIban(iban);
+        AccountDTO accountDTO = accountMapper.toDTO(account);
+        return accountDTO;
     }
 
     public float getBalanceByIban(String iban) {
