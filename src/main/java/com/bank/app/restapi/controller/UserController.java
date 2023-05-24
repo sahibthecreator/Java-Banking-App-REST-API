@@ -1,5 +1,6 @@
 package com.bank.app.restapi.controller;
 
+import com.bank.app.restapi.config.UserData;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.User;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,14 +44,24 @@ public class UserController {
         return ResponseEntity.status(201).body(createdUserDTO);
     }
 
+    @PreAuthorize("#userId.equals(authentication.principal.id.toString()) || hasAuthority('ROLE_EMPLOYEE')")
     @GetMapping("/{userId}")
     public ResponseEntity<UserDTO> getById(@PathVariable String userId, HttpServletRequest request) {
         UUID id = UUID.fromString(userId);
-        if (isAuthorized(request, id)) {
-            return ResponseEntity.status(200).body(userService.getUserDTOById(id));
-        } else {
-            return ResponseEntity.status(403).build();
-        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserData userData = (UserData) authentication.getPrincipal();
+        System.out.println(userData.getId().toString());
+        System.out.println(userId);
+        System.out.println(userData.getId().toString().equals(userId));
+
+        return ResponseEntity.status(200).body(userService.getUserDTOById(id));
+
+        // if (isAuthorized(request, id)) {
+        // return ResponseEntity.status(200).body(userService.getUserDTOById(id));
+        // } else {
+        // return ResponseEntity.status(403).build();
+        // }
     }
 
     @PutMapping("/{userId}")
@@ -96,7 +108,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         boolean isEmployee = authentication != null
-                && authentication.getAuthorities().contains(new SimpleGrantedAuthority("EMPLOYEE"));
+                && authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
         boolean isAuthorized = isEmployee || userService.matchEmailwithId(email, userId);
         return isAuthorized;
     }

@@ -21,11 +21,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private static final String[] SECURED_URLs = { 
-        "/users/**",
-        "/accounts/**",
-        "/transactions/**"
-     };
+    private static final String[] SECURED_URLs = {
+            "/users/**",
+            "/accounts/**",
+            "/transactions/**"
+    };
 
     private static final String[] UN_SECURED_URLs = {
             "/auth/**",
@@ -36,7 +36,7 @@ public class SecurityConfig {
     private JwtAuthFilter authFilter;
 
     @Autowired
-    private UserDataService userDataService; // TODO: implement instead of userDetailsService()
+    private UserDataService userDataService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -56,10 +56,10 @@ public class SecurityConfig {
         return http.csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers(UN_SECURED_URLs).permitAll()
+                .requestMatchers(SECURED_URLs).hasAuthority("ROLE_EMPLOYEE")
+                .anyRequest().authenticated()
                 .and()
-                .authorizeHttpRequests().requestMatchers(SECURED_URLs)
-                .hasAuthority("EMPLOYEE").anyRequest().authenticated()
-                .and().sessionManagement()
+                .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider())
