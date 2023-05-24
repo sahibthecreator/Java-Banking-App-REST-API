@@ -12,12 +12,12 @@ import Navigation from './components/Navigation.vue'
 
 
 <script>
-import { useUserStore } from '../src/store/user';
+//import { useUserStore } from '../src/store/user';
 
 export default {
   setup() {
     return {
-      store: useUserStore()
+      //store: useUserStore()
     }
   },
   name: "App",
@@ -25,7 +25,7 @@ export default {
     Navigation
   },
   mounted() {
-    this.store.autoLogin();
+    //this.store.autoLogin();
   }
 };
 

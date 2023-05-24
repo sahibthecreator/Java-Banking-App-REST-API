@@ -54,8 +54,6 @@ const store = new Vuex.Store({
         async register({ commit }, userData) {
             try {
                 const response = await register(userData);
-                commit('setToken', response.token);
-                commit('setUser', response.user);
             } catch (error) {
                 throw new Error(error.message);
             }

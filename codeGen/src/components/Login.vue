@@ -1,5 +1,7 @@
 <script setup>
 import Navigation from '@/components/Navigation.vue'
+
+
 </script>
 
 <template>
@@ -13,23 +15,25 @@ import Navigation from '@/components/Navigation.vue'
             <span id="logoTitle">WAVR</span>
           </div>
           <div class="selectionType py-4">
-            <button :class="{ 'selected': isLogin }" @click="isLogin = true" class="unselected">Login</button>
-            <button :class="{ 'selected': !isLogin }" @click="isLogin = false" class="unselected">Register</button>
+            <button :class="{ 'selected': isLogin }" @click="toggleRegisterView()" class="unselected">Login</button>
+            <button :class="{ 'selected': !isLogin }" @click="toggleRegisterView()" class="unselected">Register</button>
           </div>
           <div class="loginWrapper" v-if="isLogin">
             <input type="text" v-model="username" placeholder="Email" class="text-dark" />
             <input type="password" v-model="password" placeholder="Password" class="text-dark" />
             <button type="button" @click="($event) => login()">Log in</button>
+            <p class="text-danger">{{ errorMessage }}</p>
           </div>
           <div class="loginWrapper" v-else>
             <input type="text" v-model="firstName" placeholder="First Name" class="text-dark" />
             <input type="text" v-model="lastName" placeholder="Last Name" class="text-dark" />
-            <input type="text" v-model="username" placeholder="Email" class="text-dark" />
+            <input type="text" v-model="email" placeholder="Email" class="text-dark" />
             <input type="password" v-model="password" placeholder="Password" class="text-dark" />
             <input type="text" v-model="bsn" placeholder="BSN" class="text-dark" />
-            <input type="text" v-model="bsn" placeholder="Date of Birth" class="text-dark" />
+            <input type="date" v-model="dateOfBirth" class="text-dark" :max="todayDate">
 
-            <button type="button" @click="($event) => login()">Register</button>
+            <button type="button" @click="($event) => register()">Register</button>
+            <p class="text-danger">{{ errorMessage }}</p>
           </div>
         </div>
       </div>
@@ -40,6 +44,7 @@ import Navigation from '@/components/Navigation.vue'
 <script>
 //import { useUserStore } from '../store/user';
 import { mapActions } from 'vuex';
+
 
 export default {
   setup() {
@@ -54,10 +59,17 @@ export default {
       isLogin: true,
       username: '',
       password: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      bsn: '',
+      dateOfBirth: null,
+      todayDate: new Date().toISOString().split('T')[0],
+      errorMessage: '',
     };
   },
   methods: {
-    ...mapActions(['login']),
+    ...mapActions(['login', 'register']),
     async login() {
       try {
         const credentials = {
@@ -67,17 +79,45 @@ export default {
         await this.$store.dispatch('login', credentials);
         this.$router.push('/dashboard');
       } catch (error) {
+        this.errorMessage = error.message;
         console.log(error.message);
       }
-      // this.store
-      //   .login(this.username, this.password)
-      //   .then(() => {
-      //     console.log('logged in ' + this.username);
-      //   })
-      //   .catch((error) => {
-      //     this.errorMessage = error;
-      //   });
     },
+    async register() {
+      try {
+        const body = {
+          firstName: this.firstName,
+          lastName: this.lastName,
+          email: this.email,
+          password: this.password,
+          bsn: this.bsn,
+          dateOfBirth: this.formatDate(),
+          role: "USER",
+        };
+        await this.$store.dispatch('register', body);
+        this.isLogin = true;
+        this.errorMessage = 'Registered successfully';
+        this.username = body.email;
+      } catch (error) {
+        this.errorMessage = error.message;
+        console.log(error.message);
+      }
+    },
+    formatDate() {
+      if (this.dateOfBirth) {
+        const dateParts = this.dateOfBirth.split('-');
+        const day = dateParts[2];
+        const month = dateParts[1];
+        const year = dateParts[0];
+
+        return `${day}-${month}-${year}`;
+      }
+      return '';
+    },
+    toggleRegisterView() {
+      this.isLogin = !this.isLogin;
+      this.errorMessage = '';
+    }
   },
 };
 </script>
@@ -94,6 +134,14 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 40px;
+}
+
+.datePicker svg {
+  position: absolute;
+  left: 2%;
+  top: 15%;
+  width: 7%;
+  stroke: none;
 }
 
 #left {

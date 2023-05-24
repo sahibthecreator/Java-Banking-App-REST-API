@@ -16,6 +16,6 @@ export const register = async (userData) => {
     const response = await axios.post(`${API_URL}/auth/register`, userData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response.data.error);
+    throw new Error(error.response.data);
   }
 };
