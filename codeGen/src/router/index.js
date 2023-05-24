@@ -4,6 +4,8 @@ import Login from '@/components/Login.vue';
 import Home from '@/components/Home.vue';
 import Dashboard from '@/components/Dashboard.vue';
 import NotFound from '@/components/NotFound.vue';
+import store from '../store'; // Import the Vuex store
+
 
 
 const router = createRouter({
@@ -12,17 +14,19 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'Home', component: Home, },
     { path: '/login', name: 'Log in', component: Login },
-    { path: '/dashboard', name: 'my dashboard', component: Dashboard },
+    { path: '/dashboard', name: 'my dashboard', component: Dashboard, meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: '404 Not Found', component: NotFound },
   ],
 });
 
 router.beforeEach((to, from, next) => {
-  if (!to.name) {
-    document.title = DEFAULT_TITLE;
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const token = store.getters.getCurrentUserToken; // Access the store instance directly
+  if (requiresAuth && !token) {
+    next('/login');
+  } else {
+    next();
   }
-  document.title = to.name;
-  next();
 });
 
 export default router

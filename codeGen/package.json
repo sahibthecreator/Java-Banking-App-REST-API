@@ -14,7 +14,8 @@
     "pinia": "^2.0.36",
     "sass": "^1.62.1",
     "vue": "^3.3.2",
-    "vue-router": "^4.2.0"
+    "vue-router": "^4.2.0",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.1",

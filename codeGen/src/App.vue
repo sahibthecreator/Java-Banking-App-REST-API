@@ -12,7 +12,7 @@ import Navigation from './components/Navigation.vue'
 
 
 <script>
-import { useUserStore } from '../src/stores/user';
+import { useUserStore } from '../src/store/user';
 
 export default {
   setup() {

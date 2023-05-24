@@ -38,12 +38,13 @@ import Navigation from '@/components/Navigation.vue'
 </template>
 
 <script>
-import { useUserStore } from '../stores/user';
+//import { useUserStore } from '../store/user';
+import { mapActions } from 'vuex';
 
 export default {
   setup() {
     return {
-      store: useUserStore(),
+      //store: useUserStore(),
     };
   },
 
@@ -56,15 +57,26 @@ export default {
     };
   },
   methods: {
-    login() {
-      this.store
-        .login(this.username, this.password)
-        .then(() => {
-          console.log('logged in ' + this.username);
-        })
-        .catch((error) => {
-          this.errorMessage = error;
-        });
+    ...mapActions(['login']),
+    async login() {
+      try {
+        const credentials = {
+          username: this.username,
+          password: this.password,
+        };
+        await this.$store.dispatch('login', credentials);
+        this.$router.push('/dashboard');
+      } catch (error) {
+        console.log(error.message);
+      }
+      // this.store
+      //   .login(this.username, this.password)
+      //   .then(() => {
+      //     console.log('logged in ' + this.username);
+      //   })
+      //   .catch((error) => {
+      //     this.errorMessage = error;
+      //   });
     },
   },
 };
@@ -162,5 +174,4 @@ export default {
 .selectionType>.selected {
   border-bottom: 2px var(--gray-dark) solid;
 }
-
 </style>
