@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -68,20 +69,21 @@ public class TransactionService {
         }
 
         if (startDate != null) {
-            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(
-                    criteriaBuilder.function("date", LocalDate.class,
-                            root.get("dateOfExecution")),
-                    startDate));
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(
+                            root.get("dateOfExecution").as(Date.class),
+                            Date.valueOf(startDate)));
         }
 
         if (endDate != null) {
-            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(
-                    criteriaBuilder.function("date", LocalDate.class,
-                            root.get("dateOfExecution")),
-                    endDate));
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(
+                            root.get("dateOfExecution").as(Date.class),
+                            Date.valueOf(endDate)));
         }
 
-        return transactionRepository.findAll().stream().map(transactionMapper::toDTO).toList();
+        List<Transaction> transactions = transactionRepository.findAll(specification);
+        return transactions.stream().map(transactionMapper::toDTO).toList();
     }
 
     public TransactionDTO getTransactionById(UUID transactionId) {
@@ -91,6 +93,7 @@ public class TransactionService {
 
     public TransactionDTO addTransaction(TransactionDTO dto, TransactionType type) {
         dto.setDateOfExecution(LocalDateTime.now());
+        dto.setTypeOfTransaction(TransactionType.TRANSFER);
         Transaction transaction = transactionMapper.toEntity(dto);
         Transaction savedTransaction = transactionRepository.save(transaction);
         return transactionMapper.toDTO(savedTransaction);

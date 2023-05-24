@@ -24,8 +24,8 @@ public class TransactionController {
     @GetMapping()
     public ResponseEntity<List<TransactionDTO>> getTransactions(
             @RequestParam(value = "iban", required = false) String iban,
-            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate endDate,
             @RequestParam(value = "minAmount", required = false) Float minAmount,
             @RequestParam(value = "maxAmount", required = false) Float maxAmount,
             @RequestParam(value = "exactAmount", required = false) Float exactAmount,
