@@ -25,12 +25,12 @@ public class AccountMapper {
     }
 
     public boolean isValidDTO(AccountDTO accountDTO) throws IllegalArgumentException {
-        boolean ibanIsValid = accountDTO.getIban() != null;
+        //boolean ibanIsValid = accountDTO.getIban() != null;
         boolean balanceIsValid = accountDTO.getBalance() >= 0.0;
         boolean typeOfAccountIsValid = accountDTO.getTypeOfAccount() != null;
         boolean userIdIsValid = accountDTO.getUserId() != null;
         boolean absoluteLimitIsValid = accountDTO.getAbsoluteLimit() >= 0.0;
 
-        return ibanIsValid && balanceIsValid && typeOfAccountIsValid && userIdIsValid && absoluteLimitIsValid;
+        return  balanceIsValid && typeOfAccountIsValid && userIdIsValid && absoluteLimitIsValid;
     }
 }

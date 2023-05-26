@@ -6,6 +6,7 @@ import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.service.AccountService;
 import com.bank.app.restapi.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +42,7 @@ public class AccountController {
 
     // TODO: 24-May-23 test returns 500 internal server error
     @PostMapping("")
-    public ResponseEntity<?> createAccount(@RequestBody AccountDTO accountDTO) {
+    public ResponseEntity<?> createAccount(@RequestBody @Valid AccountDTO accountDTO) {
 
         AccountDTO createdAccountDTO = accountService.createAccount(accountDTO);
 

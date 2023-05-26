@@ -44,8 +44,8 @@ public class Account {
     @Column(name = "absoluteLimit")
     private float absoluteLimit;
 
-    @Column(name = "isActive")
-    private boolean isActive;
+    @Column(name = "active")
+    private boolean active;
 
     @OneToMany(mappedBy = "fromAccount")
     @JsonIgnore

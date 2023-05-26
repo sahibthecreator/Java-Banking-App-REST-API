@@ -35,7 +35,7 @@ public class AccountService {
         return new ArrayList<Account>(accountRepository.findAll());
     }
 
-    public AccountDTO createAccount(AccountDTO accountDTO){
+    public AccountDTO createAccount(AccountDTO accountDTO) {
 
         if (!accountMapper.isValidDTO(accountDTO)) {
             throw new InvalidRequestStateException("Invalid request body"); // Return 400 for bad request
@@ -43,19 +43,19 @@ public class AccountService {
 
         UUID userId = accountDTO.getUserId();
         if (!userService.userIdExists(userId)) {
-            throw new EntityNotFoundException("User with following id: "+ userId +" not found");
+            throw new EntityNotFoundException("User with following id: " + userId + " not found");
         }
 
         accountDTO.setIban(generateDutchIban());
         accountDTO.setDateOfOpening(LocalDate.now());
-//        accountDTO.setActive(true);
+        accountDTO.setActive(true);
         Account account = accountMapper.toEntity(accountDTO);
         account = accountRepository.saveAndFlush(account);
-        
+
         return accountMapper.toDTO(account);
     }
 
-    public void deactivateAccount(AccountDTO accountDTO){
+    public void deactivateAccount(AccountDTO accountDTO) {
         Account account = accountMapper.toEntity(accountDTO);
         accountDTO.setActive(false);
         accountRepository.saveAndFlush(account);

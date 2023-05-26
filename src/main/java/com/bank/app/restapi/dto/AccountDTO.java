@@ -3,6 +3,10 @@ package com.bank.app.restapi.dto;
 import com.bank.app.restapi.model.AccountType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -15,16 +19,18 @@ public class AccountDTO {
     private UUID id;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    //Removed read-only to test transactions
     private String iban;
 
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+    @Min(value = 0, message = "Balance must be greater than or equal to 0")
     private float balance;
 
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+    @NotNull(message = "Type of account can't be null")
     private AccountType typeOfAccount;
 
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+    @NotNull(message = "UserId can't be null")
     private UUID userId; // Add a separate userId field
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -32,8 +38,9 @@ public class AccountDTO {
     private LocalDate dateOfOpening;
 
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+    @Min(value = 0, message = "Absolute Limit must be greater than or equal to 0")
     private float absoluteLimit;
 
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
-    private boolean isActive;
+    private boolean active;
 }

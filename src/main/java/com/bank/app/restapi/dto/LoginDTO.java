@@ -1,14 +1,17 @@
 package com.bank.app.restapi.dto;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class LoginDTO {
 
-    private String username;
+    @Email(message = "Email is invalid")
+    @NotBlank(message = "Email can't be empty")
+    private String email;
+
+    @NotBlank(message = "Password can't be empty")
     private String password;
 }

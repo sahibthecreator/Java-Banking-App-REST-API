@@ -1,5 +1,6 @@
 package com.bank.app.restapi.service;
 
+import com.bank.app.restapi.dto.LoginDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.User;
@@ -8,6 +9,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,10 @@ public class UserService {
 
     private final UserMapper userMapper;
 
+    private final JwtService jwtService;
+
+    private final AuthenticationManager authenticationManager;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -31,10 +38,20 @@ public class UserService {
         return new ArrayList<User>(this.userRepository.findAll());
     }
 
-    public User register(User user) {
+    public UserDTO register(UserDTO userDTO) {
+        User user = userMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
-        return this.userRepository.saveAndFlush(user);
+        user = this.userRepository.saveAndFlush(user);
+        return userMapper.toDTO(user);
+    }
+
+    public String login(LoginDTO loginDTO) {
+        authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
+
+        return jwtService.generateToken(loginDTO.getEmail());
+
     }
 
     public User update(UUID userId, User user) throws EntityNotFoundException {
@@ -57,10 +74,6 @@ public class UserService {
         }
         this.userRepository.deleteById(id);
         return true;
-    }
-
-    public boolean matchEmailwithId(String email, UUID id) {
-        return userRepository.matchEmailwithId(email, id);
     }
 
     public boolean userIdExists(UUID id) {

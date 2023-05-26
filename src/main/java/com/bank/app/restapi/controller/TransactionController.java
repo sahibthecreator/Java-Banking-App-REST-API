@@ -5,6 +5,7 @@ import com.bank.app.restapi.model.TransactionType;
 import com.bank.app.restapi.service.TransactionService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ public class TransactionController {
     }
 
     @GetMapping()
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<List<TransactionDTO>> getTransactions(
             @RequestParam(value = "iban", required = false) String iban,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate,

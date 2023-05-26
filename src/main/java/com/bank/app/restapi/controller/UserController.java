@@ -5,6 +5,7 @@ import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class UserController {
 
     @GetMapping("")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<List<UserDTO>> getAll() {
         List<UserDTO> users = userService.getAll().stream().map(userMapper::toDTO).toList();
 
         return ResponseEntity.status(200).body(users);
@@ -34,10 +35,8 @@ public class UserController {
 
     @PostMapping("")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
-    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
-        User user = userMapper.toEntity(userDTO);
-        User createdUser = userService.register(user);
-        UserDTO createdUserDTO = userMapper.toDTO(createdUser);
+    public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserDTO userDTO) {
+        UserDTO createdUserDTO = userService.register(userDTO);
         return ResponseEntity.status(201).body(createdUserDTO);
     }
 
@@ -51,7 +50,7 @@ public class UserController {
 
     @PutMapping("/{userId}")
     @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
-    public ResponseEntity<?> updateUser(@PathVariable String userId, @RequestBody UserDTO userDTO,
+    public ResponseEntity<?> updateUser(@PathVariable String userId, @RequestBody @Valid UserDTO userDTO,
             HttpServletRequest request) {
 
         UUID id = UUID.fromString(userId);
