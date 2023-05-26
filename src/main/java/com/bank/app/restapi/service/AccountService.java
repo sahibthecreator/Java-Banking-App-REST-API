@@ -36,11 +36,6 @@ public class AccountService {
     }
 
     public AccountDTO createAccount(AccountDTO accountDTO) {
-
-        if (!accountMapper.isValidDTO(accountDTO)) {
-            throw new InvalidRequestStateException("Invalid request body"); // Return 400 for bad request
-        }
-
         UUID userId = accountDTO.getUserId();
         if (!userService.userIdExists(userId)) {
             throw new EntityNotFoundException("User with following id: " + userId + " not found");

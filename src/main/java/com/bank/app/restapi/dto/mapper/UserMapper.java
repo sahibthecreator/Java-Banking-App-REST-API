@@ -19,28 +19,9 @@ public class UserMapper {
         return userD;
     }
 
-    public User toEntity(UserDTO userD) throws IllegalArgumentException {
-        this.isValidDTO(userD);
+    public User toEntity(UserDTO userD) {
         User user = mapper.map(userD, User.class);
         return user;
     }
 
-    public void isValidDTO(UserDTO userDTO) throws IllegalArgumentException {
-        boolean firstNameIsValid = userDTO.getFirstName() != null && !userDTO.getFirstName().isEmpty();
-        boolean lastNameIsValid = userDTO.getLastName() != null && !userDTO.getLastName().isEmpty();
-        boolean emailIsValid = userDTO.getEmail() != null && !userDTO.getEmail().isEmpty();
-        boolean passwordIsValid = userDTO.getPassword() != null && !userDTO.getPassword().isEmpty();
-        boolean bsnIsValid = userDTO.getBsn() != null && !userDTO.getBsn().isEmpty();
-        boolean dateOfBirthIsValid = userDTO.getDateOfBirth() != null
-                && userDTO.getDateOfBirth().isBefore(LocalDate.now());
-
-        // !!!!!!ONLY FOR TESTING PHASE ONLY!!!!!
-        // Ye, This looks horrible XD - Yvan
-        boolean roleIsValid = userDTO.getRole() != null;
-
-        if (!(firstNameIsValid && lastNameIsValid && emailIsValid && passwordIsValid && bsnIsValid
-                && dateOfBirthIsValid && roleIsValid)) {
-            throw new IllegalArgumentException("Not all required fields were provided for creation User");
-        }
-    }
 }

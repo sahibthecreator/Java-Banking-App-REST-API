@@ -60,7 +60,8 @@ public class AccountController {
         return ResponseEntity.status(200).body(accountDTO);
     }
 
-    // TODO: 24-May-23 test returns 200 but it's the response for the get accountInfo
+    // TODO: 24-May-23 test returns 200 but it's the response for the get
+    // accountInfo
     // or we make a BalanceResponseDTO and return that
     @GetMapping("/{iban}/balance")
     public ResponseEntity<?> accountBalance(@PathVariable String iban) {
@@ -79,13 +80,12 @@ public class AccountController {
         AccountDTO accountDTO = accountService.getAccountByIban(iban);
 
         if (accountDTO == null) {
-            return ResponseEntity.status(404).body("Account with following Iban "+iban+" is not found");
+            return ResponseEntity.status(404).body("Account with following Iban " + iban + " is not found");
         }
 
         accountService.deactivateAccount(accountDTO);
         return ResponseEntity.status(200).body("Account deactivated");
     }
-
 
     @GetMapping("/{userName}/iban")
     public ResponseEntity<?> getIbanByUsername(@PathVariable String userName) {
