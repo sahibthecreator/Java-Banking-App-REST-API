@@ -6,14 +6,20 @@ import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +40,21 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public List<UserDTO> getAll() {
-        List<User> userList = this.userRepository.findAll();
+    public List<UserDTO> getAll(
+            String firstName,
+            String lastName,
+            String email,
+            LocalDate dateOfBirth,
+            String bsn,
+            String sortDirection,
+            int limit) {
+        Specification<User> specification = buildSpecification(firstName, lastName, email, dateOfBirth, bsn);
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "lastName", "firstName");
 
-        return new ArrayList<UserDTO>(userList.stream().map(userMapper::toDTO).toList());
+        Page<User> userPage = userRepository.findAll(specification, PageRequest.of(0, limit, sort));
+        List<User> userList = userPage.getContent();
+
+        return userList.stream().map(userMapper::toDTO).toList();
     }
 
     public UserDTO register(UserDTO userDTO) {
@@ -90,5 +107,39 @@ public class UserService {
             throw new EntityNotFoundException("No user with following id " + id + " exists");
         }
         return userMapper.toDTO(user.get());
+    }
+
+    // Private methods
+    private Specification<User> buildSpecification(
+            String firstName,
+            String lastName,
+            String email,
+            LocalDate dateOfBirth,
+            String bsn) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (firstName != null && !firstName.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("firstName"), "%" + firstName + "%"));
+            }
+
+            if (lastName != null && !lastName.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("lastName"), "%" + lastName + "%"));
+            }
+
+            if (email != null && !email.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("email"), "%" + email + "%"));
+            }
+
+            if (dateOfBirth != null) {
+                predicates.add(criteriaBuilder.equal(root.get("dateOfBirth"), dateOfBirth));
+            }
+
+            if (bsn != null && !bsn.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("bsn"), bsn));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
     }
 }

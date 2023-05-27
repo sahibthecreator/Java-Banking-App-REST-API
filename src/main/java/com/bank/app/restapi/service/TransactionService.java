@@ -69,17 +69,15 @@ public class TransactionService {
         }
 
         if (startDate != null) {
-            specification = specification.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.greaterThanOrEqualTo(
-                            root.get("dateOfExecution").as(Date.class),
-                            Date.valueOf(startDate)));
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(
+                    root.get("dateOfExecution").as(Date.class),
+                    Date.valueOf(startDate)));
         }
 
         if (endDate != null) {
-            specification = specification.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.lessThanOrEqualTo(
-                            root.get("dateOfExecution").as(Date.class),
-                            Date.valueOf(endDate)));
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(
+                    root.get("dateOfExecution").as(Date.class),
+                    Date.valueOf(endDate)));
         }
 
         List<Transaction> transactions = transactionRepository.findAll(specification);

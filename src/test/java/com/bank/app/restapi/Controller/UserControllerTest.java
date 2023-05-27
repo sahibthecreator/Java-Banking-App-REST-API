@@ -35,19 +35,19 @@ class UserControllerTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        userController = new UserController(userService, null);
+        userController = new UserController(userService);
     }
 
     @Test
     void getAllShouldReturnListOfUsers() {
         List<UserDTO> userDTOList = Arrays.asList(new UserDTO(), new UserDTO());
 
-        when(userService.getAll()).thenReturn(userDTOList);
+        when(userService.getAll(null, null, null, null, null, null, 10)).thenReturn(userDTOList);
 
-        ResponseEntity<List<UserDTO>> response = userController.getAll();
+        ResponseEntity<List<UserDTO>> response = userController.getAll(null, null, null, null, null, null, 10);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(userDTOList, response.getBody());
-        verify(userService, times(1)).getAll();
+        verify(userService, times(1)).getAll(null, null, null, null, null, null, 10);
     }
 
     @Test
