@@ -73,7 +73,7 @@ export default {
     async login() {
       try {
         const credentials = {
-          username: this.username,
+          email: this.username,
           password: this.password,
         };
         await this.$store.dispatch('login', credentials);
