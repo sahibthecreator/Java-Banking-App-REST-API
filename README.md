@@ -25,3 +25,11 @@ Current design for dashboard, not finalised
 
 
 ![Dashboard](https://github.com/sahibthecreator/Java-Banking-App-REST-API/assets/90270910/3756f4a0-179d-4b9d-aa25-fd29edd9fe59)
+
+### Login
+
+![Log in](https://github.com/sahibthecreator/Java-Banking-App-REST-API/assets/90270910/c46d9340-9bd7-420d-8a79-a50ebd90440a)
+
+### Register
+
+![Register](https://github.com/sahibthecreator/Java-Banking-App-REST-API/assets/90270910/1d0a2817-c4c9-4427-82aa-85d2a30eff04)
