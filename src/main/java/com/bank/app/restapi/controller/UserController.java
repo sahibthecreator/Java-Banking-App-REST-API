@@ -28,7 +28,7 @@ public class UserController {
     @GetMapping("")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<List<UserDTO>> getAll() {
-        List<UserDTO> users = userService.getAll().stream().map(userMapper::toDTO).toList();
+        List<UserDTO> users = userService.getAll();
 
         return ResponseEntity.status(200).body(users);
     }
@@ -54,8 +54,7 @@ public class UserController {
             HttpServletRequest request) {
 
         UUID id = UUID.fromString(userId);
-        User user = userMapper.toEntity(userDTO);
-        UserDTO createdUserDTO = userMapper.toDTO(userService.update(id, user));
+        UserDTO createdUserDTO = userService.update(id, userDTO);
 
         return ResponseEntity.status(200).body(createdUserDTO);
     }

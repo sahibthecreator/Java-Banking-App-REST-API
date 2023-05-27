@@ -34,8 +34,10 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public List<User> getAll() {
-        return new ArrayList<User>(this.userRepository.findAll());
+    public List<UserDTO> getAll() {
+        List<User> userList = this.userRepository.findAll();
+
+        return new ArrayList<UserDTO>(userList.stream().map(userMapper::toDTO).toList());
     }
 
     public UserDTO register(UserDTO userDTO) {
@@ -54,7 +56,8 @@ public class UserService {
 
     }
 
-    public User update(UUID userId, User user) throws EntityNotFoundException {
+    public UserDTO update(UUID userId, UserDTO userDTO) throws EntityNotFoundException {
+        User user = userMapper.toEntity(userDTO);
         Optional<User> existingUserOptional = userRepository.findById(userId);
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
@@ -62,7 +65,7 @@ public class UserService {
             existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
             User savedUser = userRepository.save(existingUser);
-            return savedUser;
+            return userMapper.toDTO(savedUser);
         } else {
             throw new EntityNotFoundException("No user with following id " + userId + " exists");
         }
