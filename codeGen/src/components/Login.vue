@@ -1,9 +1,3 @@
-<script setup>
-import Navigation from '@/components/Navigation.vue'
-
-
-</script>
-
 <template>
   <div class="wrapper">
     <div class="section" id="left"></div>
