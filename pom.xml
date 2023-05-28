@@ -79,8 +79,13 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.1.1</version>
 		</dependency>
+        <dependency>
+            <groupId>user.java.lang</groupId>
+            <artifactId>user.java.lang</artifactId>
+            <version>2020.164.33984</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>

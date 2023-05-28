@@ -50,7 +50,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         AccountDTO account1 = new AccountDTO();
         account1.setIban("NL01ABNA1032456789");
-        account1.setBalance(20);
+        account1.setBalance(0);
         account1.setTypeOfAccount(AccountType.CURRENT);
         account1.setUserId(userDto.getId());
         account1.setDateOfOpening(LocalDate.now());
@@ -61,7 +61,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         AccountDTO account2 = new AccountDTO();
         account2.setIban("NL01ABNA0123456789");
-        account2.setBalance(20);
+        account2.setBalance(0);
         account2.setTypeOfAccount(AccountType.CURRENT);
         account2.setUserId(userDto.getId());
         account2.setDateOfOpening(LocalDate.now());
@@ -70,14 +70,14 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         accountService.createAccount(account2);
 
-        TransactionDTO transaction = new TransactionDTO();
-        transaction.setFromAccount(account1.getIban());
-        transaction.setToAccount(account2.getIban());
-        transaction.setAmount(69);
-        transaction.setPerformingUser(userDto.getId());
-        transaction.setTypeOfTransaction(TransactionType.DEPOSIT);
-        transaction.setDescription("Bla bla");
+//        TransactionDTO transaction = new TransactionDTO();
+//        transaction.setFromAccount(account1.getIban());
+//        transaction.setToAccount(account2.getIban());
+//        transaction.setAmount(69);
+//        transaction.setPerformingUser(userDto.getId());
+//        transaction.setTypeOfTransaction(TransactionType.DEPOSIT);
+//        transaction.setDescription("Bla bla");
 
-        transactionService.addTransaction(transaction, TransactionType.DEPOSIT);
+        //transactionService.addTransaction(transaction, TransactionType.DEPOSIT);
     }
 }

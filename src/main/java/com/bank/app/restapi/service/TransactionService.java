@@ -2,6 +2,7 @@ package com.bank.app.restapi.service;
 
 import com.bank.app.restapi.dto.TransactionDTO;
 import com.bank.app.restapi.dto.mapper.TransactionMapper;
+import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.Transaction;
 import com.bank.app.restapi.model.TransactionType;
 import com.bank.app.restapi.repository.AccountRepository;
@@ -106,25 +107,37 @@ public class TransactionService {
         t.setDateOfExecution(LocalDateTime.now());
         t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow());
         t.setDescription(dto.getDescription());
-//        dto.setDateOfExecution(LocalDateTime.now());
-//        dto.setTypeOfTransaction(type);
-//        Transaction transaction = transactionMapper.toEntity(dto);
+
+        deductMoneyFromAccount(t.getFromAccount(), t.getAmount());
+        sentMoneyToAccount(t.getToAccount(), t.getAmount());
+
         Transaction savedTransaction = transactionRepository.save(t);
         return transactionMapper.toDTO(savedTransaction);
     }
 
-    // private Transaction mapDtoToTransaction(TransactionDTO dto, TransactionType
-    // type) {
-    // Transaction t = new Transaction();
-    // t.setFromAccount(accountRepository.findByIban(dto.getFromAccount()));
-    // t.setToAccount(accountRepository.findByIban(dto.getToAccount()));
-    // t.setAmount(dto.getAmount());
-    // t.setTypeOfTransaction(type);
-    // t.setDateOfExecution(LocalDateTime.now());
-    // t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow());
-    // t.setDescription(dto.getDescription());
+    private void deductMoneyFromAccount(Account fromAccount, float amount) {
+        checkAccountRelatedLimit(fromAccount, amount);
 
-    // return t;
-    // }
+        float balance = fromAccount.getBalance();
+        balance = balance - amount;
+        fromAccount.setBalance(balance);
+    }
+
+    private void sentMoneyToAccount(Account toAccount, float amount) {
+        float balance = toAccount.getBalance();
+        balance = balance + amount;
+        toAccount.setBalance(balance);
+    }
+
+    private void checkAccountRelatedLimit(Account fromAccount, float amount) {
+        float balance = fromAccount.getBalance();
+        balance = balance - amount;
+        if (fromAccount.getAbsoluteLimit() > balance) {
+            throw new IllegalArgumentException("Cannot exceed the account's absolute limit.");
+        }
+        if (amount > fromAccount.getBalance()) {
+            throw new IllegalArgumentException("Insufficient funds. Cannot complete transaction.");
+        }
+    }
 
 }

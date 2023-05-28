@@ -36,7 +36,9 @@ public class TransactionController {
         List<TransactionDTO> transactions = transactionService.getTransactions(iban, minAmount, maxAmount, exactAmount,
                 typeOfTransaction, startDate, endDate);
 
-        return ResponseEntity.status(200).body(transactions);
+        int statusCode = transactions.isEmpty() ? 204 : 200;
+
+        return ResponseEntity.status(statusCode).body(transactions);
     }
 
     @GetMapping(value = "{transactionId}")
