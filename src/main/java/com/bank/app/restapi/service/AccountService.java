@@ -23,11 +23,10 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class AccountService {
-    @Autowired
-    private AccountRepository accountRepository;
 
-    @Autowired
-    private UserService userService;
+    private final AccountRepository accountRepository;
+
+    private final UserService userService;
 
     private final AccountMapper accountMapper;
 
@@ -36,28 +35,41 @@ public class AccountService {
     }
 
     public AccountDTO createAccount(AccountDTO accountDTO) {
+
         UUID userId = accountDTO.getUserId();
         if (!userService.userIdExists(userId)) {
             throw new EntityNotFoundException("User with following id: " + userId + " not found");
         }
 
-        accountDTO.setIban(generateDutchIban());
+        String dutchIban = generateDutchIban();
+        while(ibanExists(dutchIban)) {
+            dutchIban = generateDutchIban();
+        }
+
+        accountDTO.setUserId(userId);
+        accountDTO.setIban(dutchIban);
+        accountDTO.setBalance(0);
         accountDTO.setDateOfOpening(LocalDate.now());
         accountDTO.setActive(true);
+
         Account account = accountMapper.toEntity(accountDTO);
         account = accountRepository.saveAndFlush(account);
 
         return accountMapper.toDTO(account);
     }
 
-    public void deactivateAccount(AccountDTO accountDTO) {
-        Account account = accountMapper.toEntity(accountDTO);
-        accountDTO.setActive(false);
-        accountRepository.saveAndFlush(account);
+    public boolean deactivateAccount(String iban) {
+        AccountDTO accountDTO = getAccountByIban(iban);
+        return updateAccountStatus(accountDTO, false, iban);
     }
 
-    public List<String> getIbanByUsername(String username) {
-        return accountRepository.findIbanByUsername(username);
+    public boolean activateAccount(String iban) {
+        AccountDTO accountDTO = getAccountByIban(iban);
+        return updateAccountStatus(accountDTO, true, iban);
+    }
+
+    public List<String> getIbanByUsername(String customerName) {
+        return accountRepository.findIbanByUsername(customerName);
     }
 
     public AccountDTO getAccountByIban(String iban) {
@@ -117,4 +129,20 @@ public class AccountService {
         // pad the check digit with a leading zero if necessary
         return String.format("%02d", checkDigit);
     }
+
+    public boolean ibanExists(String dutchIban){
+        Account account = accountRepository.findByIban(dutchIban);
+        return account != null;
+    }
+
+    private boolean updateAccountStatus(AccountDTO accountDTO, boolean active, String iban) {
+        if (accountDTO == null){
+            throw new EntityNotFoundException("No account with the following iban "+iban);
+        }
+        Account account = accountMapper.toEntity(accountDTO);
+        account.setActive(active);
+        this.accountRepository.saveAndFlush(account);
+        return true;
+    }
+
 }

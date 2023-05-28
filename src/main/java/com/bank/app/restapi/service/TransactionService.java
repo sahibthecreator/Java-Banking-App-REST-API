@@ -8,6 +8,7 @@ import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.repository.TransactionRepository;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +25,17 @@ public class TransactionService {
     private AccountRepository accountRepository;
     private UserRepository userRepository;
 
+    private final Environment environment;
+
+
     private TransactionMapper transactionMapper;
 
     public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository,
-            UserRepository userRepository, TransactionMapper transactionMapper) {
+                              UserRepository userRepository, Environment environment, TransactionMapper transactionMapper) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+        this.environment = environment;
         this.transactionMapper = transactionMapper;
     }
 
@@ -80,8 +85,11 @@ public class TransactionService {
                     Date.valueOf(endDate)));
         }
 
+        int defaultLimit = Integer.parseInt(environment.getProperty("api.transaction.default-limit", "100"));
+
         List<Transaction> transactions = transactionRepository.findAll(specification);
-        return transactions.stream().map(transactionMapper::toDTO).toList();
+        return transactions.stream().map(transactionMapper::toDTO).limit((defaultLimit)).toList();
+
     }
 
     public TransactionDTO getTransactionById(UUID transactionId) {
