@@ -28,7 +28,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
     @Autowired
     public DatabaseInitializer(UserService userService, AccountService accountService,
-            TransactionService transactionService, UserMapper userMapper) {
+                               TransactionService transactionService, UserMapper userMapper) {
         this.userService = userService;
         this.accountService = accountService;
         this.transactionService = transactionService;

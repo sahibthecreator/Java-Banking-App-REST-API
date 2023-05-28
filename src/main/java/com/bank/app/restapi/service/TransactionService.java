@@ -98,10 +98,18 @@ public class TransactionService {
     }
 
     public TransactionDTO addTransaction(TransactionDTO dto, TransactionType type) {
-        dto.setDateOfExecution(LocalDateTime.now());
-        dto.setTypeOfTransaction(TransactionType.TRANSFER);
-        Transaction transaction = transactionMapper.toEntity(dto);
-        Transaction savedTransaction = transactionRepository.save(transaction);
+        Transaction t = new Transaction();
+        t.setFromAccount(accountRepository.findByIban(dto.getFromAccount()));
+        t.setToAccount(accountRepository.findByIban(dto.getToAccount()));
+        t.setAmount(dto.getAmount());
+        t.setTypeOfTransaction(type);
+        t.setDateOfExecution(LocalDateTime.now());
+        t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow());
+        t.setDescription(dto.getDescription());
+//        dto.setDateOfExecution(LocalDateTime.now());
+//        dto.setTypeOfTransaction(type);
+//        Transaction transaction = transactionMapper.toEntity(dto);
+        Transaction savedTransaction = transactionRepository.save(t);
         return transactionMapper.toDTO(savedTransaction);
     }
 
