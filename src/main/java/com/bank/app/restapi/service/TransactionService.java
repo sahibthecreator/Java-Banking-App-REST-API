@@ -5,6 +5,7 @@ import com.bank.app.restapi.dto.mapper.TransactionMapper;
 import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.Transaction;
 import com.bank.app.restapi.model.TransactionType;
+import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.repository.TransactionRepository;
 import com.bank.app.restapi.repository.UserRepository;
@@ -17,6 +18,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -105,7 +107,9 @@ public class TransactionService {
         t.setAmount(dto.getAmount());
         t.setTypeOfTransaction(type);
         t.setDateOfExecution(LocalDateTime.now());
-        t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow());
+        t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow(
+                () -> new EntityNotFoundException("Performing user not found"))
+        );
         t.setDescription(dto.getDescription());
 
         deductMoneyFromAccount(t.getFromAccount(), t.getAmount());
@@ -116,27 +120,33 @@ public class TransactionService {
     }
 
     private void deductMoneyFromAccount(Account fromAccount, float amount) {
-        checkAccountRelatedLimit(fromAccount, amount);
+        checkAccountRelatedLimits(fromAccount, amount);
+        checkCustomerRelatedLimits(fromAccount, amount);
 
         float balance = fromAccount.getBalance();
         balance = balance - amount;
         fromAccount.setBalance(balance);
+
+        User ownerOfSendingAccount = mapAccountIbanToOwner(fromAccount);
+        float dayLimit = ownerOfSendingAccount.getDayLimit();
+        dayLimit = dayLimit - amount;
+        ownerOfSendingAccount.setDayLimit(dayLimit);
     }
 
     private void sentMoneyToAccount(Account toAccount, float amount) {
         if (!toAccount.isActive()) {
-            throw new IllegalArgumentException("Receiving account is deactivated");
+            throw new IllegalArgumentException("Receiving account is deactivated.");
         }
         float balance = toAccount.getBalance();
         balance = balance + amount;
         toAccount.setBalance(balance);
     }
 
-    private void checkAccountRelatedLimit(Account fromAccount, float amount) {
+    private void checkAccountRelatedLimits(Account fromAccount, float amount) {
         float balance = fromAccount.getBalance();
         balance = balance - amount;
         if (!fromAccount.isActive()) {
-            throw new IllegalArgumentException("Sending account is deactivated");
+            throw new IllegalArgumentException("Sending account is deactivated.");
         }
         if (fromAccount.getAbsoluteLimit() > balance) {
             throw new IllegalArgumentException("Cannot exceed the account's absolute limit.");
@@ -144,6 +154,26 @@ public class TransactionService {
         if (amount > fromAccount.getBalance()) {
             throw new IllegalArgumentException("Insufficient funds. Cannot complete transaction.");
         }
+    }
+
+    private void checkCustomerRelatedLimits (Account fromAccount, float amount) {
+        User ownerOfSendingAccount = mapAccountIbanToOwner(fromAccount);
+
+        if (amount > ownerOfSendingAccount.getTransactionLimit()) {
+            throw new IllegalArgumentException("Transaction exceed the transaction limit.");
+        }
+
+        float dayLimit = ownerOfSendingAccount.getDayLimit();
+        dayLimit = dayLimit - amount;
+        if (dayLimit < 0) {
+            throw new IllegalArgumentException("Day limit has been reached.");
+        }
+    }
+
+    private User mapAccountIbanToOwner (Account account) {
+        Optional<User> ownerOfSendingAccount = userRepository.findById(account.getUser().getId());
+
+        return ownerOfSendingAccount.get();
     }
 
 }
