@@ -124,6 +124,9 @@ public class TransactionService {
     }
 
     private void sentMoneyToAccount(Account toAccount, float amount) {
+        if (!toAccount.isActive()) {
+            throw new IllegalArgumentException("Receiving account is deactivated");
+        }
         float balance = toAccount.getBalance();
         balance = balance + amount;
         toAccount.setBalance(balance);
@@ -132,6 +135,9 @@ public class TransactionService {
     private void checkAccountRelatedLimit(Account fromAccount, float amount) {
         float balance = fromAccount.getBalance();
         balance = balance - amount;
+        if (!fromAccount.isActive()) {
+            throw new IllegalArgumentException("Sending account is deactivated");
+        }
         if (fromAccount.getAbsoluteLimit() > balance) {
             throw new IllegalArgumentException("Cannot exceed the account's absolute limit.");
         }
