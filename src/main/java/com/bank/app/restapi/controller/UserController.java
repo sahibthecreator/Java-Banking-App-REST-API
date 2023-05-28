@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,12 +24,17 @@ public class UserController {
 
     private final UserService userService;
 
-    private UserMapper userMapper;
-
     @GetMapping("")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
-    public ResponseEntity<List<UserDTO>> getAll() {
-        List<UserDTO> users = userService.getAll().stream().map(userMapper::toDTO).toList();
+    public ResponseEntity<List<UserDTO>> getAll(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) LocalDate dateOfBirth,
+            @RequestParam(required = false) String bsn,
+            @RequestParam(defaultValue = "asc") String sort,
+            @RequestParam(defaultValue = "20") int limit) {
+        List<UserDTO> users = userService.getAll(firstName, lastName, email, dateOfBirth, bsn, sort, limit);
 
         return ResponseEntity.status(200).body(users);
     }
@@ -50,12 +56,11 @@ public class UserController {
 
     @PutMapping("/{userId}")
     @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
-    public ResponseEntity<?> updateUser(@PathVariable String userId, @RequestBody @Valid UserDTO userDTO,
+    public ResponseEntity<UserDTO> updateUser(@PathVariable String userId, @RequestBody @Valid UserDTO userDTO,
             HttpServletRequest request) {
 
         UUID id = UUID.fromString(userId);
-        User user = userMapper.toEntity(userDTO);
-        UserDTO createdUserDTO = userMapper.toDTO(userService.update(id, user));
+        UserDTO createdUserDTO = userService.update(id, userDTO);
 
         return ResponseEntity.status(200).body(createdUserDTO);
     }

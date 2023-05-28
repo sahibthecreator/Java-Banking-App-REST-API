@@ -1,9 +1,3 @@
-<script setup>
-import Navigation from '@/components/Navigation.vue'
-
-
-</script>
-
 <template>
   <div class="wrapper">
     <div class="section" id="left"></div>
@@ -73,7 +67,7 @@ export default {
     async login() {
       try {
         const credentials = {
-          username: this.username,
+          email: this.username,
           password: this.password,
         };
         await this.$store.dispatch('login', credentials);
