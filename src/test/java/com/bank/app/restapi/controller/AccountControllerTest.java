@@ -2,76 +2,126 @@ package com.bank.app.restapi.Controller;
 
 import com.bank.app.restapi.controller.AccountController;
 import com.bank.app.restapi.dto.AccountDTO;
-import com.bank.app.restapi.model.Account;
+import com.bank.app.restapi.controller.AccountController;
 import com.bank.app.restapi.model.AccountType;
-import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.service.AccountService;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(AccountController.class)
+@ExtendWith(MockitoExtension.class)
 class AccountControllerTest {
-    private MockMvc mockMvc;
-    @MockBean
+    @InjectMocks
+    private AccountController accountController;
+    @Mock
     private AccountService accountService;
 
-    private ObjectMapper objectMapper;
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+        accountController = new AccountController(accountService);
+    }
 
-//    @Test
-//    void getAllShouldReturnAccountsUpToDefaultLimit() throws Exception {
-//        // Mock the behavior of the accountService to return a list of accounts
-//        List<Account> mockAccounts = createMockAccounts(); // Create a list of mock accounts
-//        when(accountService.getAllAccounts()).thenReturn(mockAccounts);
-//
-//        this.mockMvc.perform(get("/accounts"))
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$", hasSize(mockAccounts.size())))
-//                .andExpect(jsonPath("$[0].iban").value(mockAccounts.get(0).getIban()));
-//    }
+    @Test
+    void getAllShouldReturnListOfAccounts(){
+        List<AccountDTO> mockAccounts = Arrays.asList(new AccountDTO(), new AccountDTO());//createMockAccounts();
 
-//    private List<Account> createMockAccounts() {
-//        List<Account> accounts = new ArrayList<>();
+        when(accountService.getAccounts(null, 0, null, null, null, true, null, 10)).thenReturn(mockAccounts);
+
+        ResponseEntity<List<AccountDTO>> response = accountController.getAccounts(null, 0, null, null, null, true, null, 10);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockAccounts, response.getBody());
+        verify(accountService, times(1)).getAccounts(null, 0, null, null, null, true, null, 10);
+    }
+
+    @Test
+    void createAccountShouldReturnCreatedAccount() {
+        AccountDTO accountDTO = AccountDTO.builder()
+                .iban("NL01INHO0000000001")
+                .balance(1000.0f)
+                .typeOfAccount(AccountType.CURRENT)
+                .userId(UUID.randomUUID())
+                .dateOfOpening(LocalDate.now())
+                .active(true)
+                .build();
+
+        when(accountService.createAccount(accountDTO)).thenReturn(accountDTO);
+
+        ResponseEntity<AccountDTO> response = accountController.createAccount(accountDTO);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(accountDTO, response.getBody());
+        verify(accountService, times(1)).createAccount(accountDTO);
+    }
+
+    @Test
+    void accountInfoByIbanShouldReturnAccount(){
+        AccountDTO accountDTO = AccountDTO.builder()
+                .iban("NL01INHO0000000001")
+                .balance(1000.0f)
+                .typeOfAccount(AccountType.CURRENT)
+                .userId(UUID.randomUUID())
+                .dateOfOpening(LocalDate.now())
+                .active(true)
+                .build();
+
+        when(accountService.getAccountByIban("NL01INHO0000000001")).thenReturn(accountDTO);
+
+        ResponseEntity<AccountDTO> response = accountController.getAccountInfo("NL01INHO0000000001");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(accountDTO, response.getBody());
+        verify(accountService, times(1)).getAccountByIban("NL01INHO0000000001");
+    }
+
+    @Test
+    void getAccountBalanceShouldReturnTheCorrectBalance(){
+        AccountDTO accountDTO = AccountDTO.builder()
+                .iban("NL01INHO0000000001")
+                .balance(1000.0f)
+                .typeOfAccount(AccountType.CURRENT)
+                .userId(UUID.randomUUID())
+                .dateOfOpening(LocalDate.now())
+                .active(true)
+                .build();
+
+        when(accountService.getBalanceByIban("NL01INHO0000000001")).thenReturn(accountDTO.getBalance());
+
+        ResponseEntity<?> response = accountController.getAccountBalance("NL01INHO0000000001");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(accountDTO.getBalance(), response.getBody());
+        verify(accountService, times(1)).getBalanceByIban("NL01INHO0000000001");
+    }
+    // Create a list of 101 accounts
+//    private List<AccountDTO> createMockAccounts() {
+//        List<AccountDTO> mockAccounts = new ArrayList<>();
 //
-//        // Create and add mock accounts to the list
-//        Account account1 = new Account();
-//        account1.setIban("IBAN1");
-//        account1.setBalance(1000);
-//        account1.setTypeOfAccount(AccountType.SAVINGS);
-//        account1.setUser(new User("John Smith"));
-//        account1.setActive(true);
-//        account1.setDateOfOpening(LocalDate.now());
-//        accounts.add(account1);
+//        for (int i = 0; i < 99; i++) {
+//            AccountDTO mockAccount = AccountDTO.builder()
+//                    .iban(accountService.generateDutchIban())
+//                    .balance(1000.0f)
+//                    .typeOfAccount(AccountType.CURRENT)
+//                    .userId(UUID.randomUUID())
+//                    .dateOfOpening(LocalDate.now())
+//                    .active(true)
+//                    .build();
+//            mockAccounts.add(mockAccount);
+//        }
 //
-//        Account account2 = new Account();
-//        account2.setIban("IBAN2");
-//        account2.setBalance(2000);
-//        account2.setTypeOfAccount(AccountType.CURRENT);
-//        account2.setUser(new User("Jane Smith"));
-//        account2.setActive(true);
-//        account2.setDateOfOpening(LocalDate.now());
-//        accounts.add(account2);
-//
-//        return accounts;
+//        return mockAccounts;
 //    }
 }
