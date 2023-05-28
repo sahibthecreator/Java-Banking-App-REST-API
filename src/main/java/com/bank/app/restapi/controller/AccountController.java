@@ -1,81 +1,75 @@
 package com.bank.app.restapi.controller;
 
 import com.bank.app.restapi.dto.AccountDTO;
-import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.service.AccountService;
 
 import jakarta.validation.Valid;
 
 import lombok.AllArgsConstructor;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("accounts")
+@CrossOrigin
+@RequestMapping("/accounts")
 public class AccountController {
 
     private final AccountService accountService;
-    private final Environment environment;
-    private final AccountMapper accountMapper;
 
     @GetMapping("")
-    public ResponseEntity<?> getAll() {
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
+    public ResponseEntity<List<AccountDTO>> getAccounts(
+            @RequestParam(required = false) String iban,
+            @RequestParam(required = false) float balance,
+            @RequestParam(required = false) String typeOfAccount,
+            @RequestParam(required = false) UUID userId,
+            @RequestParam(required = false) LocalDate dateOfOpening,
+            @RequestParam(required = false) boolean active,
+            @RequestParam(defaultValue = "desc") String sort,
+            @RequestParam(defaultValue = "20") int limit) {
 
-        int defaultLimit = Integer.parseInt(environment.getProperty("api.account.default-limit", "1000"));
-        List<AccountDTO> allAccounts = accountService.getAllAccounts()
-                .stream()
-                .map(accountMapper::toDTO)
-                .limit(defaultLimit)
-                .collect(Collectors.toList());
-
-        if (allAccounts.isEmpty()) {
-            return ResponseEntity.status(404).body("No accounts found");
+            List<AccountDTO> accounts = accountService.getAccounts(iban, balance, typeOfAccount, userId, dateOfOpening, active, sort, limit);
+            return ResponseEntity.status(200).body(accounts);
         }
 
-        return ResponseEntity.status(200).body(allAccounts);
-    }
-
     @PostMapping("")
-    public ResponseEntity<?> createAccount(@RequestBody @Valid AccountDTO accountDTO) {
-
-        AccountDTO createdAccountDTO = accountService.createAccount(accountDTO);
-
-        return ResponseEntity.status(201).body(createdAccountDTO);
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
+    public ResponseEntity<AccountDTO> createAccount(@RequestBody @Valid AccountDTO accountDTO) {
+        return ResponseEntity.status(201).body(accountService.createAccount(accountDTO));
     }
 
     @GetMapping("/{iban}")
-    public ResponseEntity<?> accountInfo(@PathVariable String iban) {
-        AccountDTO accountDTO = accountService.getAccountByIban(iban);
-
-        if (accountDTO == null) {
-            return ResponseEntity.status(404).body("Account with following Iban not found");
-        }
-
-        return ResponseEntity.status(200).body(accountDTO);
+    public ResponseEntity<AccountDTO> getAccountInfo(@PathVariable String iban) {
+        return ResponseEntity.status(200).body(accountService.getAccountByIban(iban));
     }
 
     // TODO: 27-May-23 test returns 200 but return whole account object
     // should we make a BalanceResponseDTO?
     @GetMapping("/{iban}/balance")
-    public ResponseEntity<?> accountBalance(@PathVariable String iban) {
-        double balance = accountService.getBalanceByIban(iban);
-
-        if (balance == -1) {
-            return ResponseEntity.status(404).body("Account with following Iban not found");
-        }
-
-        return ResponseEntity.status(200).body(balance);
+    public ResponseEntity<?> getAccountBalance(@PathVariable String iban) {
+        return ResponseEntity.status(200).body(accountService.getBalanceByIban(iban));
     }
+
+    @GetMapping("/customerIBANs")
+    public ResponseEntity<List<String>> getIbanByCustomerName(@PathVariable String customerName) {
+        return ResponseEntity.status(200).body(accountService.getIbanByUsername(customerName));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable UUID userId) {
+        return ResponseEntity.status(200).body(accountService.getAccountsByUserId(userId));
+    }
+
 
     @PatchMapping("/{iban}")
     public ResponseEntity<?> deactivateAccount(@PathVariable String iban) {
-        accountService.deactivateAccount(iban);
-        return ResponseEntity.status(200).build();
+        return ResponseEntity.status(200).body(accountService.deactivateAccount(iban));
     }
 
     //TODO: test returns 200 but doesn't change the status (i tried both patch and post requests)
@@ -84,17 +78,5 @@ public class AccountController {
 //        accountService.activateAccount(iban);
 //        return ResponseEntity.status(200).build();
 //    }
-
-
-    @GetMapping("/customerIBANs")
-    public ResponseEntity<?> getIbanByCustomerName(@PathVariable String customerName) {
-        List<String> ibans = accountService.getIbanByUsername(customerName);
-
-        if (ibans.isEmpty()) {
-            return ResponseEntity.status(204).body("No IBANs found for this username");
-        }
-
-        return ResponseEntity.status(200).body(ibans);
-    }
 
 }

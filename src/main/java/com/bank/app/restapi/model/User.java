@@ -49,8 +49,5 @@ public class User {
     @Column(name = "transactionLimit")
     private float transactionLimit;
 
-    @OneToMany(mappedBy = "user")
-    @JsonIgnoreProperties("user")
-    @JsonIgnore
-    private Set<Account> accounts = new HashSet<>();
+
 }
