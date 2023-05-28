@@ -74,7 +74,6 @@ export default {
         this.$router.push('/dashboard');
       } catch (error) {
         this.errorMessage = error.message;
-        console.log(error.message);
       }
     },
     async register() {
@@ -94,7 +93,6 @@ export default {
         this.username = body.email;
       } catch (error) {
         this.errorMessage = error.message;
-        console.log(error.message);
       }
     },
     formatDate() {

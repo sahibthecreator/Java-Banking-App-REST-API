@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "@vue/compat": "^3.3.2",
+    "apexcharts": "^3.40.0",
     "axios": "^1.4.0",
     "bootstrap-vue": "^2.23.1",
     "pinia": "^2.0.36",
     "sass": "^1.62.1",
     "vue": "^3.3.2",
+    "vue-apexcharts": "^1.6.2",
     "vue-router": "^4.2.0",
     "vuex": "^4.1.0"
   },

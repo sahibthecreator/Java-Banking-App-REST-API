@@ -1,5 +1,6 @@
 <script setup>
 import Navigation from '@/components/Navigation.vue'
+import AccountIcon from './AccountIcon.vue';
 </script>
 
 <template>
@@ -9,11 +10,71 @@ import Navigation from '@/components/Navigation.vue'
 
   <div class="dashboardPage">
     <div class="panel">
-      <span class="dashboardName">Good afternoon,<br> <span>Jane H.</span></span>
-      <div class="accounts">
-        <div class="dashboardAccount"><span>1.245,90</span></div>
-        <div class="dashboardAccount"><span>1.245,90</span></div>
-        <div class="dashboardAccount"><span>1.245,90</span></div>
+      <div class="topPart">
+        <div class="dashboardName">
+          <h1 class="welcomeText">Good afternoon,<br>
+            {{user.firstName}} {{ user.lastName[0] }}.
+          </h1>
+
+          <div class="accounts">
+            <div class="account">
+              <div class="d-flex">
+                <AccountIcon letter="A"></AccountIcon>
+                <p class="my-auto ml-3 font-weight-bolder">Current Account</p>
+              </div>
+
+              <p class="balance">€ 234,42</p>
+            </div>
+            <div class="account">
+              <div class="d-flex">
+                <AccountIcon letter="A"></AccountIcon>
+                <p class="my-auto ml-3 font-weight-bolder">Current Account</p>
+              </div>
+
+              <p class="balance">€ 234,42</p>
+            </div>
+            <div class="account">
+              <div class="d-flex">
+                <AccountIcon letter="A"></AccountIcon>
+                <p class="my-auto ml-3 font-weight-bolder">Current Account</p>
+              </div>
+
+              <p class="balance">€ 234,42</p>
+            </div>
+            <div class="account">
+              <div class="d-flex">
+                <AccountIcon letter="A"></AccountIcon>
+                <p class="my-auto ml-3 font-weight-bolder">Current Account</p>
+              </div>
+
+              <p class="balance">€ 234,42</p>
+            </div>
+          </div>
+
+        </div>
+        <div class="dashboardAction">
+          <b-button variant="dark_primary">Send money</b-button>
+          <b-button variant="gray_dark">View transaction history</b-button>
+          <b-button variant="black">Request an account</b-button>
+        </div>
+        <div class="chart">
+          <apexchart type="line" height="200px" :options="chartOptions" :series="chartSeries" />
+        </div>
+      </div>
+
+      <div class="transactions">
+        <div class="transaction">
+          <div class="header">
+            <h5>- €430,00</h5>
+            <p class="dateTime">09:22</p>
+          </div>
+          <div class="details">
+            <p><b>To</b> Sam Jhonson</p>
+            <p>NL01033910301</p>
+          </div>
+          <b-button variant="black">See Details</b-button>
+        </div>
+
       </div>
     </div>
 
@@ -22,23 +83,72 @@ import Navigation from '@/components/Navigation.vue'
 </template>
 
 <script>
+import VueApexCharts from 'vue-apexcharts';
+
 export default {
   name: 'Dashboard',
+  components: {
+    apexchart: VueApexCharts,
+  },
   data() {
-    user: {
-      username: "Jane"
+    return {
+      user: null,
+      chartOptions: {
+        chart: {
+          type: 'line',
+          zoom: {
+            enabled: false
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        title: {
+          text: 'Total Spent by Month',
+          align: 'left'
+        },
+        grid: {
+          row: {
+            colors: ['#f3f3f3', 'transparent'],
+            opacity: 0.5
+          },
+        },
+        xaxis: {
+          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'], // Replace with actual month labels
+        },
+      },
+      chartSeries: [
+        {
+          name: 'Total Spent',
+          data: [480, 674, 400, 552, 122], // Replace with actual spent amounts
+        },
+      ],
     }
-  }
+  },
+  mounted() {
+    this.getUser();
+  },
+  methods: {
+    async getUser() {
+      try {
+        let user = await this.$store.dispatch('getUser', this.$store.getters.getUserId);
+        this.user = user;
+      } catch (error) {
+        console.log(error.message);
+      }
+
+    }
+  },
 };
 
 
-import Navigation from '@/components/Navigation.vue'
 </script>
 
 
 <style>
-
-
 .dashboardPage {
   background: url('@/assets/dashboard/bg.jpg');
   background-repeat: no-repeat;
@@ -53,26 +163,72 @@ import Navigation from '@/components/Navigation.vue'
 
 .panel {
   background: var(--white);
-  width: 70vw;
-  height: 70vh;
+  width: 90vw;
+  height: 80vh;
   border-radius: 35px;
   background-color: var(--white);
   margin: auto;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   padding: 50px;
 }
 
+.topPart {
+  display: flex;
+}
+
+.btn {
+  border: 0px !important;
+  border-radius: 7px !important;
+  padding: 10px 15px !important;
+}
+
+
+.btn::-moz-focus-outer {
+  outline: none;
+}
+
+.welcomeText {
+  font-size: 2.3vw;
+  width: fit-content;
+}
+
 .dashboardName {
-  font-size: 32px;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
 }
 
 .accounts {
+  width: 95%;
+  margin-top: 5%;
+  display: flex;
+  gap: 15px;
+  overflow: auto;
+  white-space: nowrap;
+  border-radius: 15px;
+  box-shadow: 0 0 30px #14141417;
+  padding: 5px;
+}
+
+.account {
+  background-color: white;
+  padding: 10px;
+  width: 100%;
+  border-radius: 15px;
+}
+
+.account .balance {
+  font-size: 2vw;
+  font-weight: 500;
+  text-align: center;
+}
+
+
+.transactions {
   background: white;
-  width: 90%;
-  height: 300px;
-  position: absolute;
-  bottom: 50px;
+  width: 100%;
   border-radius: 35px;
   box-shadow: 0 0 30px #14141417;
   display: flex;
@@ -80,21 +236,55 @@ import Navigation from '@/components/Navigation.vue'
   gap: 20px;
   padding: 20px;
 }
-.dashboardAccount {
+
+.transaction {
   background: white;
   position: relative;
   width: 230px;
-  height: 250px;
-  border-radius: 35px;
+  border-radius: 25px;
   box-shadow: 0 0 30px #14141417;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   padding: 20px;
 }
 
-
-.dashboardAccount > span {
-  
+.transaction .details p {
+  margin-bottom: 0px;
 }
 
+.transaction .details p:nth-child(2) {
+  font-size: small;
+}
+
+.transaction .btn {
+  padding: 5px 5px !important;
+  margin-top: 10%;
+}
+
+.transaction .header {
+  display: flex;
+}
+
+.transaction .dateTime {
+  font-size: smaller;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+.dashboardAction {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10%;
+  margin-left: auto;
+  margin-right: 5%;
+}
+
+.chart {
+  background-color: white;
+  border-radius: 35px;
+  padding: 10px;
+}
+
+.dashboardAccount>span {}
 </style>

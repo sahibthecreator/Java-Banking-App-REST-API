@@ -1,6 +1,7 @@
 package com.bank.app.restapi.service;
 
 import com.bank.app.restapi.dto.LoginDTO;
+import com.bank.app.restapi.dto.LoginResponseDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.User;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
@@ -65,11 +67,14 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
-    public String login(LoginDTO loginDTO) {
+    public LoginResponseDTO login(LoginDTO loginDTO) {
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
+        UUID userId = this.userRepository.findIdByEmail(loginDTO.getEmail()).get();
+        String jwtToken = jwtService.generateToken(loginDTO.getEmail());
+        LoginResponseDTO loginResponseDTO = new LoginResponseDTO(userId, jwtToken);
 
-        return jwtService.generateToken(loginDTO.getEmail());
+        return loginResponseDTO;
 
     }
 

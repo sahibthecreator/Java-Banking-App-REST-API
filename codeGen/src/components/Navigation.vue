@@ -8,7 +8,7 @@
       <b-nav-item to="/">Home</b-nav-item>
       <b-nav-item>Products</b-nav-item>
       <b-nav-item>App and Internet banking</b-nav-item>
-      <b-nav-item v-if="loggedUser=true">Dashboard</b-nav-item>
+      <b-nav-item v-if="loggedUser=true" to="/dashboard">Dashboard</b-nav-item>
     </b-nav>
 
     <b-navbar-nav class="ml-auto">

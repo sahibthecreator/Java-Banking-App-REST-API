@@ -1,6 +1,19 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080'; // Your backend API URL
+const API_URL = 'http://localhost:80'; // Your backend API URL
+
+export const getUser = async (userId, token) => {
+  try {
+    const response = await axios.get(`${API_URL}/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
 
 export const getUsers = async (token) => {
   try {
@@ -11,7 +24,7 @@ export const getUsers = async (token) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response.data.error);
+    throw new Error(error.response.data);
   }
 };
 

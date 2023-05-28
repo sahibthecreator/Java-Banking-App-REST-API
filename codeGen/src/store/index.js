@@ -1,6 +1,6 @@
 import Vuex from 'vuex';
 import { login, register } from '@/service/auth';
-import { getUsers, createUser, updateUser, deleteUser } from '@/service/users';
+import { getUser, getUsers, createUser, updateUser, deleteUser } from '@/service/users';
 import { getAccounts, createAccount } from '@/service/accounts';
 import { getTransactions, getTransaction } from '@/service/transactions';
 
@@ -10,6 +10,7 @@ const store = new Vuex.Store({
     state: {
         token: localStorage.getItem('jwt_token') || '', // Initial token value retrieved from local storage
         user: null,
+        userId: localStorage.getItem('user_id') || '',
         users: [],
         accounts: [],
         transactions: [],
@@ -21,6 +22,11 @@ const store = new Vuex.Store({
         },
         setUser(state, user) {
             state.user = user;
+        },
+        setUserId(state, userId) {
+            state.userId = userId;
+            localStorage.setItem('user_id', userId); // Store token in local storage
+
         },
         setUsers(state, users) {
             state.users = users;
@@ -41,12 +47,16 @@ const store = new Vuex.Store({
         getCurrentUserToken(state) {
             return state.token;
         },
+        getUserId(state) {
+            return state.userId;
+        },
     },
     actions: {
         async login({ commit }, credentials) {
             try {
                 const response = await login(credentials);
-                commit('setToken', response);
+                commit('setToken', response.jwtToken);
+                commit('setUserId', response.userId);
             } catch (error) {
                 throw new Error(error.message);
             }
@@ -65,6 +75,15 @@ const store = new Vuex.Store({
             try {
                 const users = await getUsers(state.token);
                 commit('setUsers', users);
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async getUser({ commit, state }, userId) {
+            try {
+                const user = await getUser(userId, state.token);
+                commit('setUser', user);
+                return user;
             } catch (error) {
                 throw new Error(error.message);
             }

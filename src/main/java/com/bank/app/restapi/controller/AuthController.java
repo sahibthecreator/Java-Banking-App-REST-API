@@ -1,6 +1,7 @@
 package com.bank.app.restapi.controller;
 
 import com.bank.app.restapi.dto.LoginDTO;
+import com.bank.app.restapi.dto.LoginResponseDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.service.UserService;
 
@@ -19,9 +20,9 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid LoginDTO loginDTO) {
-        String JwtToken = userService.login(loginDTO);
-        return ResponseEntity.status(201).body(JwtToken);
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginDTO loginDTO) {
+        LoginResponseDTO responseDTO = userService.login(loginDTO);
+        return ResponseEntity.status(200).body(responseDTO);
     }
 
     @PostMapping("/register")

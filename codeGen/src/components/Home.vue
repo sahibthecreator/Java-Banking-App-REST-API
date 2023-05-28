@@ -22,7 +22,7 @@ import Navigation from '@/components/Navigation.vue'
     <div class="panel" id="rightHome">
       <img src="@/assets/HomeBG.svg" class="homeBG" />
       <img src="@/assets/HomeActivityPanel.svg" class="activity" />
-      <img src="@/assets/AccountPanel.svg" class="account" />
+      <img src="@/assets/AccountPanel.svg" class="accountImg" />
     </div>
   </div>
 </template>
@@ -85,8 +85,6 @@ export default {
   width: fit-content;
   height: fit-content;
   transform: translateX(-10%);
-  /* background-repeat: no-repeat; */
-  /* transform: translateX(-170px); */
   z-index: 0;
 }
 
@@ -122,7 +120,7 @@ export default {
   z-index: 100000;
 }
 
-.account {
+.accountImg {
   position: absolute;
   width: auto;
   top: 10%;

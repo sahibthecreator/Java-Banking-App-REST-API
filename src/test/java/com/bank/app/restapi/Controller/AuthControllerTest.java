@@ -2,6 +2,7 @@ package com.bank.app.restapi.Controller;
 
 import com.bank.app.restapi.controller.AuthController;
 import com.bank.app.restapi.dto.LoginDTO;
+import com.bank.app.restapi.dto.LoginResponseDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.service.UserService;
@@ -36,13 +37,15 @@ class AuthControllerTest {
     void loginShouldReturnJwtToken() {
         LoginDTO loginDTO = new LoginDTO("sam@gmail.com", "11111");
         String expectedJwtToken = "jwt-token";
+        LoginResponseDTO responseDTO = new LoginResponseDTO(UUID.randomUUID(), expectedJwtToken);
 
-        when(userService.login(loginDTO)).thenReturn(expectedJwtToken);
+        when(userService.login(loginDTO)).thenReturn(responseDTO);
 
-        ResponseEntity<String> response = authController.login(loginDTO);
+        ResponseEntity<LoginResponseDTO> response = authController.login(loginDTO);
 
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(expectedJwtToken, response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(responseDTO, response.getBody());
+        assertEquals(expectedJwtToken, response.getBody().getJwtToken());
         verify(userService, times(1)).login(loginDTO);
     }
 
