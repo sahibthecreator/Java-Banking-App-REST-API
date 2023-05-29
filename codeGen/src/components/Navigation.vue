@@ -8,11 +8,11 @@
       <b-nav-item to="/">Home</b-nav-item>
       <b-nav-item>Products</b-nav-item>
       <b-nav-item>App and Internet banking</b-nav-item>
-      <b-nav-item v-if="token.length != 0" to="/dashboard">Dashboard</b-nav-item>
+      <b-nav-item v-if="token" to="/dashboard">Dashboard</b-nav-item>
     </b-nav>
 
     <b-navbar-nav class="ml-auto">
-      <b-nav-item to="/login" id="login" v-if="token.length == 0">Login / register</b-nav-item>
+      <b-nav-item to="/login" id="login" v-if="!token">Login / register</b-nav-item>
     </b-navbar-nav>
 
   </div>
@@ -28,8 +28,6 @@ export default {
     }
   },
   mounted() {
-    console.log(this.token)
-    console.log(this.token == null);
   }
 };
 

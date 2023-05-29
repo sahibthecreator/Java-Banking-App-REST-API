@@ -10,7 +10,7 @@ import { getTransactionsByUserId } from '../service/transactions';
 
 const store = new Vuex.Store({
     state: {
-        token: localStorage.getItem('jwt_token') || '', // Initial token value retrieved from local storage
+        token: localStorage.getItem('jwt_token') || null, // Initial token value retrieved from local storage
         user: null,
         userId: localStorage.getItem('user_id') || '',
         users: [],
@@ -42,7 +42,7 @@ const store = new Vuex.Store({
         clearAuthData(state) {
             state.token = null;
             state.user = null;
-            localStorage.removeItem('token'); // Remove token from local storage
+            localStorage.removeItem('jwt_token'); // Remove token from local storage
         },
     },
     getters: {
@@ -118,10 +118,13 @@ const store = new Vuex.Store({
         },
         async getAccountsByUserId({ commit, state }, userId) {
             try {
+                console.log(state.token);
+                console.log(userId);
                 const accounts = await getAccountsByUserId(userId, state.token);
                 commit('setAccounts', accounts);
                 return accounts;
             } catch (error) {
+                console.log(error);
                 throw new Error(error.message);
             }
         },

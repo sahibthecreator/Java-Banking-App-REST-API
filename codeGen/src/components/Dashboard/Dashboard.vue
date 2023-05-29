@@ -93,7 +93,7 @@ export default {
     }
   },
   mounted() {
-    this.getUserAndAccountsAndTransactions();
+     this.getUserAndAccountsAndTransactions();
   },
   methods: {
     async getUserAndAccountsAndTransactions() {
@@ -104,8 +104,13 @@ export default {
         this.accounts = accounts;
         let transaction = await this.$store.dispatch('getTransactionsByUserId', this.$store.getters.getUserId);
         this.transactions = transaction;
+
       } catch (error) {
         console.log(error);
+        if (this.user == null) {
+          console.log("sssss");
+          this.$store.dispatch('logout');
+        }
       }
     },
     relocate_to_transaction() {
