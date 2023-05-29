@@ -24,12 +24,12 @@ public class Transaction {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "from_iban", referencedColumnName = "iban", nullable = false)
+    @JoinColumn(name = "from_iban", nullable = false)
     @JsonIgnoreProperties("sentTransactions")
     private Account fromAccount;
 
     @ManyToOne
-    @JoinColumn(name = "to_iban", referencedColumnName = "iban", nullable = false)
+    @JoinColumn(name = "to_iban", nullable = false)
     @JsonIgnoreProperties("receivedTransactions")
     private Account toAccount;
 
