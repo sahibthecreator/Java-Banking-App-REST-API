@@ -10,6 +10,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +23,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 @AllArgsConstructor
@@ -30,8 +35,30 @@ public class AccountService {
 
     private final AccountMapper accountMapper;
 
-    public List<Account> getAllAccounts() {
-        return new ArrayList<Account>(accountRepository.findAll());
+    public List<AccountDTO> getAccounts( String iban,
+                                         float balance,
+                                         String typeOfAccount,
+                                         UUID userId,
+                                         LocalDate dateOfOpening,
+                                         boolean active,
+                                         String sortDirection,
+                                         int limit) {
+
+        Specification<Account> specification = buildSpecification(iban, balance, typeOfAccount, userId, dateOfOpening, active);
+        Sort sort;
+        if (sortDirection != null && sortDirection.equalsIgnoreCase("desc")) {
+            sort = Sort.by(Sort.Direction.DESC, "dateOfOpening");
+        } else {
+            sort = Sort.by(Sort.Direction.ASC, "dateOfOpening");
+        }
+        Page<Account> accounPage = accountRepository.findAll(specification, PageRequest.of(0, limit, sort));
+        List<Account> accountList = accounPage.getContent();
+
+        if (accountList.isEmpty()) {
+            throw new EntityNotFoundException("No accounts found");
+        }
+
+        return accountList.stream().map(accountMapper::toDTO).toList()  ;
     }
 
     public AccountDTO createAccount(AccountDTO accountDTO) {
@@ -42,9 +69,6 @@ public class AccountService {
         }
 
         String dutchIban = generateDutchIban();
-        while(ibanExists(dutchIban)) {
-            dutchIban = generateDutchIban();
-        }
 
         accountDTO.setUserId(userId);
         accountDTO.setIban(dutchIban);
@@ -69,17 +93,36 @@ public class AccountService {
     }
 
     public List<String> getIbanByUsername(String customerName) {
-        return accountRepository.findIbanByUsername(customerName);
+        List<String> ibans =accountRepository.findIbanByUsername(customerName);
+        if (ibans.isEmpty()) {
+            throw new EntityNotFoundException("No accounts found for user: " + customerName);
+        }
+        return ibans;
+    }
+
+    public List<AccountDTO> getAccountsByUserId(UUID userId) {
+        List<Account> accounts = accountRepository.findAccountsByUserId(userId);
+        if (accounts.isEmpty()) {
+            throw new EntityNotFoundException("No accounts found for user with id: " + userId);
+        }
+        return accounts.stream().map(accountMapper::toDTO).toList();
     }
 
     public AccountDTO getAccountByIban(String iban) {
         Account account = accountRepository.findByIban(iban);
-        AccountDTO accountDTO = accountMapper.toDTO(account);
-        return accountDTO;
+        if(account == null) {
+            throw new EntityNotFoundException("Account with following iban: " + iban + " not found");
+        }
+        return accountMapper.toDTO(account);
     }
 
     public float getBalanceByIban(String iban) {
         return accountRepository.findBalanceByIban(iban);
+    }
+
+    public boolean ibanExists(String dutchIban){
+        Account account = accountRepository.findByIban(dutchIban);
+        return account != null;
     }
 
     public String generateDutchIban() {
@@ -90,6 +133,7 @@ public class AccountService {
         // construct the country code and check digit placeholder
         String countryCode = "NL";
         String checkDigitPlaceholder = "00";
+        String customCode = "INHO";
 
         // concatenate the strings to form the incomplete IBAN
         String incompleteIban = countryCode + checkDigitPlaceholder + accountNumber;
@@ -99,9 +143,17 @@ public class AccountService {
 
         // concatenate the strings to form the complete IBAN
 
-        return countryCode + checkDigit + accountNumber;
+        String iban = countryCode + checkDigit + customCode + accountNumber;
+
+        while(ibanExists(iban)) {
+            iban = generateDutchIban();
+        }
+        return iban;
+
     }
 
+
+    // Private methods
     private String calculateCheckDigit(String iban) {
         // move the four initial characters to the end of the string
         String moved = iban.substring(4) + iban.substring(0, 4);
@@ -130,11 +182,6 @@ public class AccountService {
         return String.format("%02d", checkDigit);
     }
 
-    public boolean ibanExists(String dutchIban){
-        Account account = accountRepository.findByIban(dutchIban);
-        return account != null;
-    }
-
     private boolean updateAccountStatus(AccountDTO accountDTO, boolean active, String iban) {
         if (accountDTO == null){
             throw new EntityNotFoundException("No account with the following iban "+iban);
@@ -143,6 +190,39 @@ public class AccountService {
         account.setActive(active);
         this.accountRepository.saveAndFlush(account);
         return true;
+    }
+
+    private Specification<Account> buildSpecification(String iban,
+                                                      float balance,
+                                                      String typeOfAccount,
+                                                      UUID userId,
+                                                      LocalDate dateOfOpening,
+                                                      boolean active) {
+       return ((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (iban != null && !iban.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("iban"), "%" + iban + "%"));
+            }
+            if (balance != 0 ) {
+                predicates.add(criteriaBuilder.equal(root.get("balance"), balance));
+            }
+            if (typeOfAccount != null && !typeOfAccount.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("typeOfAccount"), "%" + typeOfAccount + "%"));
+            }
+            if (userId != null && !userId.toString().isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
+            }
+            if (dateOfOpening != null && !dateOfOpening.toString().isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("dateOfOpening"), dateOfOpening));
+            }
+            if (active) {
+                predicates.add(criteriaBuilder.equal(root.get("active"), active));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        });
+
     }
 
 }
