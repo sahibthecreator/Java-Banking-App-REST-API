@@ -26,7 +26,7 @@ import TransactionWidget from './TransactionWidget.vue';
         <div class="dashboardAction">
           <b-button variant="dark_primary" @click="relocate_to_transaction()">Send money</b-button>
           <b-button variant="gray_dark">View transaction history</b-button>
-          <b-button variant="black">Request an account</b-button>
+          <b-button variant="black" @click="relocate_to_request()">Request an account</b-button>
         </div>
         <div class="chart">
           <apexchart type="line" height="280px" :options="chartOptions" :series="chartSeries" />
@@ -114,7 +114,10 @@ export default {
       }
     },
     relocate_to_transaction() {
-      this.$router.push('transaction')
+      this.$router.push('/dashboard/transaction')
+    },
+    relocate_to_request() {
+      this.$router.push('/dashboard/request')
     }
   },
 };
@@ -240,6 +243,4 @@ export default {
   padding: 10px;
   height: 100%;
 }
-
-.dashboardAccount>span {}
 </style>
