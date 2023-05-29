@@ -1,6 +1,7 @@
 package com.bank.app.restapi.Controller;
 
 import com.bank.app.restapi.controller.AccountController;
+import com.bank.app.restapi.dto.AccountBalanceDTO;
 import com.bank.app.restapi.dto.AccountDTO;
 import com.bank.app.restapi.model.AccountType;
 import com.bank.app.restapi.service.AccountService;
@@ -90,16 +91,12 @@ class AccountControllerTest {
 
     @Test
     void getAccountBalanceShouldReturnTheCorrectBalance() {
-        AccountDTO accountDTO = AccountDTO.builder()
+        AccountBalanceDTO accountDTO = AccountBalanceDTO.builder()
                 .iban("NL01INHO0000000001")
                 .balance(1000.0f)
-                .typeOfAccount(AccountType.CURRENT)
-                .userId(UUID.randomUUID())
-                .dateOfOpening(LocalDate.now())
-                .active(true)
                 .build();
 
-        when(accountService.getBalanceByIban("NL01INHO0000000001")).thenReturn(accountDTO.getBalance());
+        when(accountService.getBalanceByIban("NL01INHO0000000001")).thenReturn(accountDTO);
 
         ResponseEntity<?> response = accountController.getAccountBalance("NL01INHO0000000001");
         assertEquals(HttpStatus.OK, response.getStatusCode());

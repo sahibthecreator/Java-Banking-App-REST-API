@@ -1,13 +1,20 @@
 package com.bank.app.restapi.service;
 
+import com.bank.app.restapi.dto.AccountBalanceDTO;
 import com.bank.app.restapi.dto.AccountDTO;
+import com.bank.app.restapi.dto.CustomerIbanDTO;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.AccountType;
+
+import com.bank.app.restapi.model.User;
+import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.AccountRepository;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -60,11 +67,22 @@ public class AccountService {
     public AccountDTO createAccount(AccountDTO accountDTO) {
 
         UUID userId = accountDTO.getUserId();
-        if (!userService.userIdExists(userId)) {
+        User user = userService.getUserById(userId);
+
+        if (user == null) {
             throw new EntityNotFoundException("User with following id: " + userId + " not found");
         }
+        else{
+            if(accountDTO.getTypeOfAccount().equals(AccountType.SAVINGS)){
+                if(!userHasCurrentAccount(userId)){
+                    throw new IllegalArgumentException("User with following id: " + userId + " must have a current account to create a savings account ");
+                }
+            }
 
-        String dutchIban = generateDutchIban();
+            setLimitsAccordingToUserType(user);
+        }
+
+        String dutchIban = generateUniqueDutchIban();
 
         accountDTO.setUserId(userId);
         accountDTO.setIban(dutchIban);
@@ -77,6 +95,33 @@ public class AccountService {
 
         return accountMapper.toDTO(account);
     }
+
+    public String deactivateAccount(String iban) {
+        AccountDTO accountDTO = getAccountByIban(iban);
+        if (updateAccountStatus(accountDTO, false, iban)){
+            return "Account with iban: " + iban + " deactivated";
+        } else {
+            return "Account with iban: " + iban + " could not be deactivated";
+        }
+
+    }
+
+    public String activateAccount(String iban) {
+        AccountDTO accountDTO = getAccountByIban(iban);
+        if (updateAccountStatus(accountDTO, true, iban)){
+            return "Account with iban: " + iban + " activated";
+        } else {
+            return "Account with iban: " + iban + " could not be activated";
+        }
+    }
+
+    public CustomerIbanDTO getIbanByUsername(String firstname, String lastname) {
+        List<String> ibans =accountRepository.findIbanByFirstNameAndLastName(firstname, lastname);
+
+        CustomerIbanDTO customerIbanDTO = new CustomerIbanDTO();
+        customerIbanDTO.setFirstName(firstname);
+        customerIbanDTO.setLastName(lastname);
+        customerIbanDTO.setIbanList(ibans);
 
     //The BANK's bank account
     public void createBankAccount(UUID id) {
@@ -94,23 +139,6 @@ public class AccountService {
         account = accountRepository.saveAndFlush(account);
     }
 
-    public boolean deactivateAccount(String iban) {
-        AccountDTO accountDTO = getAccountDTOByIban(iban);
-        return updateAccountStatus(accountDTO, false, iban);
-    }
-
-    public boolean activateAccount(String iban) {
-        AccountDTO accountDTO = getAccountDTOByIban(iban);
-        return updateAccountStatus(accountDTO, true, iban);
-    }
-
-    public List<String> getIbanByUsername(String customerName) {
-        List<String> ibans = accountRepository.findIbanByUsername(customerName);
-        if (ibans.isEmpty()) {
-            throw new EntityNotFoundException("No accounts found for user: " + customerName);
-        }
-        return ibans;
-    }
 
     public List<AccountDTO> getAccountsByUserId(UUID userId) {
         List<Account> accounts = accountRepository.findAccountsByUserId(userId);
@@ -128,6 +156,19 @@ public class AccountService {
         return accountMapper.toDTO(account);
     }
 
+    public AccountBalanceDTO getBalanceByIban(String iban) {
+        Account account = accountRepository.findByIban(iban);
+        if(account == null) {
+            throw new EntityNotFoundException("Account with following iban: " + iban + " not found");
+        }
+        float balance = account.getBalance();
+        AccountBalanceDTO balanceDTO = new AccountBalanceDTO();
+        balanceDTO.setIban(iban);
+        balanceDTO.setBalance(balance);
+
+        return balanceDTO;
+     }
+
     //I need this method for Transaction Services - Manol
     public Account getAccountByIban(String iban) {
         Account account = accountRepository.findByIban(iban);
@@ -137,16 +178,13 @@ public class AccountService {
         return account;
     }
 
-    public float getBalanceByIban(String iban) {
-        return accountRepository.findBalanceByIban(iban);
-    }
-
+  
     public boolean ibanExists(String dutchIban) {
         Account account = accountRepository.findByIban(dutchIban);
         return account != null;
     }
 
-    public String generateDutchIban() {
+    public String generateUniqueDutchIban() {
 
         // generate a random 10-digit account number
         String accountNumber = String.valueOf((int) (Math.random() * 1000000000));
@@ -166,14 +204,37 @@ public class AccountService {
 
         String iban = countryCode + checkDigit + customCode + accountNumber;
 
-        while (ibanExists(iban)) {
-            iban = generateDutchIban();
+        while(ibanExists(iban)) {
+            iban = generateUniqueDutchIban();
         }
         return iban;
 
     }
 
     // Private methods
+
+    private boolean userHasCurrentAccount(UUID userId){
+        List<Account> accounts = accountRepository.findAccountsByUserId(userId);
+        for (Account account : accounts) {
+            if(account.getTypeOfAccount().equals(AccountType.CURRENT)){
+                return true;
+            }
+        }
+        return false;
+    }
+    private void setLimitsAccordingToUserType(User user){
+        if(user.getRole().equals(UserType.USER)) {
+            user.setRole(UserType.CUSTOMER);
+            setLimits(user);
+        }
+        if(user.getRole().equals(UserType.EMPLOYEE)) {
+            setLimits(user);
+        }
+    }
+    private void setLimits(User user){
+        user.setDayLimit(2000);
+        user.setTransactionLimit(500);
+    }
     private String calculateCheckDigit(String iban) {
         // move the four initial characters to the end of the string
         String moved = iban.substring(4) + iban.substring(0, 4);
