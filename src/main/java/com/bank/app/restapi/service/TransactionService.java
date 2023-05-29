@@ -11,6 +11,7 @@ import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -127,9 +128,10 @@ public class TransactionService {
 
     public TransactionDTO addTransaction(TransactionDTO dto, TransactionType type) {
         Transaction t = new Transaction();
-        t.setFromAccount(accountService.getAccountByIban(dto.getFromAccount()));
-        t.setToAccount(accountService.getAccountByIban(dto.getToAccount()));
-        t.setAmount(dto.getAmount());
+        t.setFromAccount(validateAccountsBasedOnTransactionType(accountService.getAccountByIban(dto.getFromAccount()), true, type));
+        t.setToAccount(validateAccountsBasedOnTransactionType(accountService.getAccountByIban(dto.getToAccount()), false, type));
+        checkSelfTransaction(t.getFromAccount(), t.getToAccount());
+        t.setAmount(validateAmount(dto.getAmount()));
         t.setTypeOfTransaction(type);
         t.setDateOfExecution(LocalDateTime.now());
         t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow(
@@ -159,6 +161,41 @@ public class TransactionService {
         float balance = toAccount.getBalance();
         balance = balance + amount;
         toAccount.setBalance(balance);
+    }
+
+    private float validateAmount(float amount) {
+        if (Float.isNaN(amount) || amount <= 0) {
+            throw new IllegalArgumentException("Amount must be a positive number.");
+        }
+
+        return amount;
+    }
+
+    private Account validateAccountsBasedOnTransactionType(Account accountToVerify, boolean accountToVerifyIsSending ,TransactionType transactionType) {
+        switch (transactionType) {
+            case DEPOSIT:
+                if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001")) && !accountToVerifyIsSending) {
+                    throw new AccessDeniedException("During deposit, transaction cannot be sent to an account other than the BANK's dedicated one");
+                }
+                break;
+            case WITHDRAWAL:
+                if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001")) && accountToVerifyIsSending) {
+                    throw new AccessDeniedException("During withdrawal, transaction cannot be sent from an account other than the BANK's dedicated one");
+                }
+                break;
+            case TRANSFER:
+                break;
+            default:
+                throw new IllegalArgumentException("Undefined type of transaction");
+        }
+
+        return accountToVerify;
+    }
+
+    private void checkSelfTransaction(Account fromAccount, Account toAccount) {
+        if (fromAccount.equals(toAccount)) {
+            throw new AccessDeniedException("Cannot make transactions to self.");
+        }
     }
 
     private void checkAccountRelatedLimits(Account fromAccount, float amount) {

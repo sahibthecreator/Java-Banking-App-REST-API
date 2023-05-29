@@ -10,6 +10,7 @@ import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 @Data
 @ToString
@@ -55,4 +56,16 @@ public class Account {
     @JsonIgnore
     private List<Transaction> receivedTransactions;
 
+    //For comparison if entered account is the same as BANK's bank account, in case of DEPOSIT or WITHDRAWAL - Manol
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Account other = (Account) obj;
+        return Objects.equals(id, other.id) && Objects.equals(iban, other.iban);
+    }
 }
