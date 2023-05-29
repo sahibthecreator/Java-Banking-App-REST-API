@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 @Component("securityExpressions")
 public class SecurityExpressions {
     public boolean isSameUserOrEmployee(String userId, Authentication authentication) {
+        if (userId == null && authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_EMPLOYEE")))
+            return true;
+
         UserData userData = (UserData) authentication.getPrincipal();
         String principalUserId = userData.getId().toString();
         return userId.equals(principalUserId)

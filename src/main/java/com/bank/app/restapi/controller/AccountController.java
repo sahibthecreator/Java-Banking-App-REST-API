@@ -25,7 +25,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping("")
-    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
+    @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
     public ResponseEntity<List<AccountDTO>> getAccounts(
             @RequestParam(required = false) String iban,
             @RequestParam(required = false) Float balance,

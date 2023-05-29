@@ -4,6 +4,7 @@ import { getUser, getUsers, createUser, updateUser, deleteUser } from '@/service
 import { getAccounts, createAccount } from '@/service/accounts';
 import { getTransactions, getTransaction } from '@/service/transactions';
 import { getAccountsByUserId } from '../service/accounts';
+import { getTransactionsByUserId } from '../service/transactions';
 
 // Vue.use(Vuex);
 
@@ -117,7 +118,7 @@ const store = new Vuex.Store({
         },
         async getAccountsByUserId({ commit, state }, userId) {
             try {
-                const accounts = await getAccountsByUserId(state.token, userId);
+                const accounts = await getAccountsByUserId(userId, state.token);
                 commit('setAccounts', accounts);
                 return accounts;
             } catch (error) {
@@ -144,6 +145,15 @@ const store = new Vuex.Store({
             try {
                 const transactions = await getTransactions(state.token);
                 commit('setTransactions', transactions);
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async getTransactionsByUserId({ commit, state }, userId) {
+            try {
+                const transactions = await getTransactionsByUserId(userId, state.token);
+                commit('setTransactions', transactions);
+                return transactions;
             } catch (error) {
                 throw new Error(error.message);
             }

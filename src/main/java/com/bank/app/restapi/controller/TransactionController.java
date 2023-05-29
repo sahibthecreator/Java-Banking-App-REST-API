@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@CrossOrigin
 @RequestMapping("transactions")
 public class TransactionController {
 
@@ -45,6 +46,13 @@ public class TransactionController {
     public ResponseEntity<TransactionDTO> getTransactionById(@PathVariable UUID transactionId) {
         TransactionDTO result = transactionService.getTransactionById(transactionId);
         return ResponseEntity.status(200).body(result);
+    }
+
+    @GetMapping("userId/{userId}")
+    public ResponseEntity<List<TransactionDTO>> getTransactionsByUserId(@PathVariable UUID userId) {
+        List<TransactionDTO> transactions = transactionService.getTransactionsByUserId(userId); // TODO IMplement not
+                                                                                                // found exception
+        return ResponseEntity.ok(transactions);
     }
 
     @PostMapping(value = { "", "{mappingNameHolder}", "{mappingNameHolder}/" })

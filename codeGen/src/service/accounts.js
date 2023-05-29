@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080'; // Your backend API URL
+const API_URL = 'http://localhost:80'; // Your backend API URL
 
 export const getAccounts = async (token) => {
   try {
@@ -17,7 +17,7 @@ export const getAccounts = async (token) => {
 
 export const getAccountsByUserId = async (userId, token) => {
   try {
-    const response = await axios.get(`${API_URL}/accounts/${userId}`, {
+    const response = await axios.get(`${API_URL}/accounts?userId=${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

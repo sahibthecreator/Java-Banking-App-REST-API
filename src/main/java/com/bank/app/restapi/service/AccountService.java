@@ -74,7 +74,7 @@ public class AccountService {
 
         accountDTO.setUserId(userId);
         accountDTO.setIban(dutchIban);
-        accountDTO.setBalance(0);
+        //accountDTO.setBalance(0);
         accountDTO.setDateOfOpening(LocalDate.now());
         accountDTO.setActive(true);
 

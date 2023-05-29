@@ -1,6 +1,7 @@
 <script setup>
 import Navigation from '@/components/Navigation.vue'
-import AccountIcon from './AccountIcon.vue';
+import AccountWidget from './AccountWidget.vue';
+import TransactionWidget from './TransactionWidget.vue';
 </script>
 
 <template>
@@ -17,38 +18,8 @@ import AccountIcon from './AccountIcon.vue';
           </h1>
 
           <div class="accounts">
-            <div class="account">
-              <div class="d-flex">
-                <AccountIcon letter="A"></AccountIcon>
-                <p class="my-auto ml-3 font-weight-bolder">Current Account</p>
-              </div>
-
-              <p class="balance">€ 234,42</p>
-            </div>
-            <div class="account">
-              <div class="d-flex">
-                <AccountIcon letter="A"></AccountIcon>
-                <p class="my-auto ml-3 font-weight-bolder">Current Account</p>
-              </div>
-
-              <p class="balance">€ 234,42</p>
-            </div>
-            <div class="account">
-              <div class="d-flex">
-                <AccountIcon letter="A"></AccountIcon>
-                <p class="my-auto ml-3 font-weight-bolder">Current Account</p>
-              </div>
-
-              <p class="balance">€ 234,42</p>
-            </div>
-            <div class="account">
-              <div class="d-flex">
-                <AccountIcon letter="A"></AccountIcon>
-                <p class="my-auto ml-3 font-weight-bolder">Current Account</p>
-              </div>
-
-              <p class="balance">€ 234,42</p>
-            </div>
+            <AccountWidget v-for="(account, index) in accounts" :key="index" :balance="account.balance"
+              :name="user.firstName" />
           </div>
 
         </div>
@@ -58,22 +29,13 @@ import AccountIcon from './AccountIcon.vue';
           <b-button variant="black">Request an account</b-button>
         </div>
         <div class="chart">
-          <apexchart type="line" height="100%" :options="chartOptions" :series="chartSeries" />
+          <apexchart type="line" height="280px" :options="chartOptions" :series="chartSeries" />
         </div>
       </div>
 
       <div class="transactions">
-        <div class="transaction">
-          <div class="header">
-            <h5>- €430,00</h5>
-            <p class="dateTime">09:22</p>
-          </div>
-          <div class="details">
-            <p><b>To</b> Sam Jhonson</p>
-            <p>NL01033910301</p>
-          </div>
-          <b-button variant="black">See Details</b-button>
-        </div>
+        <TransactionWidget v-for="(transaction, index) in transactions" :key="index" :amount="transaction.amount"
+          :toIban="transaction.toIban" />
 
       </div>
     </div>
@@ -93,6 +55,8 @@ export default {
   data() {
     return {
       user: null,
+      accounts: null,
+      transactions: null,
       chartOptions: {
         chart: {
           type: 'line',
@@ -129,18 +93,19 @@ export default {
     }
   },
   mounted() {
-    this.getUserAndAccounts();
+    this.getUserAndAccountsAndTransactions();
   },
   methods: {
-    async getUserAndAccounts() {
+    async getUserAndAccountsAndTransactions() {
       try {
-        console.log(this.$store.state.token);
         let user = await this.$store.dispatch('getUser', this.$store.getters.getUserId);
         this.user = user;
         let accounts = await this.$store.dispatch('getAccountsByUserId', this.$store.getters.getUserId);
         this.accounts = accounts;
+        let transaction = await this.$store.dispatch('getTransactionsByUserId', this.$store.getters.getUserId);
+        this.transactions = transaction;
       } catch (error) {
-        console.log(error.message);
+        console.log(error);
       }
     },
     relocate_to_transaction() {
@@ -243,19 +208,6 @@ export default {
   background: var(--gray-black);
 }
 
-.account {
-  background-color: white;
-  padding: 10px;
-  width: 100%;
-  border-radius: 15px;
-}
-
-.account .balance {
-  font-size: 2vw;
-  font-weight: 500;
-  text-align: center;
-}
-
 
 .transactions {
   background: white;
@@ -266,40 +218,6 @@ export default {
   flex-direction: row;
   gap: 20px;
   padding: 20px;
-}
-
-.transaction {
-  background: white;
-  position: relative;
-  width: 230px;
-  border-radius: 25px;
-  box-shadow: 0 0 30px #14141417;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-}
-
-.transaction .details p {
-  margin-bottom: 0px;
-}
-
-.transaction .details p:nth-child(2) {
-  font-size: small;
-}
-
-.transaction .btn {
-  padding: 5px 5px !important;
-  margin-top: 10%;
-}
-
-.transaction .header {
-  display: flex;
-}
-
-.transaction .dateTime {
-  font-size: smaller;
-  font-weight: 500;
-  margin-left: auto;
 }
 
 .dashboardAction {

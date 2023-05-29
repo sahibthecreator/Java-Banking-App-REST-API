@@ -30,11 +30,10 @@ public class TransactionService {
 
     private final Environment environment;
 
-
     private TransactionMapper transactionMapper;
 
     public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository,
-                              UserRepository userRepository, Environment environment, TransactionMapper transactionMapper) {
+            UserRepository userRepository, Environment environment, TransactionMapper transactionMapper) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
@@ -100,6 +99,16 @@ public class TransactionService {
                 () -> new EntityNotFoundException("Transaction not found"));
     }
 
+    public List<TransactionDTO> getTransactionsByUserId(UUID userId) {
+        List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId);
+
+        // Convert the list of Transaction entities to TransactionDTOs
+        List<TransactionDTO> transactionDTOs = transactions.stream()
+                .map(transactionMapper::toDTO).toList();
+
+        return transactionDTOs;
+    }
+
     public TransactionDTO addTransaction(TransactionDTO dto, TransactionType type) {
         Transaction t = new Transaction();
         t.setFromAccount(accountRepository.findByIban(dto.getFromAccount()));
@@ -108,8 +117,7 @@ public class TransactionService {
         t.setTypeOfTransaction(type);
         t.setDateOfExecution(LocalDateTime.now());
         t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow(
-                () -> new EntityNotFoundException("Performing user not found"))
-        );
+                () -> new EntityNotFoundException("Performing user not found")));
         t.setDescription(dto.getDescription());
 
         deductMoneyFromAccount(t.getFromAccount(), t.getAmount());
@@ -156,7 +164,7 @@ public class TransactionService {
         }
     }
 
-    private void checkCustomerRelatedLimits (Account fromAccount, float amount) {
+    private void checkCustomerRelatedLimits(Account fromAccount, float amount) {
         User ownerOfSendingAccount = mapAccountIbanToOwner(fromAccount);
 
         if (amount > ownerOfSendingAccount.getTransactionLimit()) {
@@ -170,7 +178,7 @@ public class TransactionService {
         }
     }
 
-    private User mapAccountIbanToOwner (Account account) {
+    private User mapAccountIbanToOwner(Account account) {
         Optional<User> ownerOfSendingAccount = userRepository.findById(account.getUser().getId());
 
         return ownerOfSendingAccount.get();

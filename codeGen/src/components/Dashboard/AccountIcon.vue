@@ -1,6 +1,6 @@
 <template>
     <div class="accountIcon">
-        <p class="m-auto">{{ letter[0] }}</p>
+        <p class="m-auto">{{ accountName[0] }}</p>
     </div>
 </template>
 
@@ -8,7 +8,7 @@
 export default {
     name: 'AccountIcon',
     props: {
-        letter: String,
+        accountName: String,
     }
 }
 </script>
