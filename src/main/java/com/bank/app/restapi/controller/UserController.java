@@ -7,6 +7,8 @@ import com.bank.app.restapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,7 +32,7 @@ public class UserController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) LocalDate dateOfBirth,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate dateOfBirth,
             @RequestParam(required = false) String bsn,
             @RequestParam(defaultValue = "asc") String sort,
             @RequestParam(defaultValue = "20") int limit) {

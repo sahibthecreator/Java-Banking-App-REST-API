@@ -30,6 +30,7 @@ public class SecurityConfig {
     private static final String[] UN_SECURED_URLs = {
             "/auth/**",
             "/users/{userId}",
+            
     };
 
     @Autowired
@@ -54,6 +55,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
+                .cors().and()
                 .authorizeHttpRequests()
                 .requestMatchers(UN_SECURED_URLs).permitAll()
                 .requestMatchers(SECURED_URLs).hasAuthority("ROLE_EMPLOYEE")

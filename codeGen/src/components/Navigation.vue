@@ -1,3 +1,7 @@
+<script setup>
+import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
+</script>
+
 <template>
   <div id="nav">
     <b-navbar-brand to="/">
@@ -8,15 +12,26 @@
       <b-nav-item to="/">Home</b-nav-item>
       <b-nav-item>Products</b-nav-item>
       <b-nav-item>App and Internet banking</b-nav-item>
-      <b-nav-item v-if="loggedUser=true" to="/dashboard">Dashboard</b-nav-item>
+      <b-nav-item v-if="token" to="/dashboard">Dashboard</b-nav-item>
     </b-nav>
 
     <b-navbar-nav class="ml-auto">
-      <b-nav-item to="/login" id="login">Login / register</b-nav-item>
-      <!-- <a href="/login"><span id="login">Login/Register</span></a> -->
-      
+      <b-nav-item to="/login" id="login" v-if="!token"
+        >Login / register</b-nav-item>
+      <b-nav-item v-else>
+        <b-dropdown id="dropdown-offset" offset="-w" size="lg"  variant="link" toggle-class="text-decoration-none" no-caret>
+    <template #button-content>
+      <AccountIcon accountName="Root"></AccountIcon>
+    </template>
+    <b-dropdown-item to="">Settings</b-dropdown-item>
+    <b-dropdown-item to="dashboard">Dashboard</b-dropdown-item>
+    <b-dropdown-item to="">???DB management???</b-dropdown-item>
+    
+    <b-dropdown-divider></b-dropdown-divider>
+    <b-dropdown-item @click="logout">Logout</b-dropdown-item>
+  </b-dropdown>
+        </b-nav-item>
     </b-navbar-nav>
-
   </div>
   <div id="line"></div>
 </template>
@@ -25,11 +40,17 @@
 export default {
   name: 'Navigation',
   data() {
-    loggedUser: true
-  }
+    return {
+      token: this.$store.getters.getCurrentUserToken,
+    };
+  },
+  methods: {
+    logout() {
+      console.log("log out here");
+    }
+  },
+  mounted() {},
 };
-
-
 </script>
 
 <style>
@@ -65,10 +86,9 @@ export default {
 #login {
   border: 1px var(--gray-black) solid;
   border-radius: 7px;
-  padding: .1rem 2rem;
+  padding: 0.1rem 2rem;
   color: var(--gray-black);
 }
-
 
 #logoTitle {
   color: var(--gray-black);
