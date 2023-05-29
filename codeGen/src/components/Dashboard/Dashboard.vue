@@ -92,7 +92,10 @@ export default {
   },
   data() {
     return {
-      user: null,
+      user: {
+        firstName: "Yvan",
+        lastName: "Roes"
+      },
       chartOptions: {
         chart: {
           type: 'line',

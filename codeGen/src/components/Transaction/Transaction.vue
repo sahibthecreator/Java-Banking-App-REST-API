@@ -22,15 +22,15 @@
       <span>Amount</span>
       <div class="amount">
         <span>€</span>
-        <span>0.00</span>
+        <input class="amountInput" placeholder="0.00" type="number" v-model="amount" step="any"/>
       </div>
       <div class="inputContainer">
         <span>Transfer from</span>
-        <input placeholder="Select"/>
+        <input placeholder="Select" v-model="accountFrom"/>
       </div>
       <div class="inputContainer">
         <span>Transfer to</span>
-        <input placeholder="Select"/>
+        <input placeholder="Select" v-model="accountTo"/>
       </div>
 
       <b-button variant="dark_primary" v-on:click="make_transaction">Transfer</b-button>
@@ -43,10 +43,16 @@
 <script>
 export default {
   name: 'Transaction',
-
+  data() {
+    return {
+      amount: "",
+      accountFrom: "",
+      accountTo: ""
+    }
+  },
   methods: {
     async make_transaction() {
-      console.log("Make transaction here");
+      console.log(this.amount, this.accountFrom, this.accountTo);
     }
   }
 }; 
@@ -79,7 +85,7 @@ export default {
   height: fit-content;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 2.5vh;
   padding: 50px;
   overflow: auto;
 }
@@ -113,9 +119,23 @@ export default {
   color: var(--gray-dark);
 }
 
-.amount > span:nth-child(2) {
+.amountInput {
   font-weight: bold;
   font-size: 64px;
+  background: transparent;
+  border: none;
+  width: 100%;
+}
+
+
+/* remove number arrows for amountInput*/
+.amountInput::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.amountInput[type=number] {
+  -moz-appearance: textfield;
 }
 
 .inputContainer {
@@ -152,6 +172,7 @@ export default {
   font-size: 14px;
   font-weight: 200;
   text-align: center;
+  color: var(--gray-light);
 }
 
 </style>
