@@ -8,8 +8,6 @@ import com.bank.app.restapi.service.AccountService;
 import jakarta.validation.Valid;
 
 import lombok.AllArgsConstructor;
-
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -27,14 +25,14 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping("")
-    @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<List<AccountDTO>> getAccounts(
             @RequestParam(required = false) String iban,
             @RequestParam(required = false) Float balance,
             @RequestParam(required = false) String typeOfAccount,
             @RequestParam(required = false) UUID userId,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate dateOfOpening,
-            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) LocalDate dateOfOpening,
+            @RequestParam(required = false) boolean active,
             @RequestParam(defaultValue = "desc") String sort,
             @RequestParam(defaultValue = "20") int limit) {
 
@@ -53,7 +51,6 @@ public class AccountController {
     public ResponseEntity<AccountDTO> getAccountInfo(@PathVariable String iban) {
         AccountDTO accountDTO = accountService.getAccountByIban(iban);
         return ResponseEntity.status(200).body(accountDTO);
-
     }
 
     @GetMapping("/{iban}/balance")
@@ -62,19 +59,17 @@ public class AccountController {
         return ResponseEntity.status(200).body(accountBalanceDTO);
     }
 
-
     @GetMapping("/iban")
     public ResponseEntity<CustomerIbanDTO> getIbanByCustomerName(@RequestParam(required=false) String firstname, @RequestParam(required=false) String lastname) {
         CustomerIbanDTO customerIbanDTO = accountService.getIbanByUsername(firstname, lastname);
         return ResponseEntity.status(200).body(customerIbanDTO);
     }
 
-     @GetMapping("/{userId}")
-     public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable UUID userId) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable UUID userId) {
         List<AccountDTO> accounts = accountService.getAccountsByUserId(userId);
-         return ResponseEntity.status(200).body(accounts);
-     }
-
+        return ResponseEntity.status(200).body(accounts);
+    }
 
     @PatchMapping("/{iban}")
     public ResponseEntity<String> deactivateAccount(@PathVariable String iban) {
@@ -82,10 +77,10 @@ public class AccountController {
         return ResponseEntity.status(200).body(response);
     }
 
-     @PatchMapping("/{iban}/activate")
-     public ResponseEntity<String > activateAccount(@PathVariable String iban) {
-     String response = accountService.activateAccount(iban);
-     return ResponseEntity.status(200).body(response);
-     }
+    @PatchMapping("/{iban}/activate")
+    public ResponseEntity<String > activateAccount(@PathVariable String iban) {
+        String response = accountService.activateAccount(iban);
+        return ResponseEntity.status(200).body(response);
+    }
 
 }

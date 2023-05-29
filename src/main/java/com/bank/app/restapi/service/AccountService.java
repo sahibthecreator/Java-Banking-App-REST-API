@@ -6,13 +6,11 @@ import com.bank.app.restapi.dto.CustomerIbanDTO;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.AccountType;
-
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.AccountRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -26,6 +24,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 @AllArgsConstructor
@@ -37,17 +36,16 @@ public class AccountService {
 
     private final AccountMapper accountMapper;
 
-    public List<AccountDTO> getAccounts(String iban,
-            Float balance,
-            String typeOfAccount,
-            UUID userId,
-            LocalDate dateOfOpening,
-            Boolean active,
-            String sortDirection,
-            int limit) {
+    public List<AccountDTO> getAccounts( String iban,
+                                         Float balance,
+                                         String typeOfAccount,
+                                         UUID userId,
+                                         LocalDate dateOfOpening,
+                                         boolean active,
+                                         String sortDirection,
+                                         int limit) {
 
-        Specification<Account> specification = buildSpecification(iban, balance, typeOfAccount, userId, dateOfOpening,
-                active);
+        Specification<Account> specification = buildSpecification(iban, balance, typeOfAccount, userId, dateOfOpening, active);
         Sort sort;
         if (sortDirection != null && sortDirection.equalsIgnoreCase("desc")) {
             sort = Sort.by(Sort.Direction.DESC, "dateOfOpening");
@@ -61,7 +59,7 @@ public class AccountService {
             throw new EntityNotFoundException("No accounts found");
         }
 
-        return accountList.stream().map(accountMapper::toDTO).toList();
+        return accountList.stream().map(accountMapper::toDTO).toList()  ;
     }
 
     public AccountDTO createAccount(AccountDTO accountDTO) {
@@ -86,7 +84,7 @@ public class AccountService {
 
         accountDTO.setUserId(userId);
         accountDTO.setIban(dutchIban);
-        accountDTO.setBalance(accountDTO.getBalance());
+        accountDTO.setBalance(0);
         accountDTO.setDateOfOpening(LocalDate.now());
         accountDTO.setActive(true);
 
@@ -123,22 +121,11 @@ public class AccountService {
         customerIbanDTO.setLastName(lastname);
         customerIbanDTO.setIbanList(ibans);
 
-    //The BANK's bank account
-    public void createBankAccount(UUID id) {
-        AccountDTO bank = new AccountDTO();
-        bank.setIban("NL01INHO0000000001");
-        bank.setBalance(10000);
-        bank.setTypeOfAccount(AccountType.CURRENT);
-        //the account had to be connected to the root admin, userId filed in AccountDTO is annotated with @NotNull
-        bank.setUserId(id);
-        bank.setDateOfOpening(LocalDate.now());
-        bank.setAbsoluteLimit(0);
-        bank.setActive(true);
-
-        Account account = accountMapper.toEntity(bank);
-        account = accountRepository.saveAndFlush(account);
+        if (ibans.isEmpty()) {
+            throw new EntityNotFoundException("No accounts found for user: " + firstname + " " + lastname);
+        }
+        return customerIbanDTO;
     }
-
 
     public List<AccountDTO> getAccountsByUserId(UUID userId) {
         List<Account> accounts = accountRepository.findAccountsByUserId(userId);
@@ -148,9 +135,9 @@ public class AccountService {
         return accounts.stream().map(accountMapper::toDTO).toList();
     }
 
-    public AccountDTO getAccountDTOByIban(String iban) {
+    public AccountDTO getAccountByIban(String iban) {
         Account account = accountRepository.findByIban(iban);
-        if (account == null) {
+        if(account == null) {
             throw new EntityNotFoundException("Account with following iban: " + iban + " not found");
         }
         return accountMapper.toDTO(account);
@@ -167,19 +154,9 @@ public class AccountService {
         balanceDTO.setBalance(balance);
 
         return balanceDTO;
-     }
-
-    //I need this method for Transaction Services - Manol
-    public Account getAccountByIban(String iban) {
-        Account account = accountRepository.findByIban(iban);
-        if (account == null) {
-            throw new EntityNotFoundException("Account with following iban: " + iban + " not found");
-        }
-        return account;
     }
 
-  
-    public boolean ibanExists(String dutchIban) {
+    public boolean ibanExists(String dutchIban){
         Account account = accountRepository.findByIban(dutchIban);
         return account != null;
     }
@@ -210,6 +187,7 @@ public class AccountService {
         return iban;
 
     }
+
 
     // Private methods
 
@@ -264,8 +242,8 @@ public class AccountService {
     }
 
     private boolean updateAccountStatus(AccountDTO accountDTO, boolean active, String iban) {
-        if (accountDTO == null) {
-            throw new EntityNotFoundException("No account with the following iban " + iban);
+        if (accountDTO == null){
+            throw new EntityNotFoundException("No account with the following iban "+iban);
         }
         Account account = accountMapper.toEntity(accountDTO);
         account.setActive(active);
@@ -273,13 +251,12 @@ public class AccountService {
         return true;
     }
 
-    private Specification<Account> buildSpecification(
-            String iban,
-            Float balance,
-            String typeOfAccount,
-            UUID userId,
-            LocalDate dateOfOpening,
-            Boolean active) {
+    private Specification<Account> buildSpecification(String iban,
+                                                      Float balance,
+                                                      String typeOfAccount,
+                                                      UUID userId,
+                                                      LocalDate dateOfOpening,
+                                                      boolean active) {
         return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -290,15 +267,15 @@ public class AccountService {
                 predicates.add(criteriaBuilder.equal(root.get("balance"), balance));
             }
             if (typeOfAccount != null && !typeOfAccount.isEmpty()) {
-                predicates.add(criteriaBuilder.equal(root.get("typeOfAccount"), AccountType.valueOf(typeOfAccount.toUpperCase())));
+                predicates.add(criteriaBuilder.like(root.get("typeOfAccount"), "%" + typeOfAccount + "%"));
             }
             if (userId != null && !userId.toString().isEmpty()) {
-                predicates.add(criteriaBuilder.equal(root.get("user"), userId));
+                predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
             }
-            if (dateOfOpening != null) {
+            if (dateOfOpening != null && !dateOfOpening.toString().isEmpty()) {
                 predicates.add(criteriaBuilder.equal(root.get("dateOfOpening"), dateOfOpening));
             }
-            if (active != null) {
+            if (active) {
                 predicates.add(criteriaBuilder.equal(root.get("active"), active));
             }
 
