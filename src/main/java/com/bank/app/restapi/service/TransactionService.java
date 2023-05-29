@@ -124,16 +124,15 @@ public class TransactionService {
     }
 
     public TransactionDTO addTransaction(TransactionDTO dto, TransactionType type) {
+        Account sendingAccount = accountService.getAccountByIban(dto.getFromAccount());
+        Account receivingAccount = accountService.getAccountByIban(dto.getToAccount());
+
+        validateAccountLogic(sendingAccount, receivingAccount, type);
+
         Transaction t = new Transaction();
-        t.setFromAccount(validateAccountsBasedOnTransactionType(
-                accountService.getAccountByIban(dto.getFromAccount()),
-                true,
-                type));
-        t.setToAccount(validateAccountsBasedOnTransactionType(
-                accountService.getAccountByIban(dto.getToAccount()),
-                false,
-                type));
-        checkSelfTransaction(t.getFromAccount(), t.getToAccount());
+        t.setFromAccount(sendingAccount);
+        t.setToAccount(receivingAccount);
+        //checkSelfAccountTransaction(t.getFromAccount(), t.getToAccount());
         t.setAmount(validateAmount(dto.getAmount()));
         t.setTypeOfTransaction(type);
         t.setDateOfExecution(LocalDateTime.now());
@@ -174,19 +173,19 @@ public class TransactionService {
         return amount;
     }
 
-    private Account validateAccountsBasedOnTransactionType(Account accountToVerify, boolean accountToVerifyIsSending ,TransactionType transactionType) {
+    private Account validateAccountsBasedOnTransactionType(Account accountToVerify, boolean accountToVerifyIsSending, TransactionType transactionType) {
         switch (transactionType) {
             case DEPOSIT:
                 if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001")) && !accountToVerifyIsSending) {
                     throw new AccessDeniedException("During deposit, transaction cannot be sent to an account other than the BANK's dedicated one");
                 }
-                validateAccountsBasedOnAccountType(accountToVerify, transactionType);
+                //validateAccountsBasedOnAccountType(accountToVerify, transactionType);
                 break;
             case WITHDRAWAL:
                 if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001")) && accountToVerifyIsSending) {
                     throw new AccessDeniedException("During withdrawal, transaction cannot be sent from an account other than the BANK's dedicated one");
                 }
-                validateAccountsBasedOnAccountType(accountToVerify, transactionType);
+                //validateAccountsBasedOnAccountType(accountToVerify, transactionType);
                 break;
             case TRANSFER:
                 break;
@@ -197,17 +196,32 @@ public class TransactionService {
         return accountToVerify;
     }
 
-    private void validateAccountsBasedOnAccountType(Account accountToVerify, TransactionType transactionType) {
-        if (transactionType == TransactionType.DEPOSIT || transactionType == TransactionType.WITHDRAWAL) {
-            if (accountToVerify.getTypeOfAccount() == AccountType.SAVINGS) {
-                throw new IllegalArgumentException("Cannot perform " + transactionType.name() + " transaction, involving a savings account");
+    private void validateAccountsBasedOnAccountType(Account sendingAccountToVerify, Account receivingAccountToVerify, TransactionType transactionType) {
+        if (sendingAccountToVerify.getTypeOfAccount() == AccountType.SAVINGS || receivingAccountToVerify.getTypeOfAccount() == AccountType.SAVINGS) {
+            if (transactionType == TransactionType.DEPOSIT || transactionType == TransactionType.WITHDRAWAL) {
+                throw new AccessDeniedException("Cannot perform " + transactionType.name() + " transaction, involving a savings account");
+            } else if (transactionType == TransactionType.TRANSFER) {
+                UUID sendingUser = sendingAccountToVerify.getUser().getId();
+                UUID receivingUser = receivingAccountToVerify.getUser().getId();
+                if (!sendingUser.equals(receivingUser)) {
+                    throw new AccessDeniedException("When involving a savings account, both the sending and the receiving account must be on the same user.");
+                }
             }
-        } else if (transactionType == TransactionType.TRANSFER) {
-            //TODO: Allow transfer from/to SAVINGS account only on the same user
         }
     }
 
-    private void checkSelfTransaction(Account fromAccount, Account toAccount) {
+    private void validateAccountLogic(Account sendingAccountToVerify, Account receivingAccountToVerify, TransactionType transactionType) {
+        //For sending account
+        validateAccountsBasedOnTransactionType(sendingAccountToVerify, true, transactionType);
+        //For receiving account
+        validateAccountsBasedOnTransactionType(receivingAccountToVerify, false, transactionType);
+        //For sending and receiving - SAVINGS exception logic
+        validateAccountsBasedOnAccountType(sendingAccountToVerify, receivingAccountToVerify, transactionType);
+        //Preventing self account transfer
+        checkSelfAccountTransaction(sendingAccountToVerify, receivingAccountToVerify);
+    }
+
+    private void checkSelfAccountTransaction(Account fromAccount, Account toAccount) {
         if (fromAccount.equals(toAccount)) {
             throw new AccessDeniedException("Cannot make transactions to self.");
         }
