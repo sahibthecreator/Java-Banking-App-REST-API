@@ -34,7 +34,9 @@ export default {
 
 <style scoped>
 
-
+#app {
+  background-color: var(--white);
+}
 
 #header {
   line-height: 1.5;

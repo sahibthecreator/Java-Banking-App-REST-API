@@ -53,7 +53,7 @@ import AccountIcon from './AccountIcon.vue';
 
         </div>
         <div class="dashboardAction">
-          <b-button variant="dark_primary">Send money</b-button>
+          <b-button variant="dark_primary" v-on:click="relocate_to_transaction()">Send money</b-button>
           <b-button variant="gray_dark">View transaction history</b-button>
           <b-button variant="black">Request an account</b-button>
         </div>
@@ -140,7 +140,10 @@ export default {
         console.log(error.message);
       }
 
-    }
+    },
+    relocate_to_transaction() {
+    this.$router.push('transaction')
+  }
   },
 };
 
@@ -209,7 +212,31 @@ export default {
   white-space: nowrap;
   border-radius: 15px;
   box-shadow: 0 0 30px #14141417;
-  padding: 5px;
+  padding: 15px;
+  border: 15px var(--white) solid;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 100px;
+  transform: translateY(-10px);
+}
+/* Track */
+::-webkit-scrollbar-track {
+  border: 1px var(--gray-black) solid;
+  margin: 20px;
+  border-radius: 30px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--gray-dark); 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-black); 
 }
 
 .account {
