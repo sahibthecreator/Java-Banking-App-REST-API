@@ -76,14 +76,12 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.1.1</version>
 		</dependency>
-
-		<!-- Manol's dependency, error -->
-		<!-- <dependency>
-			<groupId>user.java.lang</groupId>
-			<artifactId>user.java.lang</artifactId>
-			<version>2020.164.33984</version>
-		</dependency> -->
-
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
 	</dependencies>
 
 	<build>

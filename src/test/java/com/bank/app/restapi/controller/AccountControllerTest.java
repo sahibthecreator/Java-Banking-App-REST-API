@@ -2,7 +2,6 @@ package com.bank.app.restapi.Controller;
 
 import com.bank.app.restapi.controller.AccountController;
 import com.bank.app.restapi.dto.AccountDTO;
-import com.bank.app.restapi.controller.AccountController;
 import com.bank.app.restapi.model.AccountType;
 import com.bank.app.restapi.service.AccountService;
 
@@ -13,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -82,12 +80,12 @@ class AccountControllerTest {
                 .active(true)
                 .build();
 
-        when(accountService.getAccountByIban("NL01INHO0000000001")).thenReturn(accountDTO);
+        when(accountService.getAccountDTOByIban("NL01INHO0000000001")).thenReturn(accountDTO);
 
         ResponseEntity<AccountDTO> response = accountController.getAccountInfo("NL01INHO0000000001");
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(accountDTO, response.getBody());
-        verify(accountService, times(1)).getAccountByIban("NL01INHO0000000001");
+        verify(accountService, times(1)).getAccountDTOByIban("NL01INHO0000000001");
     }
 
     @Test

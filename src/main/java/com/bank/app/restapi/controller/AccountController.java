@@ -49,7 +49,7 @@ public class AccountController {
 
     @GetMapping("/{iban}")
     public ResponseEntity<AccountDTO> getAccountInfo(@PathVariable String iban) {
-        return ResponseEntity.status(200).body(accountService.getAccountByIban(iban));
+        return ResponseEntity.status(200).body(accountService.getAccountDTOByIban(iban));
     }
 
     // TODO: 27-May-23 test returns 200 but return whole account object
