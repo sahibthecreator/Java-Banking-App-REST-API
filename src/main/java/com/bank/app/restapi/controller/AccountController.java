@@ -6,6 +6,8 @@ import com.bank.app.restapi.service.AccountService;
 import jakarta.validation.Valid;
 
 import lombok.AllArgsConstructor;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +31,8 @@ public class AccountController {
             @RequestParam(required = false) Float balance,
             @RequestParam(required = false) String typeOfAccount,
             @RequestParam(required = false) UUID userId,
-            @RequestParam(required = false) LocalDate dateOfOpening,
-            @RequestParam(required = false) boolean active,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate dateOfOpening,
+            @RequestParam(required = false) Boolean active,
             @RequestParam(defaultValue = "desc") String sort,
             @RequestParam(defaultValue = "20") int limit) {
 
@@ -57,16 +59,11 @@ public class AccountController {
         return ResponseEntity.status(200).body(accountService.getBalanceByIban(iban));
     }
 
-    @GetMapping("/{customerName}")   
+    @GetMapping("/{customerName}")
     public ResponseEntity<List<String>> getIbanByCustomerName(@PathVariable String customerName) {
         return ResponseEntity.status(200).body(accountService.getIbanByUsername(customerName));
     }
 
-
-    // @GetMapping("/{userId}")
-    // public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable UUID userId) {
-    //     return ResponseEntity.status(200).body(accountService.getAccountsByUserId(userId));
-    // }
 
     @PatchMapping("/{iban}")
     public ResponseEntity<?> deactivateAccount(@PathVariable String iban) {

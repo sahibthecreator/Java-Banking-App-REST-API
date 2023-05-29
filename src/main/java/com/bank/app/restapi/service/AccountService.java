@@ -3,6 +3,7 @@ package com.bank.app.restapi.service;
 import com.bank.app.restapi.dto.AccountDTO;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.model.Account;
+import com.bank.app.restapi.model.AccountType;
 import com.bank.app.restapi.repository.AccountRepository;
 
 import com.sun.jdi.request.InvalidRequestStateException;
@@ -35,16 +36,17 @@ public class AccountService {
 
     private final AccountMapper accountMapper;
 
-    public List<AccountDTO> getAccounts( String iban,
-                                         Float balance,
-                                         String typeOfAccount,
-                                         UUID userId,
-                                         LocalDate dateOfOpening,
-                                         boolean active,
-                                         String sortDirection,
-                                         int limit) {
+    public List<AccountDTO> getAccounts(String iban,
+            Float balance,
+            String typeOfAccount,
+            UUID userId,
+            LocalDate dateOfOpening,
+            Boolean active,
+            String sortDirection,
+            int limit) {
 
-        Specification<Account> specification = buildSpecification(iban, balance, typeOfAccount, userId, dateOfOpening, active);
+        Specification<Account> specification = buildSpecification(iban, balance, typeOfAccount, userId, dateOfOpening,
+                active);
         Sort sort;
         if (sortDirection != null && sortDirection.equalsIgnoreCase("desc")) {
             sort = Sort.by(Sort.Direction.DESC, "dateOfOpening");
@@ -58,7 +60,7 @@ public class AccountService {
             throw new EntityNotFoundException("No accounts found");
         }
 
-        return accountList.stream().map(accountMapper::toDTO).toList()  ;
+        return accountList.stream().map(accountMapper::toDTO).toList();
     }
 
     public AccountDTO createAccount(AccountDTO accountDTO) {
@@ -93,7 +95,7 @@ public class AccountService {
     }
 
     public List<String> getIbanByUsername(String customerName) {
-        List<String> ibans =accountRepository.findIbanByUsername(customerName);
+        List<String> ibans = accountRepository.findIbanByUsername(customerName);
         if (ibans.isEmpty()) {
             throw new EntityNotFoundException("No accounts found for user: " + customerName);
         }
@@ -110,7 +112,7 @@ public class AccountService {
 
     public AccountDTO getAccountByIban(String iban) {
         Account account = accountRepository.findByIban(iban);
-        if(account == null) {
+        if (account == null) {
             throw new EntityNotFoundException("Account with following iban: " + iban + " not found");
         }
         return accountMapper.toDTO(account);
@@ -120,7 +122,7 @@ public class AccountService {
         return accountRepository.findBalanceByIban(iban);
     }
 
-    public boolean ibanExists(String dutchIban){
+    public boolean ibanExists(String dutchIban) {
         Account account = accountRepository.findByIban(dutchIban);
         return account != null;
     }
@@ -145,13 +147,12 @@ public class AccountService {
 
         String iban = countryCode + checkDigit + customCode + accountNumber;
 
-        while(ibanExists(iban)) {
+        while (ibanExists(iban)) {
             iban = generateDutchIban();
         }
         return iban;
 
     }
-
 
     // Private methods
     private String calculateCheckDigit(String iban) {
@@ -183,8 +184,8 @@ public class AccountService {
     }
 
     private boolean updateAccountStatus(AccountDTO accountDTO, boolean active, String iban) {
-        if (accountDTO == null){
-            throw new EntityNotFoundException("No account with the following iban "+iban);
+        if (accountDTO == null) {
+            throw new EntityNotFoundException("No account with the following iban " + iban);
         }
         Account account = accountMapper.toEntity(accountDTO);
         account.setActive(active);
@@ -192,31 +193,32 @@ public class AccountService {
         return true;
     }
 
-    private Specification<Account> buildSpecification(String iban,
-                                                      Float balance,
-                                                      String typeOfAccount,
-                                                      UUID userId,
-                                                      LocalDate dateOfOpening,
-                                                      boolean active) {
-       return ((root, query, criteriaBuilder) -> {
+    private Specification<Account> buildSpecification(
+            String iban,
+            Float balance,
+            String typeOfAccount,
+            UUID userId,
+            LocalDate dateOfOpening,
+            Boolean active) {
+        return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (iban != null && !iban.isEmpty()) {
                 predicates.add(criteriaBuilder.like(root.get("iban"), "%" + iban + "%"));
             }
-            if (balance != null) { 
+            if (balance != null) {
                 predicates.add(criteriaBuilder.equal(root.get("balance"), balance));
             }
             if (typeOfAccount != null && !typeOfAccount.isEmpty()) {
-                predicates.add(criteriaBuilder.like(root.get("typeOfAccount"), "%" + typeOfAccount + "%"));
+                predicates.add(criteriaBuilder.equal(root.get("typeOfAccount"), AccountType.valueOf(typeOfAccount.toUpperCase())));
             }
             if (userId != null && !userId.toString().isEmpty()) {
-                predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
+                predicates.add(criteriaBuilder.equal(root.get("user"), userId));
             }
-            if (dateOfOpening != null && !dateOfOpening.toString().isEmpty()) {
+            if (dateOfOpening != null) {
                 predicates.add(criteriaBuilder.equal(root.get("dateOfOpening"), dateOfOpening));
             }
-            if (active) {
+            if (active != null) {
                 predicates.add(criteriaBuilder.equal(root.get("active"), active));
             }
 
