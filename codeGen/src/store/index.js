@@ -72,6 +72,7 @@ const store = new Vuex.Store({
         },
         logout({ commit }) {
             commit('clearAuthData');
+            location.reload();
         },
         async getUsers({ commit, state }) {
             try {
