@@ -1,6 +1,8 @@
 package com.bank.app.restapi.controller;
 
+import com.bank.app.restapi.dto.AccountBalanceDTO;
 import com.bank.app.restapi.dto.AccountDTO;
+import com.bank.app.restapi.dto.CustomerIbanDTO;
 import com.bank.app.restapi.service.AccountService;
 
 import jakarta.validation.Valid;
@@ -45,40 +47,40 @@ public class AccountController {
         return ResponseEntity.status(201).body(accountService.createAccount(accountDTO));
     }
 
-    @GetMapping("/{iban}")
+    @GetMapping("/{iban}/accountInfo")
     public ResponseEntity<AccountDTO> getAccountInfo(@PathVariable String iban) {
-        return ResponseEntity.status(200).body(accountService.getAccountByIban(iban));
+        AccountDTO accountDTO = accountService.getAccountByIban(iban);
+        return ResponseEntity.status(200).body(accountDTO);
     }
 
-    // TODO: 27-May-23 test returns 200 but return whole account object
-    // should we make a BalanceResponseDTO?
     @GetMapping("/{iban}/balance")
-    public ResponseEntity<?> getAccountBalance(@PathVariable String iban) {
-        return ResponseEntity.status(200).body(accountService.getBalanceByIban(iban));
+    public ResponseEntity<AccountBalanceDTO> getAccountBalance(@PathVariable String iban) {
+        AccountBalanceDTO accountBalanceDTO = accountService.getBalanceByIban(iban);
+        return ResponseEntity.status(200).body(accountBalanceDTO);
     }
 
-    @GetMapping("/{customerName}")   
-    public ResponseEntity<List<String>> getIbanByCustomerName(@PathVariable String customerName) {
-        return ResponseEntity.status(200).body(accountService.getIbanByUsername(customerName));
+    @GetMapping("/iban")
+    public ResponseEntity<CustomerIbanDTO> getIbanByCustomerName(@RequestParam(required=false) String firstname, @RequestParam(required=false) String lastname) {
+        CustomerIbanDTO customerIbanDTO = accountService.getIbanByUsername(firstname, lastname);
+        return ResponseEntity.status(200).body(customerIbanDTO);
     }
 
-
-    // @GetMapping("/{userId}")
-    // public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable UUID userId) {
-    //     return ResponseEntity.status(200).body(accountService.getAccountsByUserId(userId));
-    // }
+     @GetMapping("/{userId}")
+     public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable UUID userId) {
+        List<AccountDTO> accounts = accountService.getAccountsByUserId(userId);
+         return ResponseEntity.status(200).body(accounts);
+     }
 
     @PatchMapping("/{iban}")
-    public ResponseEntity<?> deactivateAccount(@PathVariable String iban) {
-        return ResponseEntity.status(200).body(accountService.deactivateAccount(iban));
+    public ResponseEntity<String> deactivateAccount(@PathVariable String iban) {
+        String response = accountService.deactivateAccount(iban);
+        return ResponseEntity.status(200).body(response);
     }
 
-    // TODO: test returns 200 but doesn't change the status (i tried both patch and
-    // post requests)
-    // @PostMapping("/{iban}")
-    // public ResponseEntity<?> activateAccount(@PathVariable String iban) {
-    // accountService.activateAccount(iban);
-    // return ResponseEntity.status(200).build();
-    // }
+     @PatchMapping("/{iban}/activate")
+     public ResponseEntity<String > activateAccount(@PathVariable String iban) {
+     String response = accountService.activateAccount(iban);
+     return ResponseEntity.status(200).body(response);
+     }
 
 }

@@ -5,6 +5,7 @@ import com.bank.app.restapi.dto.LoginResponseDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.User;
+import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
@@ -112,6 +113,14 @@ public class UserService {
             throw new EntityNotFoundException("No user with following id " + id + " exists");
         }
         return userMapper.toDTO(user.get());
+    }
+
+    public User getUserById(UUID id) throws EntityNotFoundException {
+        Optional<User> user = userRepository.findById(id);
+        if (!user.isPresent()) {
+            throw new EntityNotFoundException("No user with following id " + id + " exists");
+        }
+        return user.get();
     }
 
     // Private methods
