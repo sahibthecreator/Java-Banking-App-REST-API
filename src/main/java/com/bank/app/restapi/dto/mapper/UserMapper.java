@@ -4,8 +4,6 @@ import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.model.User;
 import org.modelmapper.ModelMapper;
 
-import java.time.LocalDate;
-
 public class UserMapper {
 
     private ModelMapper mapper;

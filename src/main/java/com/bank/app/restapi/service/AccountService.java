@@ -5,26 +5,20 @@ import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.AccountType;
 import com.bank.app.restapi.repository.AccountRepository;
-
-import com.sun.jdi.request.InvalidRequestStateException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import jakarta.persistence.criteria.Predicate;
 
 @Service
 @AllArgsConstructor
@@ -74,7 +68,7 @@ public class AccountService {
 
         accountDTO.setUserId(userId);
         accountDTO.setIban(dutchIban);
-        //accountDTO.setBalance(0);
+        accountDTO.setBalance(accountDTO.getBalance());
         accountDTO.setDateOfOpening(LocalDate.now());
         accountDTO.setActive(true);
 
@@ -84,13 +78,29 @@ public class AccountService {
         return accountMapper.toDTO(account);
     }
 
+    //The BANK's bank account
+    public void createBankAccount(UUID id) {
+        AccountDTO bank = new AccountDTO();
+        bank.setIban("NL01INHO0000000001");
+        bank.setBalance(10000);
+        bank.setTypeOfAccount(AccountType.CURRENT);
+        //the account had to be connected to the root admin, userId filed in AccountDTO is annotated with @NotNull
+        bank.setUserId(id);
+        bank.setDateOfOpening(LocalDate.now());
+        bank.setAbsoluteLimit(0);
+        bank.setActive(true);
+
+        Account account = accountMapper.toEntity(bank);
+        account = accountRepository.saveAndFlush(account);
+    }
+
     public boolean deactivateAccount(String iban) {
-        AccountDTO accountDTO = getAccountByIban(iban);
+        AccountDTO accountDTO = getAccountDTOByIban(iban);
         return updateAccountStatus(accountDTO, false, iban);
     }
 
     public boolean activateAccount(String iban) {
-        AccountDTO accountDTO = getAccountByIban(iban);
+        AccountDTO accountDTO = getAccountDTOByIban(iban);
         return updateAccountStatus(accountDTO, true, iban);
     }
 
@@ -110,12 +120,21 @@ public class AccountService {
         return accounts.stream().map(accountMapper::toDTO).toList();
     }
 
-    public AccountDTO getAccountByIban(String iban) {
+    public AccountDTO getAccountDTOByIban(String iban) {
         Account account = accountRepository.findByIban(iban);
         if (account == null) {
             throw new EntityNotFoundException("Account with following iban: " + iban + " not found");
         }
         return accountMapper.toDTO(account);
+    }
+
+    //I need this method for Transaction Services - Manol
+    public Account getAccountByIban(String iban) {
+        Account account = accountRepository.findByIban(iban);
+        if (account == null) {
+            throw new EntityNotFoundException("Account with following iban: " + iban + " not found");
+        }
+        return account;
     }
 
     public float getBalanceByIban(String iban) {

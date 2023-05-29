@@ -6,7 +6,6 @@ import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.Transaction;
 import com.bank.app.restapi.model.TransactionType;
 import com.bank.app.restapi.model.User;
-import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.repository.TransactionRepository;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,20 +24,37 @@ import java.util.UUID;
 public class TransactionService {
 
     private TransactionRepository transactionRepository;
-    private AccountRepository accountRepository;
+    private AccountService accountService;
     private UserRepository userRepository;
 
     private final Environment environment;
 
     private TransactionMapper transactionMapper;
 
-    public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository,
-            UserRepository userRepository, Environment environment, TransactionMapper transactionMapper) {
+    public TransactionService(TransactionRepository transactionRepository, AccountService accountService,
+                              UserRepository userRepository, Environment environment, TransactionMapper transactionMapper) {
         this.transactionRepository = transactionRepository;
-        this.accountRepository = accountRepository;
+        this.accountService = accountService;
         this.userRepository = userRepository;
         this.environment = environment;
         this.transactionMapper = transactionMapper;
+    }
+
+    private List<TransactionDTO> getTodaysTransactionsFromSendingUser(String iban, LocalDate today) {
+        Specification<Transaction> specification = Specification.where(null);
+
+        if (iban != null && !iban.isEmpty() && today != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("fromAccount").get("iban"), iban));
+
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("dateOfExecution").as(Date.class), Date.valueOf(today)));
+
+            List<Transaction> transactions = transactionRepository.findAll(specification);
+            return transactions.stream().map(transactionMapper::toDTO).toList();
+        }
+
+        throw new RuntimeException("Internal error. Could not retrieve IBAN and/or Today's date.");
     }
 
     public List<TransactionDTO> getTransactions(String iban, Float minAmount, Float maxAmount, Float exactAmount,
@@ -111,8 +127,8 @@ public class TransactionService {
 
     public TransactionDTO addTransaction(TransactionDTO dto, TransactionType type) {
         Transaction t = new Transaction();
-        t.setFromAccount(accountRepository.findByIban(dto.getFromAccount()));
-        t.setToAccount(accountRepository.findByIban(dto.getToAccount()));
+        t.setFromAccount(accountService.getAccountByIban(dto.getFromAccount()));
+        t.setToAccount(accountService.getAccountByIban(dto.getToAccount()));
         t.setAmount(dto.getAmount());
         t.setTypeOfTransaction(type);
         t.setDateOfExecution(LocalDateTime.now());
@@ -134,11 +150,6 @@ public class TransactionService {
         float balance = fromAccount.getBalance();
         balance = balance - amount;
         fromAccount.setBalance(balance);
-
-        User ownerOfSendingAccount = mapAccountIbanToOwner(fromAccount);
-        float dayLimit = ownerOfSendingAccount.getDayLimit();
-        dayLimit = dayLimit - amount;
-        ownerOfSendingAccount.setDayLimit(dayLimit);
     }
 
     private void sentMoneyToAccount(Account toAccount, float amount) {
@@ -171,11 +182,23 @@ public class TransactionService {
             throw new IllegalArgumentException("Transaction exceed the transaction limit.");
         }
 
-        float dayLimit = ownerOfSendingAccount.getDayLimit();
-        dayLimit = dayLimit - amount;
-        if (dayLimit < 0) {
+        checkCustomerDailyLimit(ownerOfSendingAccount.getDayLimit(), fromAccount.getIban(), amount);
+    }
+
+    private void checkCustomerDailyLimit (float dayLimit, String ownerIban, float amountToSend) {
+        float ownerDayLimit = dayLimit;
+
+        List<TransactionDTO> todaysTransactionsFromSendingUser = this.getTodaysTransactionsFromSendingUser(ownerIban, LocalDate.now());
+        float sentMoneyToday = 0;
+        for (TransactionDTO t:
+             todaysTransactionsFromSendingUser) {
+            sentMoneyToday = sentMoneyToday + t.getAmount();
+        }
+
+        if (sentMoneyToday + amountToSend > ownerDayLimit) {
             throw new IllegalArgumentException("Day limit has been reached.");
         }
+
     }
 
     private User mapAccountIbanToOwner(Account account) {
