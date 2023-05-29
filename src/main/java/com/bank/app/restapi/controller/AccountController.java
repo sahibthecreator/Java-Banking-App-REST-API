@@ -49,7 +49,7 @@ public class AccountController {
 
     @GetMapping("/{iban}/accountInfo")
     public ResponseEntity<AccountDTO> getAccountInfo(@PathVariable String iban) {
-        AccountDTO accountDTO = accountService.getAccountByIban(iban);
+        AccountDTO accountDTO = accountService.getAccountDTOByIban(iban);
         return ResponseEntity.status(200).body(accountDTO);
     }
 

@@ -132,7 +132,6 @@ public class TransactionService {
         Transaction t = new Transaction();
         t.setFromAccount(sendingAccount);
         t.setToAccount(receivingAccount);
-        //checkSelfAccountTransaction(t.getFromAccount(), t.getToAccount());
         t.setAmount(validateAmount(dto.getAmount()));
         t.setTypeOfTransaction(type);
         t.setDateOfExecution(LocalDateTime.now());
@@ -176,13 +175,13 @@ public class TransactionService {
     private Account validateAccountsBasedOnTransactionType(Account accountToVerify, boolean accountToVerifyIsSending, TransactionType transactionType) {
         switch (transactionType) {
             case DEPOSIT:
-                if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001")) && !accountToVerifyIsSending) {
+                if (!accountToVerify.equals(accountService.getAccountDTOByIban("NL01INHO0000000001")) && !accountToVerifyIsSending) {
                     throw new AccessDeniedException("During deposit, transaction cannot be sent to an account other than the BANK's dedicated one");
                 }
                 //validateAccountsBasedOnAccountType(accountToVerify, transactionType);
                 break;
             case WITHDRAWAL:
-                if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001")) && accountToVerifyIsSending) {
+                if (!accountToVerify.equals(accountService.getAccountDTOByIban("NL01INHO0000000001")) && accountToVerifyIsSending) {
                     throw new AccessDeniedException("During withdrawal, transaction cannot be sent from an account other than the BANK's dedicated one");
                 }
                 //validateAccountsBasedOnAccountType(accountToVerify, transactionType);
