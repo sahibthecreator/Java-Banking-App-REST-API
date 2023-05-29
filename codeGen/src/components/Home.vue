@@ -117,7 +117,6 @@ export default {
   border-radius: 7px;
   bottom: 50px;
   right: -20px;
-  z-index: 100000;
 }
 
 .accountImg {
@@ -125,6 +124,5 @@ export default {
   width: auto;
   top: 10%;
   right: 10%;
-  z-index: 100000;
 }
 </style>
