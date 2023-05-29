@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Component
 public class DatabaseInitializer implements CommandLineRunner {
@@ -45,12 +46,14 @@ public class DatabaseInitializer implements CommandLineRunner {
         user.setBsn("212121212");
         user.setDateOfBirth(LocalDate.of(2004, 3, 23));
         user.setRole(UserType.EMPLOYEE);
+        user.setDayLimit(100);
+        user.setTransactionLimit(50);
 
         UserDTO userDto = userService.register(userMapper.toDTO(user));
 
         AccountDTO account1 = new AccountDTO();
         account1.setIban("NL01ABNA1032456789");
-        account1.setBalance(0);
+        account1.setBalance(220);
         account1.setTypeOfAccount(AccountType.CURRENT);
         account1.setUserId(userDto.getId());
         account1.setDateOfOpening(LocalDate.now());
@@ -61,7 +64,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         AccountDTO account2 = new AccountDTO();
         account2.setIban("NL01ABNA0123456789");
-        account2.setBalance(0);
+        account2.setBalance(110);
         account2.setTypeOfAccount(AccountType.CURRENT);
         account2.setUserId(userDto.getId());
         account2.setDateOfOpening(LocalDate.now());
@@ -69,6 +72,8 @@ public class DatabaseInitializer implements CommandLineRunner {
         account2.setActive(true);
 
         accountService.createAccount(account2);
+
+        accountService.createBankAccount(userDto.getId());
 
 //        TransactionDTO transaction = new TransactionDTO();
 //        transaction.setFromAccount(account1.getIban());

@@ -74,7 +74,7 @@ public class AccountService {
 
         accountDTO.setUserId(userId);
         accountDTO.setIban(dutchIban);
-        accountDTO.setBalance(0);
+        accountDTO.setBalance(accountDTO.getBalance());
         accountDTO.setDateOfOpening(LocalDate.now());
         accountDTO.setActive(true);
 
@@ -82,6 +82,22 @@ public class AccountService {
         account = accountRepository.saveAndFlush(account);
 
         return accountMapper.toDTO(account);
+    }
+
+    //The BANK's bank account
+    public void createBankAccount(UUID id) {
+        AccountDTO bank = new AccountDTO();
+        bank.setIban("NL01INHO0000000001");
+        bank.setBalance(10000);
+        bank.setTypeOfAccount(AccountType.CURRENT);
+        //the account had to be connected to the root admin, userId filed in AccountDTO is annotated with @NotNull
+        bank.setUserId(id);
+        bank.setDateOfOpening(LocalDate.now());
+        bank.setAbsoluteLimit(0);
+        bank.setActive(true);
+
+        Account account = accountMapper.toEntity(bank);
+        account = accountRepository.saveAndFlush(account);
     }
 
     public boolean deactivateAccount(String iban) {
