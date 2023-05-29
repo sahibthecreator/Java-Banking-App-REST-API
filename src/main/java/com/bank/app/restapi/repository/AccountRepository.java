@@ -15,7 +15,7 @@ public interface AccountRepository extends JpaRepository<Account, UUID>, JpaSpec
 
     @Query("SELECT a.iban FROM Account a JOIN a.user u WHERE CONCAT(u.firstName, ' ', u.lastName) = :username")
     List<String>  findIbanByUsername(@Param("username") String customerName);
-    @Query("SELECT a FROM Account a JOIN a.user u WHERE id = :userId")
+    @Query("SELECT a FROM Account a JOIN a.user u WHERE a.user = :userId")
     List<Account> findAccountsByUserId(@Param("userId") UUID userId);
 
     Account findByIban(String iban);
