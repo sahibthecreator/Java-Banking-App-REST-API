@@ -26,7 +26,7 @@ public class AccountController {
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<List<AccountDTO>> getAccounts(
             @RequestParam(required = false) String iban,
-            @RequestParam(required = false) float balance,
+            @RequestParam(required = false) Float balance,
             @RequestParam(required = false) String typeOfAccount,
             @RequestParam(required = false) UUID userId,
             @RequestParam(required = false) LocalDate dateOfOpening,
@@ -34,9 +34,10 @@ public class AccountController {
             @RequestParam(defaultValue = "desc") String sort,
             @RequestParam(defaultValue = "20") int limit) {
 
-            List<AccountDTO> accounts = accountService.getAccounts(iban, balance, typeOfAccount, userId, dateOfOpening, active, sort, limit);
-            return ResponseEntity.status(200).body(accounts);
-        }
+        List<AccountDTO> accounts = accountService.getAccounts(iban, balance, typeOfAccount, userId, dateOfOpening,
+                active, sort, limit);
+        return ResponseEntity.status(200).body(accounts);
+    }
 
     @PostMapping("")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
@@ -56,27 +57,28 @@ public class AccountController {
         return ResponseEntity.status(200).body(accountService.getBalanceByIban(iban));
     }
 
-    @GetMapping("/customerIBANs")
+    @GetMapping("/{customerName}")   
     public ResponseEntity<List<String>> getIbanByCustomerName(@PathVariable String customerName) {
         return ResponseEntity.status(200).body(accountService.getIbanByUsername(customerName));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable UUID userId) {
-        return ResponseEntity.status(200).body(accountService.getAccountsByUserId(userId));
-    }
 
+    // @GetMapping("/{userId}")
+    // public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable UUID userId) {
+    //     return ResponseEntity.status(200).body(accountService.getAccountsByUserId(userId));
+    // }
 
     @PatchMapping("/{iban}")
     public ResponseEntity<?> deactivateAccount(@PathVariable String iban) {
         return ResponseEntity.status(200).body(accountService.deactivateAccount(iban));
     }
 
-    //TODO: test returns 200 but doesn't change the status (i tried both patch and post requests)
-//    @PostMapping("/{iban}")
-//    public ResponseEntity<?> activateAccount(@PathVariable String iban) {
-//        accountService.activateAccount(iban);
-//        return ResponseEntity.status(200).build();
-//    }
+    // TODO: test returns 200 but doesn't change the status (i tried both patch and
+    // post requests)
+    // @PostMapping("/{iban}")
+    // public ResponseEntity<?> activateAccount(@PathVariable String iban) {
+    // accountService.activateAccount(iban);
+    // return ResponseEntity.status(200).build();
+    // }
 
 }

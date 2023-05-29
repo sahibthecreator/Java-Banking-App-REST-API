@@ -39,15 +39,17 @@ class AccountControllerTest {
     }
 
     @Test
-    void getAllShouldReturnListOfAccounts(){
-        List<AccountDTO> mockAccounts = Arrays.asList(new AccountDTO(), new AccountDTO());//createMockAccounts();
+    void getAllShouldReturnListOfAccounts() {
+        List<AccountDTO> mockAccounts = Arrays.asList(new AccountDTO(), new AccountDTO());// createMockAccounts();
 
-        when(accountService.getAccounts(null, 0, null, null, null, true, null, 10)).thenReturn(mockAccounts);
+        // Why balance is zero here? CHanged already
+        when(accountService.getAccounts(null, null, null, null, null, true, null, 10)).thenReturn(mockAccounts);
 
-        ResponseEntity<List<AccountDTO>> response = accountController.getAccounts(null, 0, null, null, null, true, null, 10);
+        ResponseEntity<List<AccountDTO>> response = accountController.getAccounts(null, null, null, null, null, true,
+                null, 10);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(mockAccounts, response.getBody());
-        verify(accountService, times(1)).getAccounts(null, 0, null, null, null, true, null, 10);
+        verify(accountService, times(1)).getAccounts(null, null, null, null, null, true, null, 10);
     }
 
     @Test
@@ -70,7 +72,7 @@ class AccountControllerTest {
     }
 
     @Test
-    void accountInfoByIbanShouldReturnAccount(){
+    void accountInfoByIbanShouldReturnAccount() {
         AccountDTO accountDTO = AccountDTO.builder()
                 .iban("NL01INHO0000000001")
                 .balance(1000.0f)
@@ -89,7 +91,7 @@ class AccountControllerTest {
     }
 
     @Test
-    void getAccountBalanceShouldReturnTheCorrectBalance(){
+    void getAccountBalanceShouldReturnTheCorrectBalance() {
         AccountDTO accountDTO = AccountDTO.builder()
                 .iban("NL01INHO0000000001")
                 .balance(1000.0f)
@@ -107,21 +109,21 @@ class AccountControllerTest {
         verify(accountService, times(1)).getBalanceByIban("NL01INHO0000000001");
     }
     // Create a list of 101 accounts
-//    private List<AccountDTO> createMockAccounts() {
-//        List<AccountDTO> mockAccounts = new ArrayList<>();
-//
-//        for (int i = 0; i < 99; i++) {
-//            AccountDTO mockAccount = AccountDTO.builder()
-//                    .iban(accountService.generateDutchIban())
-//                    .balance(1000.0f)
-//                    .typeOfAccount(AccountType.CURRENT)
-//                    .userId(UUID.randomUUID())
-//                    .dateOfOpening(LocalDate.now())
-//                    .active(true)
-//                    .build();
-//            mockAccounts.add(mockAccount);
-//        }
-//
-//        return mockAccounts;
-//    }
+    // private List<AccountDTO> createMockAccounts() {
+    // List<AccountDTO> mockAccounts = new ArrayList<>();
+    //
+    // for (int i = 0; i < 99; i++) {
+    // AccountDTO mockAccount = AccountDTO.builder()
+    // .iban(accountService.generateDutchIban())
+    // .balance(1000.0f)
+    // .typeOfAccount(AccountType.CURRENT)
+    // .userId(UUID.randomUUID())
+    // .dateOfOpening(LocalDate.now())
+    // .active(true)
+    // .build();
+    // mockAccounts.add(mockAccount);
+    // }
+    //
+    // return mockAccounts;
+    // }
 }

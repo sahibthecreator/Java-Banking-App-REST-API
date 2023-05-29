@@ -13,7 +13,7 @@ import AccountIcon from './AccountIcon.vue';
       <div class="topPart">
         <div class="dashboardName">
           <h1 class="welcomeText">Good afternoon,<br>
-            {{user.firstName}} {{ user.lastName[0] }}.
+            {{ user ? user.firstName : "" }} {{ user ? user.lastName[0] : "" }}.
           </h1>
 
           <div class="accounts">
@@ -53,12 +53,12 @@ import AccountIcon from './AccountIcon.vue';
 
         </div>
         <div class="dashboardAction">
-          <b-button variant="dark_primary" v-on:click="relocate_to_transaction()">Send money</b-button>
+          <b-button variant="dark_primary" @click="relocate_to_transaction()">Send money</b-button>
           <b-button variant="gray_dark">View transaction history</b-button>
           <b-button variant="black">Request an account</b-button>
         </div>
         <div class="chart">
-          <apexchart type="line" height="200px" :options="chartOptions" :series="chartSeries" />
+          <apexchart type="line" height="100%" :options="chartOptions" :series="chartSeries" />
         </div>
       </div>
 
@@ -93,6 +93,7 @@ export default {
   data() {
     return {
       user: null,
+      accounts: null,
       chartOptions: {
         chart: {
           type: 'line',
@@ -129,21 +130,23 @@ export default {
     }
   },
   mounted() {
-    this.getUser();
+    this.getUserAndAccounts();
   },
   methods: {
-    async getUser() {
+    async getUserAndAccounts() {
       try {
+        console.log(this.$store.state.token);
         let user = await this.$store.dispatch('getUser', this.$store.getters.getUserId);
         this.user = user;
+        let accounts = await this.$store.dispatch('getAccountsByUserId', this.$store.getters.getUserId);
+        this.accounts = accounts;
       } catch (error) {
         console.log(error.message);
       }
-
     },
     relocate_to_transaction() {
-    this.$router.push('transaction')
-  }
+      this.$router.push('transaction')
+    }
   },
 };
 
@@ -162,19 +165,20 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 10px 0;
 }
 
 .panel {
   background: var(--white);
   width: 90vw;
-  height: 80vh;
   border-radius: 35px;
   background-color: var(--white);
   margin: auto;
   display: flex;
   flex-direction: column;
+  gap: 10px;
   justify-content: space-between;
-  padding: 50px;
+  padding: 30px;
 }
 
 .topPart {
@@ -221,22 +225,23 @@ export default {
   width: 100px;
   transform: translateY(-10px);
 }
+
 /* Track */
 ::-webkit-scrollbar-track {
   border: 1px var(--gray-black) solid;
   margin: 20px;
   border-radius: 30px;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: var(--gray-dark); 
+  background: var(--gray-dark);
   border-radius: 10px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gray-black); 
+  background: var(--gray-black);
 }
 
 .account {
@@ -311,6 +316,7 @@ export default {
   background-color: white;
   border-radius: 35px;
   padding: 10px;
+  height: 100%;
 }
 
 .dashboardAccount>span {}

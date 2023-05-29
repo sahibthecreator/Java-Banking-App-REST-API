@@ -11,7 +11,20 @@ export const getAccounts = async (token) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response.data.error);
+    throw error.response.data;
+  }
+};
+
+export const getAccountsByUserId = async (userId, token) => {
+  try {
+    const response = await axios.get(`${API_URL}/accounts/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
   }
 };
 
@@ -24,6 +37,6 @@ export const createAccount = async (accountData, token) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response.data.error);
+    throw error.response.data;
   }
 };
