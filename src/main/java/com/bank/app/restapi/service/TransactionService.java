@@ -128,8 +128,14 @@ public class TransactionService {
 
     public TransactionDTO addTransaction(TransactionDTO dto, TransactionType type) {
         Transaction t = new Transaction();
-        t.setFromAccount(validateAccountsBasedOnTransactionType(accountService.getAccountByIban(dto.getFromAccount()), true, type));
-        t.setToAccount(validateAccountsBasedOnTransactionType(accountService.getAccountByIban(dto.getToAccount()), false, type));
+        t.setFromAccount(validateAccountsBasedOnTransactionType(
+                accountService.getAccountByIban(dto.getFromAccount()),
+                true,
+                type));
+        t.setToAccount(validateAccountsBasedOnTransactionType(
+                accountService.getAccountByIban(dto.getToAccount()),
+                false,
+                type));
         checkSelfTransaction(t.getFromAccount(), t.getToAccount());
         t.setAmount(validateAmount(dto.getAmount()));
         t.setTypeOfTransaction(type);
