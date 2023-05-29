@@ -2,10 +2,7 @@ package com.bank.app.restapi.service;
 
 import com.bank.app.restapi.dto.TransactionDTO;
 import com.bank.app.restapi.dto.mapper.TransactionMapper;
-import com.bank.app.restapi.model.Account;
-import com.bank.app.restapi.model.Transaction;
-import com.bank.app.restapi.model.TransactionType;
-import com.bank.app.restapi.model.User;
+import com.bank.app.restapi.model.*;
 import com.bank.app.restapi.repository.TransactionRepository;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -183,11 +180,13 @@ public class TransactionService {
                 if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001")) && !accountToVerifyIsSending) {
                     throw new AccessDeniedException("During deposit, transaction cannot be sent to an account other than the BANK's dedicated one");
                 }
+                validateAccountsBasedOnAccountType(accountToVerify, transactionType);
                 break;
             case WITHDRAWAL:
                 if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001")) && accountToVerifyIsSending) {
                     throw new AccessDeniedException("During withdrawal, transaction cannot be sent from an account other than the BANK's dedicated one");
                 }
+                validateAccountsBasedOnAccountType(accountToVerify, transactionType);
                 break;
             case TRANSFER:
                 break;
@@ -196,6 +195,16 @@ public class TransactionService {
         }
 
         return accountToVerify;
+    }
+
+    private void validateAccountsBasedOnAccountType(Account accountToVerify, TransactionType transactionType) {
+        if (transactionType == TransactionType.DEPOSIT || transactionType == TransactionType.WITHDRAWAL) {
+            if (accountToVerify.getTypeOfAccount() == AccountType.SAVINGS) {
+                throw new IllegalArgumentException("Cannot perform " + transactionType.name() + " transaction, involving a savings account");
+            }
+        } else if (transactionType == TransactionType.TRANSFER) {
+            //TODO: Allow transfer from/to SAVINGS account only on the same user
+        }
     }
 
     private void checkSelfTransaction(Account fromAccount, Account toAccount) {
