@@ -36,7 +36,7 @@ public class AccountService {
     private final AccountMapper accountMapper;
 
     public List<AccountDTO> getAccounts( String iban,
-                                         float balance,
+                                         Float balance,
                                          String typeOfAccount,
                                          UUID userId,
                                          LocalDate dateOfOpening,
@@ -193,7 +193,7 @@ public class AccountService {
     }
 
     private Specification<Account> buildSpecification(String iban,
-                                                      float balance,
+                                                      Float balance,
                                                       String typeOfAccount,
                                                       UUID userId,
                                                       LocalDate dateOfOpening,
@@ -204,7 +204,7 @@ public class AccountService {
             if (iban != null && !iban.isEmpty()) {
                 predicates.add(criteriaBuilder.like(root.get("iban"), "%" + iban + "%"));
             }
-            if (balance != 0 ) {
+            if (balance != null) { 
                 predicates.add(criteriaBuilder.equal(root.get("balance"), balance));
             }
             if (typeOfAccount != null && !typeOfAccount.isEmpty()) {
