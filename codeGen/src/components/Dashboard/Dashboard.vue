@@ -117,7 +117,7 @@ export default {
       this.$router.push('/dashboard/transaction')
     },
     relocate_to_request() {
-      this.$router.push('/dashboard/request')
+      this.$router.push('/dashboard/requestAccount')
     }
   },
 };

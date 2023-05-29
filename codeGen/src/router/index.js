@@ -19,7 +19,7 @@ const router = createRouter({
     { path: '/dashboard', name: 'my dashboard', component: Dashboard, meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: '404 Not Found', component: NotFound },
     { path: '/dashboard/transaction', name: 'transfer', component: Transaction, meta: { requiresAuth: true} },
-    { path: '/dashboard/request', name: 'request', component: RequestAccount, meta: { requiresAuth: true} },
+    { path: '/dashboard/requestAccount', name: 'request', component: RequestAccount, meta: { requiresAuth: true} },
   ],
 });
 
