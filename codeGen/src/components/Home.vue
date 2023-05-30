@@ -125,4 +125,49 @@ export default {
   top: 10%;
   right: 10%;
 }
+
+@media (max-width: 1000px) {
+.homePage {
+   flex-direction: column;
+}
+
+#leftHome {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   }
+
+#rightHome {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   margin-top: 150px;
+}
+
+.homeBG {
+   position: absolute;
+   flex-direction: column;
+   align-items: center;
+   width: 200%;
+   height: 180%;
+}
+
+.activity{
+   position: absolute;
+   top: 0;
+   right: 0;
+   height: 100%;
+   width: 50%;
+}
+
+.accountImg {
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   height: 140%;
+   width: 40%;
+}
+}
 </style>
