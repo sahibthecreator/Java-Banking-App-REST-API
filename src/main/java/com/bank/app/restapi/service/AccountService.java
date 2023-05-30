@@ -36,7 +36,7 @@ public class AccountService {
 
     private final AccountMapper accountMapper;
 
-    public List<AccountDTO> getAccounts( String iban,
+    public List<AccountDTO>  getAccounts( String iban,
                                          Float balance,
                                          String typeOfAccount,
                                          UUID userId,
@@ -295,7 +295,7 @@ public class AccountService {
                 predicates.add(criteriaBuilder.like(root.get("typeOfAccount"), "%" + typeOfAccount + "%"));
             }
             if (userId != null && !userId.toString().isEmpty()) {
-                predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
+                predicates.add(criteriaBuilder.equal(root.get("user"), userId));
             }
             if (dateOfOpening != null && !dateOfOpening.toString().isEmpty()) {
                 predicates.add(criteriaBuilder.equal(root.get("dateOfOpening"), dateOfOpening));
