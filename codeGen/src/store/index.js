@@ -119,8 +119,6 @@ const store = new Vuex.Store({
         },
         async getAccountsByUserId({ commit, state }, userId) {
             try {
-                console.log(state.token);
-                console.log(userId);
                 const accounts = await getAccountsByUserId(userId, state.token);
                 commit('setAccounts', accounts);
                 return accounts;

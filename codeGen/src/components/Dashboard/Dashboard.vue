@@ -93,7 +93,7 @@ export default {
     }
   },
   mounted() {
-     this.getUserAndAccountsAndTransactions();
+    this.getUserAndAccountsAndTransactions();
   },
   methods: {
     async getUserAndAccountsAndTransactions() {
@@ -108,13 +108,12 @@ export default {
       } catch (error) {
         console.log(error);
         if (this.user == null) {
-          console.log("sssss");
           this.$store.dispatch('logout');
         }
       }
     },
     relocate_to_transaction() {
-      this.$router.push('/dashboard/transaction')
+      this.$router.push({ name: 'transfer', params: { accounts: "22" } });
     },
     relocate_to_request() {
       this.$router.push('/dashboard/requestAccount')
@@ -191,6 +190,8 @@ export default {
   padding: 15px;
   border: 15px var(--white) solid;
 }
+
+
 
 /* width */
 ::-webkit-scrollbar {
