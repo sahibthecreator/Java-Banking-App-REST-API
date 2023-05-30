@@ -42,7 +42,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 user.setLastName("Admin");
                 user.setEmail("root@gmail.com");
                 user.setPassword("11111");
-                user.setBsn("212121212");
+                user.setBsn("832698734");
                 user.setDateOfBirth(LocalDate.of(2004, 3, 23));
                 user.setRole(UserType.EMPLOYEE);
                 user.setDayLimit(100);

@@ -60,6 +60,8 @@ public class UserService {
     }
 
     public UserDTO register(UserDTO userDTO) {
+        emailIsRegistered(userDTO.getEmail());
+        bsnIsValid(userDTO.getBsn());
         User user = userMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
@@ -101,11 +103,6 @@ public class UserService {
         return true;
     }
 
-    public boolean userIdExists(UUID id) {
-        Optional<User> user = userRepository.findById(id);
-        return user.isPresent();
-    }
-
     public UserDTO getUserDTOById(UUID id) throws EntityNotFoundException {
         Optional<User> user = userRepository.findById(id);
         if (!user.isPresent()) {
@@ -123,6 +120,7 @@ public class UserService {
     }
 
     // Private methods
+
     private Specification<User> buildSpecification(
             String firstName,
             String lastName,
@@ -154,5 +152,28 @@ public class UserService {
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    private void emailIsRegistered(String email) throws IllegalArgumentException {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent())
+            throw new IllegalArgumentException("Email is already registered");
+    }
+
+    private void bsnIsValid(String bsn) {
+        if (bsn == null || bsn.length() != 9 || !bsn.matches("[0-9]+")) {
+            throw new IllegalArgumentException("BSN should contain only numbers");
+        }
+
+        int[] factors = { 9, 8, 7, 6, 5, 4, 3, 2, -1 };
+        int checksum = 0;
+
+        for (int i = 0; i < 9; i++) {
+            int digit = Character.getNumericValue(bsn.charAt(i));
+            checksum += digit * factors[i];
+        }
+
+        if (checksum % 11 == 0)
+            throw new IllegalArgumentException("BSN is not valid");
     }
 }

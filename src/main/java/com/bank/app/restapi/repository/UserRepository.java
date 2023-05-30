@@ -17,9 +17,9 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
 
     Optional<User> findByEmail(String email);
 
+
     @Query("SELECT id FROM User u WHERE u.email = :email")
     Optional<UUID> findIdByEmail(@Param("email") String email);
-
 
     @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.id = :id AND u.email = :email")
     boolean matchEmailwithId(@Param("email") String email, @Param("id") UUID id);
