@@ -13,18 +13,42 @@
             <button :class="{ 'selected': !isLogin }" @click="toggleRegisterView()" class="unselected">Register</button>
           </div>
           <div class="loginWrapper" v-if="isLogin">
-            <input type="text" v-model="username" placeholder="Email" class="text-dark" />
-            <input type="password" v-model="password" placeholder="Password" class="text-dark" />
+            <div>
+              <label class="m-0">Email</label>
+              <input type="text" v-model="username" placeholder="sam@gmail.com" class="text-dark" />
+            </div>
+            <div>
+              <label class="m-0">Password</label>
+              <input type="password" v-model="password" placeholder="sam12345" class="text-dark" />
+            </div>
             <button type="button" @click="($event) => login()">Log in</button>
             <p class="text-danger">{{ errorMessage }}</p>
           </div>
           <div class="loginWrapper" v-else>
-            <input type="text" v-model="firstName" placeholder="First Name" class="text-dark" />
-            <input type="text" v-model="lastName" placeholder="Last Name" class="text-dark" />
-            <input type="text" v-model="email" placeholder="Email" class="text-dark" />
-            <input type="password" v-model="password" placeholder="Password" class="text-dark" />
-            <input type="text" v-model="bsn" placeholder="BSN" class="text-dark" />
-            <input type="date" v-model="dateOfBirth" class="text-dark" :max="todayDate">
+            <div>
+              <label class="m-0">First Name*</label>
+              <input type="text" v-model="firstName" placeholder="Sam" class="text-dark" />
+            </div>
+            <div>
+              <label class="m-0">Last Name*</label>
+              <input type="text" v-model="lastName" placeholder="Jhonson" class="text-dark" />
+            </div>
+            <div>
+              <label class="m-0">Email*</label>
+              <input type="text" v-model="email" placeholder="sam@gmail.com" class="text-dark" />
+            </div>
+            <div>
+              <label class="m-0">Password*</label>
+              <input type="password" v-model="password" placeholder="sam12345" class="text-dark" />
+            </div>
+            <div>
+              <label for="bsn" class="m-0">BSN*</label>
+              <input name="bsn" type="text" v-model="bsn" placeholder="7219313183" class="text-dark" />
+            </div>
+            <div>
+              <label for="dayOfBirth" class="m-0">Date of birth*</label>
+              <input name="dayOfBirth" type="date" v-model="dateOfBirth" class="text-dark m-0" :max="todayDate">
+            </div>
 
             <button type="button" @click="($event) => register()">Register</button>
             <p class="text-danger">{{ errorMessage }}</p>
@@ -114,7 +138,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 .wrapper {
   width: 100%;
   height: 100%;
@@ -169,34 +193,69 @@ export default {
   width: 300px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
 }
 
-.loginWrapper>input {
-  background-color: var(--white);
-  height: 40px;
-  padding: 10px;
-  border: none;
-  border-radius: 7px;
-  border: 1px var(--gray-light) solid;
-  color: var(--white);
+.loginWrapper {
+  div {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-size: smaller;
+    }
+
+    input {
+      background-color: var(--white);
+      height: 40px;
+      padding: 10px;
+      border: none;
+      border-radius: 7px;
+      border: 1px var(--gray-light) solid;
+      color: var(--white);
+
+      &::placeholder {
+        font-size: 14px;
+      }
+    }
+  }
+
+  button {
+    margin-top: 5%;
+    height: 50px;
+    width: 130px;
+    border-radius: 7px;
+    background-color: var(--gray-black);
+    border: none;
+    color: white;
+    cursor: pointer;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.103);
+    position: relative;
+    overflow: hidden;
+    transition-duration: .3s;
+
+    &:active {
+      transform: translate(5px, 5px);
+      transition-duration: .3s;
+    }
+  }
 }
 
 ::placeholder {
   color: var(--gray-dark);
 }
 
-.loginWrapper>button {
-  height: 50px;
-  border: none;
-  border-radius: 7px;
-  background-color: var(--gray-black);
-  color: var(--gray-light);
-}
+// .loginWrapper>button {
+//   height: 50px;
+//   border: none;
+//   border-radius: 7px;
+//   background-color: var(--gray-black);
+//   color: var(--gray-light);
+// }
 
-.loginWrapper>button:hover {
-  filter: opacity(0.9);
-}
+// .loginWrapper>button:hover {
+//   filter: opacity(0.9);
+// }
 
 .selectionType {
   width: 100%;

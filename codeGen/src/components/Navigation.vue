@@ -16,21 +16,22 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
     </b-nav>
 
     <b-navbar-nav class="ml-auto">
-      <b-nav-item to="/login" id="login" v-if="!token"
-        >Login / register</b-nav-item>
+      <b-nav-item to="/login" id="login" v-if="!token">Login / register</b-nav-item>
       <b-nav-item v-else>
-        <b-dropdown id="dropdown-offset" offset="-w" size="lg"  variant="link" toggle-class="text-decoration-none" no-caret>
-    <template #button-content>
-      <AccountIcon accountName="Root"></AccountIcon>
-    </template>
-    <b-dropdown-item to="">Settings</b-dropdown-item>
-    <b-dropdown-item to="dashboard">Dashboard</b-dropdown-item>
-    <b-dropdown-item to="">???DB management???</b-dropdown-item>
-    
-    <b-dropdown-divider></b-dropdown-divider>
-    <b-dropdown-item @click="logout">Logout</b-dropdown-item>
-  </b-dropdown>
-        </b-nav-item>
+        <b-dropdown id="dropdown-offset" offset="-w" size="lg" variant="link" toggle-class="text-decoration-none"
+          no-caret>
+          <template #button-content>
+            <AccountIcon accountName="Root"></AccountIcon>
+          </template>
+          <b-dropdown-item to="">Settings</b-dropdown-item>
+          <b-dropdown-item to="dashboard">Dashboard</b-dropdown-item>
+          <b-dropdown-item to="">???DB management???</b-dropdown-item>
+
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item> <b-button variant="danger" class="w-100 p-1"
+              @click="logout">Logout</b-button></b-dropdown-item>
+        </b-dropdown>
+      </b-nav-item>
     </b-navbar-nav>
   </div>
   <div id="line"></div>
@@ -46,10 +47,10 @@ export default {
   },
   methods: {
     logout() {
-      console.log("log out here");
+      this.$store.dispatch('logout');
     }
   },
-  mounted() {},
+  mounted() { },
 };
 </script>
 
