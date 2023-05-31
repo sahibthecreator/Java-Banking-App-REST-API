@@ -12,7 +12,7 @@
 
   </div>
   <div id="line"></div>
-  <div class="transactionPage">
+  <div class="transactionPage" id="transactionPage">
     <div class="actionContent">
       <span>Deposit funds into an account</span>
       <div class="titleContainer">
@@ -30,7 +30,8 @@
         <i class="dropdown-icon" :class="{ 'active': showDropdown }"></i>
         <div class="dropdown-accounts" v-show="showDropdown">
           <ul>
-            <li v-for="option in accountOptions" :key="option" @click="selectAccount(option)">
+            <li v-for="option in accountOptions" :key="option" @click="selectAccount(option)"
+              :class="{ optionDisabled: option.iban == accountTo }">
               <div>
                 <p class="m-0">{{ option.iban }}</p>
                 <p class="m-0">{{ option.typeOfAccount }}</p>
@@ -47,7 +48,8 @@
         <div class="dropdown-accounts-to" v-show="showDropdownToAccount">
           <ul>
             <li v-if="accountFrom.typeOfAccount !== 'SAVINGS'" @click="selectOtherAccount">Other account</li>
-            <li v-for="option in filteredAccountOptions" :key="option" @click="selectAccountTo(option)">
+            <li v-for="option in filteredAccountOptions" :key="option" @click="selectAccountTo(option)"
+              :class="{ optionDisabled: option.iban == accountFrom.iban }">
               <div>
                 <p class="m-0">{{ option.iban }}</p>
                 <p class="m-0">{{ option.typeOfAccount }}</p>
@@ -57,9 +59,23 @@
           </ul>
         </div>
       </div>
-
-      <b-button variant="dark_primary" v-on:click="make_transaction">Transfer</b-button>
+      <b-button variant="dark_primary" v-on:click="performTransaction" id="transferBtn">Transfer</b-button>
+      <p class="text-danger errorMsg">{{ errorMsg }}</p>
       <span class="tos">By clicking transfer, I authorize WAVR to initiate the transaction detailed above</span>
+    </div>
+  </div>
+
+  <div class="card" v-if="statusPopupCardEnabled">
+    <div class="header">
+      <div class="image">
+        <img src="@/assets/SuccessIcon.png" class="success icon" />
+      </div>
+      <div class="content">
+        <span class="title">{{ statusTitle }}</span>
+      </div>
+      <div class="actions">
+        <button type="button" class="history" @click="this.$router.push('/dashboard')">Return to dashboard</button>
+      </div>
     </div>
   </div>
 </template>
@@ -75,34 +91,60 @@ export default {
       accountTo: "",
       showDropdown: false,
       showDropdownToAccount: false,
-      accountOptions: this.$store.state.accounts
+      accountOptions: this.$store.state.accounts,
+      statusPopupCardEnabled: false,
+      statusTitle: "",
+      errorMsg: "",
     }
   },
   computed: {
     filteredAccountOptions() {
+
       const filteredOptions = this.accountOptions.filter(option => option.iban != this.accountFrom);
       return filteredOptions;
     }
   },
   methods: {
-    async make_transaction() {
-      console.log(this.amount, this.accountFrom, this.accountTo);
+    async performTransaction() {
+      try {
+        const transactionData = {
+          fromAccount: this.accountFrom.iban,
+          toAccount: this.accountTo,
+          amount: this.amount,
+          performingUser: this.$store.getters.getUserId,
+          description: "test",
+          typeOfTransaction: "TRANSFER"
+        };
+        await this.$store.dispatch('performTransaction', transactionData);
+        this.statusTitle = `You successfully sent €${this.amount} to ${this.accountTo}`;
+        document.getElementById("transactionPage").style.filter = "blur(5px)";
+        document.getElementById("transactionPage").style.cursor = "default";
+        document.getElementById("transferBtn").disabled = true;
+        this.statusPopupCardEnabled = true;
+      } catch (error) {
+        this.errorMsg = error;
+      }
+
     },
     toggleDropdown() {
       this.showDropdown = !this.showDropdown;
       this.showDropdownToAccount = false;
     },
     selectAccount(option) {
-      this.accountFrom = option;
-      this.toggleDropdown;
+      if (option.iban != this.accountTo) {
+        this.accountFrom = option;
+        this.toggleDropdown;
+      }
     },
     toggleDropdownToAccount() {
       this.showDropdownToAccount = !this.showDropdownToAccount;
       this.showDropdown = false;
     },
     selectAccountTo(option) {
-      this.accountTo = option.iban;
-      this.toggleDropdownToAccount;
+      if (option.iban != this.accountFrom.iban) {
+        this.accountTo = option.iban;
+        this.toggleDropdownToAccount;
+      }
     },
     selectOtherAccount() {
       this.accountTo = "NL";
@@ -114,7 +156,7 @@ export default {
 </script>
 
 
-<style lang="scss">
+<style lang="scss" scoped>
 #nav {
   height: 100px;
   display: flex;
@@ -266,6 +308,7 @@ input::-webkit-inner-spin-button {
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
   ul {
     list-style: none;
     padding: 0;
@@ -306,4 +349,111 @@ input::-webkit-inner-spin-button {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--gray-black);
 }
-</style>
+
+.optionDisabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+
+  &:hover {
+    background-color: #ffffff !important;
+  }
+}
+
+.card {
+  overflow: hidden;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: left;
+  border-radius: 0.5rem;
+  max-width: 290px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background-color: #fff;
+}
+
+
+.header {
+  padding: 1.25rem 1rem 1rem 1rem;
+}
+
+.image {
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #e2feee;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  animation: animate .6s linear alternate-reverse infinite;
+  transition: .6s ease;
+
+  img {
+    height: 80%;
+    width: 80%;
+  }
+}
+
+
+.content {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.title {
+  color: #066e29;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5rem;
+}
+
+.message {
+  margin-top: 0.5rem;
+  color: #595b5f;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.actions {
+  margin: 0.75rem 1rem;
+}
+
+.history {
+  display: inline-flex;
+  padding: 0.5rem 1rem;
+  margin-top: 10%;
+  background-color: #145c40;
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+  justify-content: center;
+  width: 100%;
+  border-radius: 0.375rem;
+  border: none;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    filter: contrast(1.2);
+  }
+}
+
+
+
+@keyframes animate {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.09);
+  }
+}
+.errorMsg{
+  font-size: smaller;
+  margin-bottom: 0;
+}
+</style> 

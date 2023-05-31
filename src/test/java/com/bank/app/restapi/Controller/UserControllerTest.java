@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -114,7 +115,7 @@ class UserControllerTest {
     void deleteUserShouldReturnHttpStatusOK() {
         UUID id = UUID.randomUUID();
 
-        ResponseEntity<HttpStatus> response = userController.deleteUser(id.toString(), request);
+        ResponseEntity<HashMap<String, String>> response = userController.deleteUser(id.toString(), request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(userService, times(1)).delete(id);

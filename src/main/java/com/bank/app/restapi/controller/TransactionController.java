@@ -56,6 +56,7 @@ public class TransactionController {
     }
 
     @PostMapping(value = { "", "{mappingNameHolder}", "{mappingNameHolder}/" })
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<TransactionDTO> addTransaction(@PathVariable(required = false) String mappingNameHolder,
             @RequestBody TransactionDTO transaction) {
         TransactionType typeOfTransaction;
