@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:80'; // Your backend API URL
+import axios from '@/axios-auth.js';
 
 export const getUser = async (userId, token) => {
   try {
-    const response = await axios.get(`${API_URL}/users/${userId}`, {
+    const response = await axios.get(`/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -17,7 +15,7 @@ export const getUser = async (userId, token) => {
 
 export const getUsers = async (token) => {
   try {
-    const response = await axios.get(`${API_URL}/users`, {
+    const response = await axios.get(`/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -30,7 +28,7 @@ export const getUsers = async (token) => {
 
 export const createUser = async (userData, token) => {
   try {
-    const response = await axios.post(`${API_URL}/users`, userData, {
+    const response = await axios.post(`/users`, userData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -43,7 +41,7 @@ export const createUser = async (userData, token) => {
 
 export const updateUser = async (userId, userData, token) => {
   try {
-    const response = await axios.put(`${API_URL}/users/${userId}`, userData, {
+    const response = await axios.put(`/users/${userId}`, userData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -56,7 +54,7 @@ export const updateUser = async (userId, userData, token) => {
 
 export const deleteUser = async (userId, token) => {
   try {
-    const response = await axios.delete(`${API_URL}/users/${userId}`, {
+    const response = await axios.delete(`/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

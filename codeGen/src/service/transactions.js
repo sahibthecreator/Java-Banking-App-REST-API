@@ -1,10 +1,9 @@
-import axios from 'axios';
+import axios from '@/axios-auth.js';
 
-const API_URL = 'http://localhost:80'; // Your backend API URL
 
 export const getTransactions = async (token) => {
   try {
-    const response = await axios.get(`${API_URL}/transactions`, {
+    const response = await axios.get(`/transactions`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -17,7 +16,7 @@ export const getTransactions = async (token) => {
 
 export const performTransaction = async (transactionData, token) => {
   try {
-    const response = await axios.post(`${API_URL}/transactions`, transactionData, {
+    const response = await axios.post(`/transactions`, transactionData, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
@@ -30,7 +29,7 @@ export const performTransaction = async (transactionData, token) => {
 
 export const getTransactionsByUserId = async (userId, token) => {
   try {
-    const response = await axios.get(`${API_URL}/transactions/userId/${userId}`, {
+    const response = await axios.get(`/transactions/userId/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -43,7 +42,7 @@ export const getTransactionsByUserId = async (userId, token) => {
 
 export const getTransaction = async (transactionId, token) => {
   try {
-    const response = await axios.get(`${API_URL}/transactions/${transactionId}`, {
+    const response = await axios.get(`/transactions/${transactionId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

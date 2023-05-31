@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:80'; // Your backend API URL
+import axios from '@/axios-auth.js';
 
 export const login = async (credentials) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/login`, credentials);
+    const response = await axios.post(`/auth/login`, credentials);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -13,7 +11,7 @@ export const login = async (credentials) => {
 
 export const register = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/register`, userData);
+    const response = await axios.post(`/auth/register`, userData);
     return response.data;
   } catch (error) {
     throw error.response.data;

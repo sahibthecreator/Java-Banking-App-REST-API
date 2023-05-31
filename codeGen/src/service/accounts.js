@@ -1,10 +1,8 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:80'; // Your backend API URL
+import axios from '@/axios-auth.js';
 
 export const getAccounts = async (token) => {
   try {
-    const response = await axios.get(`${API_URL}/accounts`, {
+    const response = await axios.get(`/accounts`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -17,7 +15,7 @@ export const getAccounts = async (token) => {
 
 export const getAccountsByUserId = async (userId, token) => {
   try {
-    const response = await axios.get(`${API_URL}/accounts?userId=${userId}`, {
+    const response = await axios.get(`/accounts?userId=${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -30,7 +28,7 @@ export const getAccountsByUserId = async (userId, token) => {
 
 export const createAccount = async (accountData, token) => {
   try {
-    const response = await axios.post(`${API_URL}/accounts`, accountData, {
+    const response = await axios.post(`/accounts`, accountData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
