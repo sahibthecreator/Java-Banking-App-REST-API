@@ -50,4 +50,7 @@ public class UserDTO {
     private float dayLimit;
 
     private float transactionLimit;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private final boolean active = true;
 }

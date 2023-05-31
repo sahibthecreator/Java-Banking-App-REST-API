@@ -4,8 +4,10 @@ import com.bank.app.restapi.dto.LoginDTO;
 import com.bank.app.restapi.dto.LoginResponseDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
+import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.model.UserType;
+import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
@@ -32,6 +34,8 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+
+    private final AccountRepository accountRepository;
 
     private final UserMapper userMapper;
 
@@ -70,6 +74,7 @@ public class UserService {
     }
 
     public LoginResponseDTO login(LoginDTO loginDTO) {
+        userIsActive(loginDTO.getEmail());
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
         UUID userId = this.userRepository.findIdByEmail(loginDTO.getEmail()).get();
@@ -95,12 +100,20 @@ public class UserService {
         }
     }
 
-    public boolean delete(UUID id) throws EntityNotFoundException {
-        if (!userRepository.findById(id).isPresent()) {
+    public String delete(UUID id) throws EntityNotFoundException {
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (!userOptional.isPresent()) {
             throw new EntityNotFoundException("No user with following id " + id + " exists");
         }
-        this.userRepository.deleteById(id);
-        return true;
+        List<Account> accounts = accountRepository.findAccountsByUserId(id);
+        if (accounts.isEmpty()) {
+            this.userRepository.deleteById(id);
+            return "User " + id + " has been permanently deleted";
+        } else {
+            userOptional.get().setActive(false);
+            return "User " + id + " has been deactivated";
+        }
     }
 
     public UserDTO getUserDTOById(UUID id) throws EntityNotFoundException {
@@ -160,7 +173,18 @@ public class UserService {
             throw new IllegalArgumentException("Email is already registered");
     }
 
-    private void bsnIsValid(String bsn) {
+    private void userIsActive(String email) throws IllegalArgumentException {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            if (!user.get().isActive())
+                throw new IllegalArgumentException("Your account is deactivated");
+        } else {
+            throw new IllegalArgumentException("Email is not registered");
+        }
+
+    }
+
+    private void bsnIsValid(String bsn) throws IllegalArgumentException {
         if (bsn == null || bsn.length() != 9 || !bsn.matches("[0-9]+")) {
             throw new IllegalArgumentException("BSN should contain only numbers");
         }

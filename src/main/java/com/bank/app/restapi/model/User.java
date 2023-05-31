@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class User {
     @Id
     @Column(name = "id")
@@ -49,5 +49,7 @@ public class User {
     @Column(name = "transactionLimit")
     private float transactionLimit;
 
+    @Column(name = "active")
+    private boolean active;
 
 }

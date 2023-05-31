@@ -3,6 +3,7 @@ package com.bank.app.restapi.controller;
 import com.bank.app.restapi.dto.LoginDTO;
 import com.bank.app.restapi.dto.LoginResponseDTO;
 import com.bank.app.restapi.dto.UserDTO;
+import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.service.UserService;
 
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> register(@RequestBody @Valid UserDTO userDTO) {
+        userDTO.setRole(UserType.USER);
         UserDTO createdUserDTO = userService.register(userDTO);
         return ResponseEntity.status(201).body(createdUserDTO);
     }

@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,11 +70,13 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
-    public ResponseEntity<HttpStatus> deleteUser(@PathVariable String userId, HttpServletRequest request) {
+    public ResponseEntity<HashMap<String, String>> deleteUser(@PathVariable String userId, HttpServletRequest request) {
         UUID id = UUID.fromString(userId);
-        userService.delete(id);
+        String response = userService.delete(id);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("message", response);
 
-        return ResponseEntity.status(200).build();
+        return ResponseEntity.status(200).body(map);
     }
 
 }
