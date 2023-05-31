@@ -13,10 +13,12 @@ import TransactionWidget from './TransactionWidget.vue';
     <div class="panel">
       <div class="topPart">
         <div class="dashboardName">
-          <h1 class="welcomeText">Good afternoon,<br>
-            {{ user ? user.firstName : "" }} {{ user ? user.lastName[0] : "" }}.
-          </h1>
-
+          <div class="mainPart">
+            <h1 class="welcomeText">Good afternoon,<br>
+              {{ user ? user.firstName : "" }} {{ user ? user.lastName[0] : "" }}.
+            </h1>
+            <h2>€ {{ accounts?.reduce((sum, account) => sum + account.balance, 0) }}</h2>
+          </div>
           <div class="accounts">
             <AccountWidget v-for="(account, index) in accounts" :key="index" :balance="account.balance"
               :name="user.firstName" />
@@ -34,9 +36,7 @@ import TransactionWidget from './TransactionWidget.vue';
       </div>
 
       <div class="transactions">
-        <TransactionWidget v-for="(transaction, index) in transactions" :key="index" :amount="transaction.amount"
-          :toIban="transaction.toIban" />
-
+        <TransactionWidget v-for="(transaction, index) in transactions" :key="index" :transaction="transaction" />
       </div>
     </div>
 
@@ -57,6 +57,7 @@ export default {
       user: null,
       accounts: null,
       transactions: null,
+      balance: 0,
       chartOptions: {
         chart: {
           type: 'line',
@@ -96,6 +97,7 @@ export default {
     this.getUserAndAccountsAndTransactions();
   },
   methods: {
+
     async getUserAndAccountsAndTransactions() {
       try {
         let user = await this.$store.dispatch('getUser', this.$store.getters.getUserId);
@@ -104,7 +106,6 @@ export default {
         this.accounts = accounts;
         let transaction = await this.$store.dispatch('getTransactionsByUserId', this.$store.getters.getUserId);
         this.transactions = transaction;
-
       } catch (error) {
         console.log(error);
         if (this.user == null) {
@@ -125,7 +126,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped lang="scss">
 .dashboardPage {
   background: url('@/assets/dashboard/bg.jpg');
   background-repeat: no-repeat;
@@ -176,6 +177,16 @@ export default {
   display: flex;
   flex-direction: column;
   width: 50%;
+
+  .mainPart {
+    display: flex;
+    justify-content: space-between;
+    h2{
+      margin-right: 7%;
+      margin-top: 3%;
+      font-size: 3vw;
+    }
+  }
 }
 
 .accounts {

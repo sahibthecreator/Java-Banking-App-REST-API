@@ -1,14 +1,33 @@
 <template>
     <div class="transaction">
         <div class="header">
-            <h5>- €{{ amount }}</h5>
-            <p class="dateTime">09:22</p>
+            <h5>- €{{ transaction.amount }} </h5>
+            <p class="dateTime">{{ time }}</p>
         </div>
         <div class="details">
             <p><b>To</b> Sam Jhonson</p>
-            <p>{{ toIban }}</p>
+            <p>{{ transaction.toAccount }}</p>
         </div>
-        <b-button variant="black">See Details</b-button>
+        <b-button variant="black" @click="detailsPanelEnabled = true">See Details</b-button>
+    </div>
+
+    <div class="card" v-if="detailsPanelEnabled">
+        <div class="content">
+            <p class="heading">- €{{ transaction.amount }} {{ transaction.typeOfTransaction.toLowerCase() }}</p>
+            <p class="para">
+                <b>From: </b>{{ transaction.fromAccount }}
+                <br>
+                <b>To: </b>{{ transaction.toAccount }}
+                <br>
+                <b>Date: </b> {{ transaction.dateOfExecution.split(",")[0] }}
+                <br>
+                <b>Time: </b> {{ time }}
+                <br>
+                <br>
+                {{ transaction.description }}
+            </p>
+            <button class="btn" @click="detailsPanelEnabled = false">Hide</button>
+        </div>
     </div>
 </template>
 
@@ -16,9 +35,20 @@
 export default {
     name: 'TransactionWidget',
     props: {
-        toIban: String,
-        amount: Number
+        transaction: Object,
     },
+    data() {
+        return {
+            time: "",
+            detailsPanelEnabled: false,
+        }
+    },
+    mounted: function () {
+        const parts = this.transaction.dateOfExecution.split(' ');
+        const timePart = parts[1];
+        const time = timePart.split(':').slice(0, 2).join(':');
+        this.time = time;
+    }
 }
 </script>
 
@@ -55,5 +85,68 @@ export default {
     font-size: smaller;
     font-weight: 500;
     margin-left: auto;
+}
+
+.card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 320px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    padding: 32px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #fcfcfc;
+    border: 2px solid #ffffff;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    color: #1b1b1b;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.content .heading {
+    font-weight: 700;
+    font-size: 32px;
+}
+
+.content .para {
+    line-height: 1.5;
+}
+
+.content .btn {
+    color: #e8e8e8;
+    text-decoration: none;
+    padding: 10px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    background: #1b1b1b;
+    border-radius: 5px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+}
+
+.card:hover {
+    border-color: #dadada;
+}
+
+.content .btn:hover {
+    outline: 2px solid #e8e8e8;
+    background: transparent;
+    color: #1b1b1b;
+}
+
+.content .btn:active {
+    box-shadow: none;
 }
 </style>
