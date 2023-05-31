@@ -2,13 +2,17 @@ package com.bank.app.restapi.service;
 
 import com.bank.app.restapi.dto.AccountBalanceDTO;
 import com.bank.app.restapi.dto.AccountDTO;
+import com.bank.app.restapi.dto.AccountRequestDTO;
 import com.bank.app.restapi.dto.CustomerIbanDTO;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
+import com.bank.app.restapi.dto.mapper.AccountRequestMapper;
 import com.bank.app.restapi.model.Account;
+import com.bank.app.restapi.model.AccountRequest;
 import com.bank.app.restapi.model.AccountType;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.AccountRepository;
+import com.bank.app.restapi.repository.AccountRequestRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -32,20 +36,25 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
 
+    private final AccountRequestRepository accountRequestRepository;
+
     private final UserService userService;
 
     private final AccountMapper accountMapper;
 
-    public List<AccountDTO>  getAccounts( String iban,
-                                         Float balance,
-                                         String typeOfAccount,
-                                         UUID userId,
-                                         LocalDate dateOfOpening,
-                                         boolean active,
-                                         String sortDirection,
-                                         int limit) {
+    private final AccountRequestMapper accountRequestMapper;
 
-        Specification<Account> specification = buildSpecification(iban, balance, typeOfAccount, userId, dateOfOpening, active);
+    public List<AccountDTO> getAccounts(String iban,
+            Float balance,
+            String typeOfAccount,
+            UUID userId,
+            LocalDate dateOfOpening,
+            boolean active,
+            String sortDirection,
+            int limit) {
+
+        Specification<Account> specification = buildSpecification(iban, balance, typeOfAccount, userId, dateOfOpening,
+                active);
         Sort sort;
         if (sortDirection != null && sortDirection.equalsIgnoreCase("desc")) {
             sort = Sort.by(Sort.Direction.DESC, "dateOfOpening");
@@ -59,7 +68,7 @@ public class AccountService {
             throw new EntityNotFoundException("No accounts found");
         }
 
-        return accountList.stream().map(accountMapper::toDTO).toList()  ;
+        return accountList.stream().map(accountMapper::toDTO).toList();
     }
 
     public AccountDTO createAccount(AccountDTO accountDTO) {
@@ -69,11 +78,11 @@ public class AccountService {
 
         if (user == null) {
             throw new EntityNotFoundException("User with following id: " + userId + " not found");
-        }
-        else{
-            if(accountDTO.getTypeOfAccount().equals(AccountType.SAVINGS)){
-                if(!userHasCurrentAccount(userId)){
-                    throw new IllegalArgumentException("User with following id: " + userId + " must have a current account to create a savings account ");
+        } else {
+            if (accountDTO.getTypeOfAccount().equals(AccountType.SAVINGS)) {
+                if (!userHasCurrentAccount(userId)) {
+                    throw new IllegalArgumentException("User with following id: " + userId
+                            + " must have a current account to create a savings account ");
                 }
             }
 
@@ -94,13 +103,14 @@ public class AccountService {
         return accountMapper.toDTO(account);
     }
 
-    //The BANK's bank account
+    // The BANK's bank account
     public void createBankAccount(UUID id) {
         AccountDTO bank = new AccountDTO();
         bank.setIban("NL01INHO0000000001");
         bank.setBalance(10000);
         bank.setTypeOfAccount(AccountType.CURRENT);
-        //the account had to be connected to the root admin, userId filed in AccountDTO is annotated with @NotNull
+        // the account had to be connected to the root admin, userId filed in AccountDTO
+        // is annotated with @NotNull
         bank.setUserId(id);
         bank.setDateOfOpening(LocalDate.now());
         bank.setAbsoluteLimit(0);
@@ -112,7 +122,7 @@ public class AccountService {
 
     public String deactivateAccount(String iban) {
         AccountDTO accountDTO = getAccountDTOByIban(iban);
-        if (updateAccountStatus(accountDTO, false, iban)){
+        if (updateAccountStatus(accountDTO, false, iban)) {
             return "Account with iban: " + iban + " deactivated";
         } else {
             return "Account with iban: " + iban + " could not be deactivated";
@@ -122,7 +132,7 @@ public class AccountService {
 
     public String activateAccount(String iban) {
         AccountDTO accountDTO = getAccountDTOByIban(iban);
-        if (updateAccountStatus(accountDTO, true, iban)){
+        if (updateAccountStatus(accountDTO, true, iban)) {
             return "Account with iban: " + iban + " activated";
         } else {
             return "Account with iban: " + iban + " could not be activated";
@@ -130,7 +140,7 @@ public class AccountService {
     }
 
     public CustomerIbanDTO getIbanByUsername(String firstname, String lastname) {
-        List<String> ibans =accountRepository.findIbanByFirstNameAndLastName(firstname, lastname);
+        List<String> ibans = accountRepository.findIbanByFirstNameAndLastName(firstname, lastname);
 
         CustomerIbanDTO customerIbanDTO = new CustomerIbanDTO();
         customerIbanDTO.setFirstName(firstname);
@@ -153,13 +163,13 @@ public class AccountService {
 
     public AccountDTO getAccountDTOByIban(String iban) {
         Account account = accountRepository.findByIban(iban);
-        if(account == null) {
+        if (account == null) {
             throw new EntityNotFoundException("Account with following iban: " + iban + " not found");
         }
         return accountMapper.toDTO(account);
     }
 
-    //I need this method for Transaction Services - Manol
+    // I need this method for Transaction Services - Manol
     public Account getAccountByIban(String iban) {
         Account account = accountRepository.findByIban(iban);
         if (account == null) {
@@ -170,7 +180,7 @@ public class AccountService {
 
     public AccountBalanceDTO getBalanceByIban(String iban) {
         Account account = accountRepository.findByIban(iban);
-        if(account == null) {
+        if (account == null) {
             throw new EntityNotFoundException("Account with following iban: " + iban + " not found");
         }
         float balance = account.getBalance();
@@ -181,7 +191,7 @@ public class AccountService {
         return balanceDTO;
     }
 
-    public boolean ibanExists(String dutchIban){
+    public boolean ibanExists(String dutchIban) {
         Account account = accountRepository.findByIban(dutchIban);
         return account != null;
     }
@@ -206,38 +216,80 @@ public class AccountService {
 
         String iban = countryCode + checkDigit + customCode + accountNumber;
 
-        while(ibanExists(iban)) {
+        while (ibanExists(iban)) {
             iban = generateUniqueDutchIban();
         }
         return iban;
 
     }
 
+    public AccountRequestDTO submitAccountRequest(AccountRequestDTO requestDto) {
+        userService.getUserById(requestDto.getUserId());
+        AccountRequest request = new AccountRequest();
+        request.setUserId(requestDto.getUserId());
+        request.setAccountType(requestDto.getAccountType());
+        request.setStatus("pending");
+
+        return accountRequestMapper.toDTO(accountRequestRepository.save(request));
+    }
+
+    public List<AccountRequestDTO> getAllRequests() {
+
+        List<AccountRequest> accountRequests = accountRequestRepository.findAll();
+        return accountRequests.stream().map(accountRequestMapper::toDTO).toList();
+    }
+
+    public AccountDTO approveAccountRequest(UUID requestId) {
+        AccountRequest request = accountRequestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction with id " + requestId + " does not exist"));
+
+        request.setStatus("accepted");
+        accountRequestRepository.save(request);
+        AccountDTO accountDTO = AccountDTO.builder()
+                .balance(0)
+                .typeOfAccount(request.getAccountType())
+                .userId(request.getUserId())
+                .absoluteLimit(0)
+                .build();
+
+        return createAccount(accountDTO);
+    }
+
+    public AccountRequestDTO denyBankAccountRequest(UUID requestId) {
+        AccountRequest request = accountRequestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction with id " + requestId + " does not exist"));
+        request.setStatus("denied");
+        accountRequestRepository.save(request);
+        return accountRequestMapper.toDTO(request);
+    }
 
     // Private methods
 
-    private boolean userHasCurrentAccount(UUID userId){
+    private boolean userHasCurrentAccount(UUID userId) {
         List<Account> accounts = accountRepository.findAccountsByUserId(userId);
         for (Account account : accounts) {
-            if(account.getTypeOfAccount().equals(AccountType.CURRENT)){
+            if (account.getTypeOfAccount().equals(AccountType.CURRENT)) {
                 return true;
             }
         }
         return false;
     }
-    private void setLimitsAccordingToUserType(User user){
-        if(user.getRole().equals(UserType.USER)) {
+
+    private void setLimitsAccordingToUserType(User user) {
+        if (user.getRole().equals(UserType.USER)) {
             user.setRole(UserType.CUSTOMER);
             setLimits(user);
         }
-        if(user.getRole().equals(UserType.EMPLOYEE)) {
+        if (user.getRole().equals(UserType.EMPLOYEE)) {
             setLimits(user);
         }
     }
-    private void setLimits(User user){
+
+    private void setLimits(User user) {
         user.setDayLimit(2000);
         user.setTransactionLimit(500);
     }
+
     private String calculateCheckDigit(String iban) {
         // move the four initial characters to the end of the string
         String moved = iban.substring(4) + iban.substring(0, 4);
@@ -267,8 +319,8 @@ public class AccountService {
     }
 
     private boolean updateAccountStatus(AccountDTO accountDTO, boolean active, String iban) {
-        if (accountDTO == null){
-            throw new EntityNotFoundException("No account with the following iban "+iban);
+        if (accountDTO == null) {
+            throw new EntityNotFoundException("No account with the following iban " + iban);
         }
         Account account = accountMapper.toEntity(accountDTO);
         account.setActive(active);
@@ -277,11 +329,11 @@ public class AccountService {
     }
 
     private Specification<Account> buildSpecification(String iban,
-                                                      Float balance,
-                                                      String typeOfAccount,
-                                                      UUID userId,
-                                                      LocalDate dateOfOpening,
-                                                      boolean active) {
+            Float balance,
+            String typeOfAccount,
+            UUID userId,
+            LocalDate dateOfOpening,
+            boolean active) {
         return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 

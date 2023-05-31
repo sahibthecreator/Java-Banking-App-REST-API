@@ -2,6 +2,7 @@ package com.bank.app.restapi.controller;
 
 import com.bank.app.restapi.dto.AccountBalanceDTO;
 import com.bank.app.restapi.dto.AccountDTO;
+import com.bank.app.restapi.dto.AccountRequestDTO;
 import com.bank.app.restapi.dto.CustomerIbanDTO;
 import com.bank.app.restapi.service.AccountService;
 
@@ -60,7 +61,8 @@ public class AccountController {
     }
 
     @GetMapping("/iban")
-    public ResponseEntity<CustomerIbanDTO> getIbanByCustomerName(@RequestParam(required=false) String firstname, @RequestParam(required=false) String lastname) {
+    public ResponseEntity<CustomerIbanDTO> getIbanByCustomerName(@RequestParam(required = false) String firstname,
+            @RequestParam(required = false) String lastname) {
         CustomerIbanDTO customerIbanDTO = accountService.getIbanByUsername(firstname, lastname);
         return ResponseEntity.status(200).body(customerIbanDTO);
     }
@@ -78,9 +80,33 @@ public class AccountController {
     }
 
     @PatchMapping("/{iban}/activate")
-    public ResponseEntity<String > activateAccount(@PathVariable String iban) {
+    public ResponseEntity<String> activateAccount(@PathVariable String iban) {
         String response = accountService.activateAccount(iban);
         return ResponseEntity.status(200).body(response);
+    }
+
+    @PostMapping("/requests")
+    public ResponseEntity<AccountRequestDTO> submitAccountRequest(@RequestBody @Valid AccountRequestDTO requestDto) {
+        AccountRequestDTO accountRequestDTO = accountService.submitAccountRequest(requestDto);
+        return ResponseEntity.status(200).body(accountRequestDTO);
+    }
+
+    @GetMapping("/requests")
+    public ResponseEntity<List<AccountRequestDTO>> getAllRequests() {
+        List<AccountRequestDTO> requests = accountService.getAllRequests();
+        return ResponseEntity.status(200).body(requests);
+    }
+
+    @PutMapping("/requests/{requestId}/approve")
+    public ResponseEntity<AccountDTO> approveBankAccountRequest(@PathVariable UUID requestId) {
+        AccountDTO createdAccountDTO = accountService.approveAccountRequest(requestId);
+        return ResponseEntity.status(200).body(createdAccountDTO);
+    }
+
+    @PutMapping("/requests/{requestId}/deny")
+    public ResponseEntity<AccountRequestDTO> denyBankAccountRequest(@PathVariable UUID requestId) {
+        accountService.denyBankAccountRequest(requestId);
+        return ResponseEntity.ok().build();
     }
 
 }

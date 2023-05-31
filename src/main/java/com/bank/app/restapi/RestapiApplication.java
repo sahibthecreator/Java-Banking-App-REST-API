@@ -1,6 +1,7 @@
 package com.bank.app.restapi;
 
 import com.bank.app.restapi.dto.mapper.AccountMapper;
+import com.bank.app.restapi.dto.mapper.AccountRequestMapper;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.dto.mapper.TransactionMapper;
 
@@ -27,13 +28,18 @@ public class RestapiApplication {
 	}
 
 	@Bean
-	public AccountMapper AccountDTOMapper() {
+	public AccountMapper accountDTOMapper() {
 		return new AccountMapper(modelMapper());
 	}
 
 	@Bean
-	public TransactionMapper TransactionDTOMapper() {
+	public TransactionMapper transactionDTOMapper() {
 		return new TransactionMapper(modelMapper());
+	}
+
+	@Bean
+	public AccountRequestMapper accountRequestDTOMapper() {
+		return new AccountRequestMapper(modelMapper());
 	}
 
 	// generates some predefined data in DB - dev version only
