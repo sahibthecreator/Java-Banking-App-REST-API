@@ -11,8 +11,8 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
         <div class="infoList ml-3">
           <span>email: {{ user.email }} | </span>
           <span>bsn: {{ user.bsn }} | </span>
-          <span>{{ user.active ? "Active" : "Not Active" }} | </span>
-          <span>accounts: {{ accounts?.length || 0}}  </span>
+          <span>{{ user.active ? 'Active' : 'Not Active' }} | </span>
+          <span>accounts: {{ accounts?.length || 0 }} </span>
         </div>
       </div>
 
@@ -33,7 +33,7 @@ export default {
   data() {
     return {
       accounts: null,
-    }
+    };
   },
   mounted() {
     this.getAllAccounts();
@@ -44,14 +44,17 @@ export default {
     },
     deleteUser() {
       if (confirm('Are you sure?')) {
-        console.log("Delete user");
+        console.log('Delete user');
       } else {
-        console.log("User not deleted");
+        console.log('User not deleted');
       }
     },
     async getAllAccounts() {
       try {
-        let accounts = await this.$store.dispatch('getAccountsByUserId', this.user.id);
+        let accounts = await this.$store.dispatch(
+          'getAccountsByUserId',
+          this.user.id
+        );
         this.accounts = accounts;
         console.log(accounts);
       } catch (error) {

@@ -145,7 +145,7 @@ export default {
 
 <style scoped lang="scss">
 .dashboardPage {
-  background: url('@/assets/dashboard/bg.jpg');
+  // background: url('@/assets/dashboard/bg.jpg');
   background-repeat: no-repeat;
   background-clip: border-box;
   background-position-x: center;
@@ -158,7 +158,6 @@ export default {
 }
 
 .panel {
-  background: var(--white);
   width: 90vw;
   border-radius: 35px;
   background-color: var(--white);
