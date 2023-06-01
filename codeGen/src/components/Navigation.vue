@@ -16,20 +16,30 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
     </b-nav>
 
     <b-navbar-nav class="ml-auto">
-      <b-nav-item to="/login" id="login" v-if="!token">Login / register</b-nav-item>
+      <b-nav-item to="/login" id="login" v-if="!token"
+        >Login / register</b-nav-item
+      >
       <b-nav-item v-else>
-        <b-dropdown id="dropdown-offset" offset="-w" size="lg" variant="link" toggle-class="text-decoration-none"
-          no-caret>
+        <b-dropdown
+          id="dropdown-offset"
+          offset="-w"
+          size="lg"
+          variant="link"
+          toggle-class="text-decoration-none"
+          no-caret
+        >
           <template #button-content>
             <AccountIcon accountName="Root"></AccountIcon>
           </template>
           <b-dropdown-item to="">Settings</b-dropdown-item>
           <b-dropdown-item to="dashboard">Dashboard</b-dropdown-item>
-          <b-dropdown-item to="">???DB management???</b-dropdown-item>
-
+          <b-dropdown-item to="dashboard/employeePanel">???DB management???</b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider>
-          <b-dropdown-item> <b-button variant="danger" class="w-100 p-1"
-              @click="logout">Logout</b-button></b-dropdown-item>
+          <b-dropdown-item>
+            <b-button variant="danger" class="w-100 p-1" @click="logout"
+              >Logout</b-button
+            ></b-dropdown-item
+          >
         </b-dropdown>
       </b-nav-item>
     </b-navbar-nav>
@@ -43,14 +53,30 @@ export default {
   data() {
     return {
       token: this.$store.getters.getCurrentUserToken,
+      user: null,
     };
   },
   methods: {
     logout() {
       this.$store.dispatch('logout');
-    }
+    },
+    mounted() {
+      this.getUser();
+    },
+    methods: {
+      async getUser() {
+        try {
+          let user = await this.$store.dispatch('getUser',this.$store.getters.getUserId);
+          this.user = user;
+        } catch (error) {
+          console.log(error);
+          if (this.user == null) {
+            this.$store.dispatch('logout');
+          }
+        }
+      },
+    },
   },
-  mounted() { },
 };
 </script>
 
