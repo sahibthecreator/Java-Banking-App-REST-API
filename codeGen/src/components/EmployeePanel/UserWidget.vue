@@ -5,14 +5,14 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
 <template>
   <div class="userWidget">
     <div class="d-flex userCard">
-      <AccountIcon :accountName="firstName" class="icon"></AccountIcon>
+      <AccountIcon :accountName="user.firstName" class="icon"></AccountIcon>
       <div class="userInfo">
-        <p class="my-auto ml-3">{{ firstName }} {{ lastName }}</p>
+        <p class="my-auto ml-3">{{ user.firstName }} {{ user.lastName }}</p>
         <div class="infoList ml-3">
-          <span>email: root@gmail.com | </span> 
-          <span>bsn: 12324242525 | </span>
-          <span>active: yes | </span>
-          <span>accounts: 3 | </span>
+          <span>email: {{ user.email }} | </span>
+          <span>bsn: {{ user.bsn }} | </span>
+          <span>{{ user.active ? "Active" : "Not Active" }} | </span>
+          <span>accounts: {{ accounts?.length || 0}}  </span>
         </div>
       </div>
 
@@ -28,10 +28,16 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
 export default {
   name: 'UserWidget',
   props: {
-    firstName: String,
-    lastName: String,
+    user: Object,
   },
-
+  data() {
+    return {
+      accounts: null,
+    }
+  },
+  mounted() {
+    this.getAllAccounts();
+  },
   methods: {
     updateUser() {
       console.log('update dialog here');
@@ -41,6 +47,15 @@ export default {
         console.log("Delete user");
       } else {
         console.log("User not deleted");
+      }
+    },
+    async getAllAccounts() {
+      try {
+        let accounts = await this.$store.dispatch('getAccountsByUserId', this.user.id);
+        this.accounts = accounts;
+        console.log(accounts);
+      } catch (error) {
+        console.log(error);
       }
     },
   },
@@ -62,10 +77,12 @@ export default {
   .icon {
     aspect-ratio: 1;
   }
+
   .userCard {
     display: flex;
     flex-direction: row;
     width: 100%;
+
     .userInfo {
       .infoList {
         color: var(--gray-light);

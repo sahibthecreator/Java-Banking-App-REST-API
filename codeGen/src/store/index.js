@@ -78,6 +78,7 @@ const store = new Vuex.Store({
             try {
                 const users = await getUsers(state.token);
                 commit('setUsers', users);
+                return users;
             } catch (error) {
                 throw new Error(error.message);
             }
