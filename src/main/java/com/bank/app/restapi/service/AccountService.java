@@ -263,8 +263,17 @@ public class AccountService {
         return accountRequestMapper.toDTO(request);
     }
 
-    // Private methods
+    public boolean updateAccountStatus(AccountDTO accountDTO, boolean active, String iban) {
+        if (accountDTO == null) {
+            throw new EntityNotFoundException("No account with the following iban " + iban);
+        }
+        Account account = accountMapper.toEntity(accountDTO);
+        account.setActive(active);
+        this.accountRepository.saveAndFlush(account);
+        return true;
+    }
 
+    // Private methods
     private boolean userHasCurrentAccount(UUID userId) {
         List<Account> accounts = accountRepository.findAccountsByUserId(userId);
         for (Account account : accounts) {
@@ -316,16 +325,6 @@ public class AccountService {
 
         // pad the check digit with a leading zero if necessary
         return String.format("%02d", checkDigit);
-    }
-
-    private boolean updateAccountStatus(AccountDTO accountDTO, boolean active, String iban) {
-        if (accountDTO == null) {
-            throw new EntityNotFoundException("No account with the following iban " + iban);
-        }
-        Account account = accountMapper.toEntity(accountDTO);
-        account.setActive(active);
-        this.accountRepository.saveAndFlush(account);
-        return true;
     }
 
     private Specification<Account> buildSpecification(String iban,

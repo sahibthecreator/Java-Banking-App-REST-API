@@ -3,9 +3,15 @@ package com.bank.app.restapi.Controller;
 import com.bank.app.restapi.controller.AccountController;
 import com.bank.app.restapi.dto.AccountBalanceDTO;
 import com.bank.app.restapi.dto.AccountDTO;
+import com.bank.app.restapi.dto.CustomerIbanDTO;
+import com.bank.app.restapi.dto.mapper.AccountMapper;
+import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.AccountType;
+import com.bank.app.restapi.model.User;
+import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.service.AccountService;
 
+import org.glassfish.jaxb.core.v2.TODO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +36,10 @@ class AccountControllerTest {
     private AccountController accountController;
     @Mock
     private AccountService accountService;
+    @Mock
+    AccountRepository accountRepository;
+    @Mock
+    AccountMapper accountMapper;
 
     @BeforeEach
     void setup() {
@@ -41,8 +51,7 @@ class AccountControllerTest {
     void getAllShouldReturnListOfAccounts() {
         List<AccountDTO> mockAccounts = Arrays.asList(new AccountDTO(), new AccountDTO());// createMockAccounts();
 
-        // Why balance is zero here? CHanged already
-        when(accountService.getAccounts(null, null, null, null, null, true, null, 10)).thenReturn(mockAccounts);
+          when(accountService.getAccounts(null, null, null, null, null, true, null, 10)).thenReturn(mockAccounts);
 
         ResponseEntity<List<AccountDTO>> response = accountController.getAccounts(null, null, null, null, null, true,
                 null, 10);
@@ -103,22 +112,56 @@ class AccountControllerTest {
         assertEquals(accountDTO.getBalance(), response.getBody());
         verify(accountService, times(1)).getBalanceByIban("NL01INHO0000000001");
     }
-    // Create a list of 101 accounts
-    // private List<AccountDTO> createMockAccounts() {
-    // List<AccountDTO> mockAccounts = new ArrayList<>();
-    //
-    // for (int i = 0; i < 99; i++) {
-    // AccountDTO mockAccount = AccountDTO.builder()
-    // .iban(accountService.generateDutchIban())
-    // .balance(1000.0f)
-    // .typeOfAccount(AccountType.CURRENT)
-    // .userId(UUID.randomUUID())
-    // .dateOfOpening(LocalDate.now())
-    // .active(true)
-    // .build();
-    // mockAccounts.add(mockAccount);
-    // }
-    //
-    // return mockAccounts;
-    // }
+
+    @Test
+    void getIbanByCustmerNameShouldReturnListOfIbans() {
+        List<String> ibans = accountRepository.findIbanByFirstNameAndLastName("Root", "Admin");
+        CustomerIbanDTO customerIbanDTO = CustomerIbanDTO.builder()
+                .firstName("Root")
+                .lastName("Admin")
+                .ibanList(ibans)
+                .build();
+
+        when(accountService.getIbanByUsername("Root", "Admin")).thenReturn(customerIbanDTO);
+
+        ResponseEntity<CustomerIbanDTO> response = accountController.getIbanByCustomerName("Root", "Admin");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(customerIbanDTO, response.getBody());
+        verify(accountService, times(1)).getIbanByUsername("Root", "Admin");
+    }
+
+    @Test
+    void getAccountsByUserIdShouldReturnListOfAccounts() {
+        List<AccountDTO> mockAccounts = Arrays.asList(new AccountDTO(), new AccountDTO());
+        UUID userId = UUID.randomUUID();
+
+        when(accountService.getAccountsByUserId(userId)).thenReturn(mockAccounts);
+
+        ResponseEntity<List<AccountDTO>> response = accountController.getAccountsByUserId(userId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockAccounts, response.getBody());
+        verify(accountService, times(1)).getAccountsByUserId(userId);
+    }
+
+//    TODO: fix this test
+//    @Test
+//    void deactivateAccountShouldChangeAccountStatusToNotActive() {
+//
+//        AccountDTO accountDTO = AccountDTO.builder()
+//                .iban("NL01INHO0000000001")
+//                .balance(1000.0f)
+//                .typeOfAccount(AccountType.CURRENT)
+//                .userId(UUID.randomUUID())
+//                .dateOfOpening(LocalDate.now())
+//                .active(false)
+//                .build();
+//
+//        when(accountService.updateAccountStatus(accountDTO, false, accountDTO.getIban())).thenReturn(true);
+//
+//        ResponseEntity<String> response = accountController.deactivateAccount(accountDTO.getIban());
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertEquals("Account with iban: " + accountDTO.getIban() + " deactivated", response.getBody());
+//        verify(accountService, times(1)).deactivateAccount(accountDTO.getIban());
+//
+//    }
 }
