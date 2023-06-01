@@ -3,7 +3,7 @@ import { login, register } from '@/service/auth';
 import { getUser, getUsers, createUser, updateUser, deleteUser } from '@/service/users';
 import { getAccounts, createAccount } from '@/service/accounts';
 import { getTransactions, getTransaction } from '@/service/transactions';
-import { getAccountsByUserId } from '../service/accounts';
+import { getAccountsByUserId, requestAccount } from '../service/accounts';
 import { getTransactionsByUserId, performTransaction } from '../service/transactions';
 
 // Vue.use(Vuex);
@@ -173,6 +173,15 @@ const store = new Vuex.Store({
             try {
                 const transaction = await getTransaction(transactionId, state.token);
                 return transaction;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+
+        async requestAccount({ commit, state }, requestData) {
+            try {
+                const request = await requestAccount(requestData, state.token);
+                return request;
             } catch (error) {
                 throw new Error(error.message);
             }

@@ -38,3 +38,16 @@ export const createAccount = async (accountData, token) => {
     throw error.response.data;
   }
 };
+
+export const requestAccount = async (requestData, token) => {
+  try {
+    const response = await axios.post(`/accounts/requests`, requestData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

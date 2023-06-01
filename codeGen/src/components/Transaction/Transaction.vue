@@ -1,5 +1,5 @@
 <template>
-  <div id="nav">
+  <div id="nav" >
     <b-navbar-brand to="/">
       <img src="@/assets/Logo.svg" alt="logo" id="logo" />
       <span id="logoTitle">WAVR</span>
@@ -7,7 +7,6 @@
 
     <b-navbar-nav class="ml-auto">
       <b-nav-item to="/dashboard"><img src="@/assets/Transaction/x.svg" /></b-nav-item>
-
     </b-navbar-nav>
 
   </div>
