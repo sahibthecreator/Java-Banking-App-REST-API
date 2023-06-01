@@ -14,7 +14,7 @@ import Navigation from '@/components/Navigation.vue'
         <span>One Card,<br>Access anywhere<br><b id="WAVR"><span id="fade">WAVR</span> banking</b></span>
         <span style="font-size: 16px;">Enjoy the maximum security and get more using our best services. No more complicated apps.</span>
         <div class="buttonsHome">
-          <button>Create an account</button>
+          <button @click="this.$router.push('/login')">Create an account</button>
           <button>Download <img src="@/assets/Apple.svg" style="width: 15px; transform: translateY(-2px);"> app</button>
         </div>
       </div>
