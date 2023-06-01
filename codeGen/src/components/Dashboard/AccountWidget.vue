@@ -43,6 +43,7 @@ var formatter = new Intl.NumberFormat('de-DE', {
   background-color: white;
   padding: 10px 15px;
   border-radius: 15px;
+  cursor: pointer;
 
   .balance {
     font-size: 2vw;

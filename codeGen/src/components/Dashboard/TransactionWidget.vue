@@ -88,8 +88,8 @@ export default {
 }
 
 .card {
-    position: absolute;
-    top: 50%;
+    position: fixed;
+    top: 80%;
     left: 50%;
     transform: translate(-50%, -100%);
     display: flex;
@@ -103,6 +103,7 @@ export default {
     background: #fcfcfc;
     border: 2px solid #ffffff;
     transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+    z-index: 20;
 }
 
 .content {

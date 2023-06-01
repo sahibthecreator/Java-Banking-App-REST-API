@@ -2,6 +2,8 @@
 import Navigation from '@/components/Navigation.vue'
 import AccountWidget from './AccountWidget.vue';
 import TransactionWidget from './TransactionWidget.vue';
+import CurrentAccountPanel from './CurrentAccountPanel.vue';
+
 </script>
 
 <template>
@@ -11,7 +13,7 @@ import TransactionWidget from './TransactionWidget.vue';
 
   <div class="dashboardPage">
     <div class="panel">
-      <div class="topPart">
+      <div class="topPart" v-if="!currentAccount">
         <div class="dashboardName">
           <div class="mainPart">
             <h1 class="welcomeText">Good afternoon,<br>
@@ -21,7 +23,7 @@ import TransactionWidget from './TransactionWidget.vue';
           </div>
           <div class="accounts">
             <AccountWidget v-for="(account, index) in accounts" :key="index" :balance="account.balance"
-              :name="user.firstName" :iban="account.iban" />
+              :name="user.firstName" :iban="account.iban" @click.native="setCurrentAccountView(account)" />
           </div>
 
         </div>
@@ -34,13 +36,14 @@ import TransactionWidget from './TransactionWidget.vue';
           <apexchart type="line" height="280px" :options="chartOptions" :series="chartSeries" />
         </div>
       </div>
+      <CurrentAccountPanel :currentAccount="currentAccount" :user="user" @returnBack="returnDashboardView"
+        v-if="currentAccount">
+      </CurrentAccountPanel>
 
       <div class="transactions">
-        <TransactionWidget v-for="(transaction, index) in transactions" :key="index" :transaction="transaction" />
+        <TransactionWidget v-for="(transaction, index) in currentTransactions" :key="index" :transaction="transaction" />
       </div>
     </div>
-
-
   </div>
 </template>
 
@@ -56,8 +59,10 @@ export default {
     return {
       user: null,
       accounts: null,
+      currentTransactions: null,
       transactions: null,
       balance: 0,
+      currentAccount: null,
       chartOptions: {
         chart: {
           type: 'line',
@@ -97,6 +102,14 @@ export default {
     this.getUserAndAccountsAndTransactions();
   },
   methods: {
+    setCurrentAccountView(account) {
+      this.currentAccount = account;
+      this.currentTransactions = this.transactions.filter((t) => t.fromAccount == this.currentAccount.iban || t.toAccount == this.currentAccount.iban);
+    },
+    returnDashboardView() {
+      this.currentAccount = null;
+      this.currentTransactions = this.transactions;
+    },
     formatPrice(value) {
       let val = (value / 1).toFixed(2).replace('.', ',');
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -107,8 +120,9 @@ export default {
         this.user = user;
         let accounts = await this.$store.dispatch('getAccountsByUserId', this.$store.getters.getUserId);
         this.accounts = accounts;
-        let transaction = await this.$store.dispatch('getTransactionsByUserId', this.$store.getters.getUserId);
-        this.transactions = transaction;
+        let transactions = await this.$store.dispatch('getTransactionsByUserId', this.$store.getters.getUserId);
+        this.transactions = transactions;
+        this.currentTransactions = this.transactions;
       } catch (error) {
         console.log(error);
         if (this.user == null) {
@@ -184,7 +198,8 @@ export default {
   .mainPart {
     display: flex;
     justify-content: space-between;
-    h2{
+
+    h2 {
       margin-right: 7%;
       margin-top: 3%;
       font-size: 3vw;
@@ -232,6 +247,7 @@ export default {
 }
 
 
+
 .transactions {
   background: white;
   width: 100%;
@@ -241,6 +257,7 @@ export default {
   flex-direction: row;
   gap: 20px;
   padding: 20px;
+  overflow-x: auto;
 }
 
 .dashboardAction {
