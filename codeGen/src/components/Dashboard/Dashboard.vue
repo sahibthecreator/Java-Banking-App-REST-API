@@ -17,11 +17,11 @@ import TransactionWidget from './TransactionWidget.vue';
             <h1 class="welcomeText">Good afternoon,<br>
               {{ user ? user.firstName : "" }} {{ user ? user.lastName[0] : "" }}.
             </h1>
-            <h2>€ {{ accounts?.reduce((sum, account) => sum + account.balance, 0) }}</h2>
+            <h2>€ {{ formatPrice(accounts?.reduce((sum, account) => sum + account.balance, 0)) }}</h2>
           </div>
           <div class="accounts">
             <AccountWidget v-for="(account, index) in accounts" :key="index" :balance="account.balance"
-              :name="user.firstName" />
+              :name="user.firstName" :iban="account.iban" />
           </div>
 
         </div>
@@ -97,7 +97,10 @@ export default {
     this.getUserAndAccountsAndTransactions();
   },
   methods: {
-
+    formatPrice(value) {
+      let val = (value / 1).toFixed(2).replace('.', ',');
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    },
     async getUserAndAccountsAndTransactions() {
       try {
         let user = await this.$store.dispatch('getUser', this.$store.getters.getUserId);
