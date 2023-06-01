@@ -67,14 +67,28 @@
 
   <div class="card" v-if="statusPopupCardEnabled">
     <div class="header">
-      <div class="image">
+      <!-- Loading -->
+      <div class="spinnerContainer" v-if="loading">
+        <div class="spinner"></div>
+        <div class="loader">
+          <div class="words">
+            <span class="word">Verifying credentials</span>
+            <span class="word">Sending to recipient</span>
+            <span class="word">Receiving transaction</span>
+          </div>
+        </div>
+      </div>
+      <!-- /Loading -->
+
+      <div class="image" v-if="!loading">
         <img src="@/assets/SuccessIcon.png" class="success icon" />
       </div>
-      <div class="content">
+      <div class="content" v-if="!loading">
         <span class="title">{{ statusTitle }}</span>
       </div>
       <div class="actions">
-        <button type="button" class="history" @click="this.$router.push('/dashboard')">Return to dashboard</button>
+        <button type="button" class="history" @click="this.$router.push('/dashboard')" v-if="!loading">Return to
+          dashboard</button>
       </div>
     </div>
   </div>
@@ -95,6 +109,8 @@ export default {
       statusPopupCardEnabled: false,
       statusTitle: "",
       errorMsg: "",
+      loading: false,
+      delay: ms => new Promise(res => setTimeout(res, ms))
     }
   },
   computed: {
@@ -116,11 +132,14 @@ export default {
           typeOfTransaction: "TRANSFER"
         };
         await this.$store.dispatch('performTransaction', transactionData);
+        this.loading = true;
+        this.statusPopupCardEnabled = true;
         this.statusTitle = `You successfully sent €${this.amount} to ${this.accountTo}`;
         document.getElementById("transactionPage").style.filter = "blur(5px)";
         document.getElementById("transactionPage").style.cursor = "default";
         document.getElementById("transferBtn").disabled = true;
-        this.statusPopupCardEnabled = true;
+        await this.delay(2000);
+        this.loading = false;
       } catch (error) {
         this.errorMsg = error;
       }
@@ -452,8 +471,116 @@ input::-webkit-inner-spin-button {
     transform: scale(1.09);
   }
 }
-.errorMsg{
+
+.errorMsg {
   font-size: smaller;
   margin-bottom: 0;
+}
+
+.spinnerContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  border: 4px solid #0000;
+  border-radius: 50%;
+  border-right-color: #299fff;
+  animation: tri-spinner 1s infinite linear;
+}
+
+.spinner::before,
+.spinner::after {
+  content: "";
+  grid-area: 1/1;
+  margin: 2px;
+  border: inherit;
+  border-radius: 50%;
+  animation: tri-spinner 2s infinite;
+}
+
+.spinner::after {
+  margin: 8px;
+  animation-duration: 3s;
+}
+
+@keyframes tri-spinner {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.loader {
+  color: #4a4a4a;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-size: 23px;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 40px;
+  padding: 10px 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  border-radius: 8px;
+}
+
+.words {
+  overflow: hidden;
+}
+
+.word {
+  display: block;
+  height: 100%;
+  color: #299fff;
+  text-align: center;
+  animation: cycle-words 3s infinite;
+}
+
+@keyframes cycle-words {
+  0% {
+    -webkit-transform: translateY(50%);
+    transform: translateY(50%);
+  }
+
+  5% {
+    -webkit-transform: translateY(0%);
+    transform: translateY(0%);
+  }
+
+  30% {
+    -webkit-transform: translateY(0%);
+    transform: translateY(0%);
+  }
+
+  45% {
+    -webkit-transform: translateY(-105%);
+    transform: translateY(-105%);
+  }
+
+  65% {
+    -webkit-transform: translateY(-105%);
+    transform: translateY(-105%);
+  }
+
+  75% {
+    -webkit-transform: translateY(-200%);
+    transform: translateY(-200%);
+  }
+
+
+  90% {
+    -webkit-transform: translateY(-200%);
+    transform: translateY(-200%);
+  }
+
+  100% {
+    -webkit-transform: translateY(-300%);
+    transform: translateY(-300%);
+  }
 }
 </style> 
