@@ -86,7 +86,7 @@ public class AccountController {
     }
 
     @PostMapping("/requests")
-    @PreAuthorize("@securityExpressions.hasUserOrEmployeeRole(authentication)")
+    @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<AccountRequestDTO> submitAccountRequest(@RequestBody @Valid AccountRequestDTO requestDto) {
         AccountRequestDTO accountRequestDTO = accountService.submitAccountRequest(requestDto);
         return ResponseEntity.status(200).body(accountRequestDTO);

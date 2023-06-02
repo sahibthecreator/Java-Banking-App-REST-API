@@ -23,7 +23,7 @@ import CurrentAccountPanel from './CurrentAccountPanel.vue';
           </div>
           <div class="accounts">
             <AccountWidget v-for="(account, index) in accounts" :key="index" :balance="account.balance"
-              :name="user.firstName" :iban="account.iban" @click.native="setCurrentAccountView(account)" />
+              :name="user.firstName" :iban="account.iban" :type="account.typeOfAccount" @click.native="setCurrentAccountView(account)" />
           </div>
 
         </div>

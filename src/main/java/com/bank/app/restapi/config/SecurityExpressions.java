@@ -20,9 +20,10 @@ public class SecurityExpressions {
         return authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
     }
 
-    public boolean hasUserOrEmployeeRole(Authentication authentication) {
+    public boolean loggedIn(Authentication authentication) {
         return authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_EMPLOYEE"))
-                || authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"));
+                || authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"))
+                || authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
     }
 
 }
