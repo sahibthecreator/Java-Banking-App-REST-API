@@ -6,7 +6,6 @@ import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.User;
-import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;

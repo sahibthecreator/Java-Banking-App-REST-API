@@ -57,8 +57,6 @@ public class TransactionMapper {
         boolean toAccountIsValid = transactionDTO.getToAccount() != null && !transactionDTO.getToAccount().isEmpty();
         boolean performingUserIsValid = transactionDTO.getPerformingUser() != null;
         boolean amountIsValid = transactionDTO.getAmount() > 0;
-        // boolean typeOfTransactionIsValid = transactionDTO.getTypeOfTransaction() !=
-        // null;
         boolean descriptionIsValid = transactionDTO.getDescription() != null;
 
         if (!(fromAccountIsValid && toAccountIsValid && performingUserIsValid && amountIsValid && descriptionIsValid)) {

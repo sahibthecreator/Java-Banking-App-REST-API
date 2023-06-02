@@ -113,7 +113,7 @@ public class TransactionControllerTest {
                         .content("{\"amount\": 500.0}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.amount").value(500.0));
-        
+
         verify(transactionService).addTransaction(eq(transaction), eq(TransactionType.TRANSFER));
     }
 }
