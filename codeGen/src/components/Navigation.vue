@@ -22,7 +22,7 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
             <AccountIcon accountName="Root"></AccountIcon>
           </template>
           <b-dropdown-item to="">Settings</b-dropdown-item>
-          <b-dropdown-item to="dashboard">Dashboard</b-dropdown-item>
+          <b-dropdown-item to="/dashboard">Dashboard</b-dropdown-item>
           <b-dropdown-item to="dashboard/employeePanel">???DB management???</b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider>
           <b-dropdown-item>

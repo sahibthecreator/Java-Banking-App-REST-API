@@ -6,6 +6,7 @@ import Dashboard from '@/components/Dashboard/Dashboard.vue';
 import Transaction from '@/components/Transaction/Transaction.vue';
 import RequestAccount from '@/components/RequestAccount/RequestAccount.vue';
 import EmployeePanel from '@/components/EmployeePanel/EmployeePanel.vue'
+import CreateBankAccount from '@/components/CreateAccount/CreateAccount.vue';
 import NotFound from '@/components/NotFound.vue';
 import store from '../store'; // Import the Vuex store
 
@@ -22,6 +23,7 @@ const router = createRouter({
     { path: '/dashboard/transaction', name: 'transfer', component: Transaction, meta: { requiresAuth: true} },
     { path: '/dashboard/requestAccount', name: 'request', component: RequestAccount, meta: { requiresAuth: true } },
     { path: '/dashboard/employeePanel', name: 'employeePanel', component: EmployeePanel, meta: { requiresAuth: true } },
+    { path: '/dashboard/employeePanel/createAccount', name: 'createAccount', component: CreateBankAccount, meta: { requiresAuth: true } },
   ],
 });
 

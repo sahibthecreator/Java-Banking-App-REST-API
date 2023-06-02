@@ -15,13 +15,24 @@
   </div>
   <div class="requestPage">
     <div class="requestPanel">
-      <span>Request an account</span>
+      <span>Create account</span>
+
+      <div class="inputRequestContainer">
+        <span>User ID</span>
+        <input placeholder="ex: 12341231341"/>
+      </div>
+
       <div class="inputRequestContainer">
         <span>Account type</span>
         <b-form-select v-model="selected" :options="options"></b-form-select>
       </div>
-      <b-button variant="dark_primary" v-on:click="requestAccountBtn()"
-        >Request account</b-button
+
+      <div class="inputRequestContainer">
+        <span>Absolute limit</span>
+        <input type="number" step=".5" placeholder="12,20"/>
+      </div>
+      <b-button variant="dark_primary" v-on:click=""
+        >Create</b-button
       >
       <p class="text-danger errorMsg">{{ errorMsg }}</p>
       <span class="tos"
@@ -64,6 +75,8 @@
     </div>
   </div>
 </template>
+
+
 <script>
 export default {
   name: 'RequestAccount',
@@ -80,25 +93,7 @@ export default {
       errorMsg: '',
     };
   },
-  methods: {
-    async requestAccountBtn() {
-      try {
-        const transactionData = {
-          userId: this.$store.state.userId,
-          accountType: 'SAVINGS',
-          absoluteLimit: 0,
-        };
-        await this.$store.dispatch('requestAccount', transactionData);
-        this.responsePopupEnabled = true;
-        this.loading = true;
-        await this.delay(1500);
-        this.loading = false;
-      } catch (error) {
-        this.errorMsg = error;
-      }
-    },
-  },
-};
+}
 </script>
 
 <style lang="scss" scoped>

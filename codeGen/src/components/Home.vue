@@ -69,6 +69,7 @@ export default {
 #fade {
   font-weight: 500;
   background: -webkit-linear-gradient(#19198D, #00d5ffe0);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

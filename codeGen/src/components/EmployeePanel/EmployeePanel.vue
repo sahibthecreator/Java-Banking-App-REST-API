@@ -19,7 +19,7 @@ import UserWidget from './UserWidget.vue';
         <div class="actionPanel">
           <div class="actions">
             <b-button variant="dark_primary" @click="">Create transaction</b-button>
-            <b-button variant="gray_dark">Create new bank account</b-button>
+            <b-button variant="gray_dark" @click="relocate_to_createAccount()">Create new bank account</b-button>
             <b-button variant="black" @click="">Maybe smth else here</b-button
             >
           </div>
@@ -71,6 +71,9 @@ export default {
         }
       }
     },
+    relocate_to_createAccount() {
+      this.$router.push('/dashboard/employeePanel/createAccount')
+    }
   },
 };
 </script>
