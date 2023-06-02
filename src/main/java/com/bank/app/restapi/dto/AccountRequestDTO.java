@@ -25,6 +25,9 @@ public class AccountRequestDTO {
     @NotNull(message = "userId can't be null")
     private UUID userId;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String fullName;
+
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     @NotNull(message = "Account type can't be null")
     private AccountType accountType;

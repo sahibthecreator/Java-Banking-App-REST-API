@@ -134,7 +134,7 @@ export default {
       this.$router.push({ name: 'transfer', params: { accounts: "22" } });
     },
     relocate_to_request() {
-      this.$router.push('employeePanel/requestPanel')
+      this.$router.push('dashboard/requestAccount')
     }
   },
 };

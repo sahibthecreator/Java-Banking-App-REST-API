@@ -51,3 +51,39 @@ export const requestAccount = async (requestData, token) => {
     throw error.response.data;
   }
 };
+
+export const getAllRequests = async (token) => {
+  try {
+    const response = await axios.get(`/accounts/requests`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const approveRequest = async (requestId, token) => {
+  try {
+    await axios.put(`/accounts/requests/${requestId}/approve`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const denyRequest = async (requestId, token) => {
+  try {
+    await axios.put(`/accounts/requests/${requestId}/deny`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+  } catch (error) {
+    throw error.response.data;
+  }
+};

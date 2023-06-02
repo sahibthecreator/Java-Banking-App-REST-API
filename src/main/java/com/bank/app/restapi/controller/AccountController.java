@@ -26,7 +26,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping("")
-    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
+    @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
     public ResponseEntity<List<AccountDTO>> getAccounts(
             @RequestParam(required = false) String iban,
             @RequestParam(required = false) Float balance,
@@ -86,6 +86,7 @@ public class AccountController {
     }
 
     @PostMapping("/requests")
+    @PreAuthorize("@securityExpressions.hasUserOrEmployeeRole(authentication)")
     public ResponseEntity<AccountRequestDTO> submitAccountRequest(@RequestBody @Valid AccountRequestDTO requestDto) {
         AccountRequestDTO accountRequestDTO = accountService.submitAccountRequest(requestDto);
         return ResponseEntity.status(200).body(accountRequestDTO);
@@ -106,7 +107,7 @@ public class AccountController {
     @PutMapping("/requests/{requestId}/deny")
     public ResponseEntity<AccountRequestDTO> denyBankAccountRequest(@PathVariable UUID requestId) {
         accountService.denyBankAccountRequest(requestId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(200).build();
     }
 
 }

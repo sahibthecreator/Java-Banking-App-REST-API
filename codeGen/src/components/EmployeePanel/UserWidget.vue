@@ -56,7 +56,6 @@ export default {
           this.user.id
         );
         this.accounts = accounts;
-        console.log(accounts);
       } catch (error) {
         console.log(error);
       }
