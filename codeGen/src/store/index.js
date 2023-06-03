@@ -112,8 +112,6 @@ const store = new Vuex.Store({
         async deleteUser({ commit, state }, userId) {
             try {
                 await deleteUser(userId, state.token);
-                const updatedUsers = state.users.filter((u) => u.id !== userId);
-                commit('setUsers', updatedUsers);
             } catch (error) {
                 throw new Error(error.message);
             }

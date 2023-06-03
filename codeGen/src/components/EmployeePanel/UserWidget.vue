@@ -12,13 +12,13 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
           <span>email: {{ user.email }} | </span>
           <span>bsn: {{ user.bsn }} | </span>
           <span>{{ user.active ? 'Active' : 'Not Active' }} | </span>
-          <span>accounts: {{ accounts?.length || 0 }} </span>
+          <span>accounts: {{ accounts }} </span>
         </div>
       </div>
 
       <div class="userControls">
         <button class="button btn-warning" @click="updateUser()">Edit</button>
-        <button class="button btn-danger" @click="deleteUser()">Delete</button>
+        <button class="button btn-danger" @click="deleteUser()">{{ accounts == 0 ? 'Delete' : 'Deactivate' }}</button>
       </div>
     </div>
   </div>
@@ -37,16 +37,28 @@ export default {
   },
   mounted() {
     this.getAllAccounts();
+    console.log(this.user);
+  },
+  watch: {
+    user: {
+      immediate: true,
+      handler() {
+        this.getAllAccounts();
+      },
+    },
   },
   methods: {
     updateUser() {
       console.log('update dialog here');
     },
-    deleteUser() {
+    async deleteUser() {
       if (confirm('Are you sure?')) {
-        console.log('Delete user');
-      } else {
-        console.log('User not deleted');
+        try {
+          await this.$store.dispatch('deleteUser', this.user.id);
+          alert('User was deletet/deactivated');
+        } catch (error) {
+          alert(error.message);
+        }
       }
     },
     async getAllAccounts() {
@@ -55,9 +67,9 @@ export default {
           'getAccountsByUserId',
           this.user.id
         );
-        this.accounts = accounts;
+        this.accounts = accounts.length;
       } catch (error) {
-        console.log(error);
+        this.accounts = 0;
       }
     },
   },

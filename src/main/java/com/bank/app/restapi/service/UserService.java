@@ -6,6 +6,7 @@ import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.User;
+import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -51,9 +52,10 @@ public class UserService {
             String email,
             LocalDate dateOfBirth,
             String bsn,
+            String role,
             String sortDirection,
             int limit) {
-        Specification<User> specification = buildSpecification(firstName, lastName, email, dateOfBirth, bsn);
+        Specification<User> specification = buildSpecification(firstName, lastName, email, dateOfBirth, bsn, role);
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "lastName", "firstName");
 
         Page<User> userPage = userRepository.findAll(specification, PageRequest.of(0, limit, sort));
@@ -65,6 +67,8 @@ public class UserService {
     public UserDTO register(UserDTO userDTO) {
         emailIsRegistered(userDTO.getEmail());
         bsnIsValid(userDTO.getBsn());
+        
+        userDTO.setActive(true);
         User user = userMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
@@ -110,7 +114,9 @@ public class UserService {
             this.userRepository.deleteById(id);
             return "User " + id + " has been permanently deleted";
         } else {
-            userOptional.get().setActive(false);
+            User deactivatedUser = userOptional.get();
+            deactivatedUser.setActive(false);
+            this.userRepository.saveAndFlush(deactivatedUser);
             return "User " + id + " has been deactivated";
         }
     }
@@ -138,7 +144,8 @@ public class UserService {
             String lastName,
             String email,
             LocalDate dateOfBirth,
-            String bsn) {
+            String bsn,
+            String role) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -160,6 +167,15 @@ public class UserService {
 
             if (bsn != null && !bsn.isEmpty()) {
                 predicates.add(criteriaBuilder.equal(root.get("bsn"), bsn));
+            }
+
+            if (bsn != null && !bsn.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("bsn"), bsn));
+            }
+
+            if (role != null) {
+                UserType userType = UserType.valueOf(role.toUpperCase());
+                predicates.add(criteriaBuilder.equal(root.get("role"), userType));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
