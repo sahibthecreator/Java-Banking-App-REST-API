@@ -23,14 +23,13 @@ public class SecurityConfig {
 
     private static final String[] SECURED_URLs = {
             "/users/**",
-            "/accounts/**",
             "/transactions/**"
     };
 
     private static final String[] UN_SECURED_URLs = {
             "/auth/**",
             "/users/{userId}",
-            
+            "/accounts/**",
     };
 
     @Autowired

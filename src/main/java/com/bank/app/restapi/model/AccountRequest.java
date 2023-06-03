@@ -27,6 +27,9 @@ public class AccountRequest {
     @Column(name = "userId")
     private UUID userId;
 
+    @Column(name = "fullName")
+    private String fullName;
+
     @Column(name = "accountType")
     private AccountType accountType;
 

@@ -3,7 +3,7 @@ import { login, register } from '@/service/auth';
 import { getUser, getUsers, createUser, updateUser, deleteUser } from '@/service/users';
 import { getAccounts, createAccount } from '@/service/accounts';
 import { getTransactions, getTransaction } from '@/service/transactions';
-import { getAccountsByUserId, requestAccount } from '../service/accounts';
+import { approveRequest, denyRequest, getAccountsByUserId, getAllRequests, requestAccount } from '../service/accounts';
 import { getTransactionsByUserId, performTransaction } from '../service/transactions';
 
 // Vue.use(Vuex);
@@ -138,8 +138,7 @@ const store = new Vuex.Store({
         },
         async createAccount({ commit, state }, accountData) {
             try {
-                const account = await createAccount(accountData, state.token);
-                commit('setAccounts', [...state.accounts, account]);
+                await createAccount(accountData, state.token);
             } catch (error) {
                 throw new Error(error.message);
             }
@@ -182,6 +181,28 @@ const store = new Vuex.Store({
             try {
                 const request = await requestAccount(requestData, state.token);
                 return request;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async getAllRequests({ commit, state }) {
+            try {
+                const requests = await getAllRequests(state.token);
+                return requests;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async approveRequest({ commit, state }, requestId) {
+            try {
+                await approveRequest(requestId, state.token);
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async denyRequest({ commit, state }, requestId) {
+            try {
+                await denyRequest(requestId, state.token);
             } catch (error) {
                 throw new Error(error.message);
             }

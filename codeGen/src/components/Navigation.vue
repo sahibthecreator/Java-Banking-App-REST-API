@@ -23,7 +23,7 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
           </template>
           <b-dropdown-item to="/dashboard/profile">Profile</b-dropdown-item>
           <b-dropdown-item to="/dashboard">Dashboard</b-dropdown-item>
-          <b-dropdown-item to="dashboard/employeePanel">???DB management???</b-dropdown-item>
+          <b-dropdown-item to="/dashboard/employeePanel">DB management</b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider>
           <b-dropdown-item>
             <b-button variant="danger" class="w-100 p-1" @click="logout">Logout</b-button></b-dropdown-item>

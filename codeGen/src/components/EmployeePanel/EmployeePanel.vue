@@ -20,18 +20,13 @@ import UserWidget from './UserWidget.vue';
           <div class="actions">
             <b-button variant="dark_primary" @click="">Create transaction</b-button>
             <b-button variant="gray_dark" @click="relocate_to_createAccount()">Create new bank account</b-button>
-            <b-button variant="black" @click="">Maybe smth else here</b-button
-            >
+            <b-button variant="black" @click="">Maybe smth else here</b-button>
           </div>
         </div>
         <!-- <h2>Account requests</h2> -->
         <div class="accountRequests">
-          <RequestWidget :request="request" />
-          <RequestWidget :request="request" />
-          <RequestWidget :request="request" />
-          <RequestWidget :request="request" />
-          <RequestWidget :request="request" />
-          <RequestWidget :request="request" />
+          <RequestWidget v-for="(request, index) in requests" :request="request" />
+
         </div>
       </div>
     </div>
@@ -49,14 +44,12 @@ export default {
         lastName: 'Roes',
       },
 
-      request: {
-        user: this.user,
-        //smth else idk??
-      },
+      requests: null
     };
   },
   mounted() {
     this.getAllUsers();
+    this.initAllRequests();
   },
 
   methods: {
@@ -69,6 +62,14 @@ export default {
         if (this.users == null) {
           console.log('Connection refused');
         }
+      }
+    },
+    async initAllRequests() {
+      try {
+        let requests = await this.$store.dispatch('getAllRequests');
+        this.requests = requests;
+      } catch (error) {
+        console.log(error);
       }
     },
     relocate_to_createAccount() {
@@ -119,6 +120,7 @@ export default {
       display: flex;
       flex-direction: column;
       gap: 100px;
+
       .actionPanel {
         background: var(--white);
         width: 100%;
@@ -131,6 +133,7 @@ export default {
         gap: 20px;
         align-items: center;
         justify-content: center;
+
         .actions {
           display: flex;
           flex: row;

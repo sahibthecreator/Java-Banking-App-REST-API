@@ -215,9 +215,10 @@ public class AccountService {
     }
 
     public AccountRequestDTO submitAccountRequest(AccountRequestDTO requestDto) {
-        userService.getUserById(requestDto.getUserId());
+        User user = userService.getUserById(requestDto.getUserId());
         AccountRequest request = new AccountRequest();
         request.setUserId(requestDto.getUserId());
+        request.setFullName(user.getFirstName() + " " + user.getLastName());
         request.setAccountType(requestDto.getAccountType());
         request.setStatus("pending");
 

@@ -1,11 +1,9 @@
 package com.bank.app.restapi.config;
 
 import com.bank.app.restapi.dto.AccountDTO;
-import com.bank.app.restapi.dto.TransactionDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.AccountType;
-import com.bank.app.restapi.model.TransactionType;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.service.AccountService;

@@ -7,7 +7,7 @@ import AccountIcon from './AccountIcon.vue';
     <div class="d-flex">
       <AccountIcon :accountName="name"></AccountIcon>
       <div class="title">
-        <p class="my-auto ml-3 font-weight-bolder">Current Account</p>
+        <p class="my-auto ml-3 font-weight-bolder">{{type}} Account</p>
         <p class="my-auto ml-3 iban">{{ iban }}</p>
       </div>
     </div>
@@ -20,9 +20,10 @@ import AccountIcon from './AccountIcon.vue';
 export default {
   name: 'AccountWidget',
   props: {
+    type: String,
     name: String,
-      balance: Number,
-      iban: String
+    balance: Number,
+    iban: String
   },
   methods: {
     formatPrice(value) {

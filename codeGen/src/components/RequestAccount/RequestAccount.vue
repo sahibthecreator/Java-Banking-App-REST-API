@@ -74,7 +74,7 @@ export default {
       try {
         const transactionData = {
           userId: this.$store.state.userId,
-          accountType: 'SAVINGS',
+          accountType: this.selected,
           absoluteLimit: 0,
         };
         await this.$store.dispatch('requestAccount', transactionData);

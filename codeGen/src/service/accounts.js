@@ -28,6 +28,7 @@ export const getAccountsByUserId = async (userId, token) => {
 
 export const createAccount = async (accountData, token) => {
   try {
+    console.log(accountData);
     const response = await axios.post(`/accounts`, accountData, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -47,6 +48,42 @@ export const requestAccount = async (requestData, token) => {
       },
     });
     return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getAllRequests = async (token) => {
+  try {
+    const response = await axios.get(`/accounts/requests`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const approveRequest = async (requestId, token) => {
+  try {
+    await axios.put(`/accounts/requests/${requestId}/approve`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const denyRequest = async (requestId, token) => {
+  try {
+    await axios.put(`/accounts/requests/${requestId}/deny`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
   } catch (error) {
     throw error.response.data;
   }
