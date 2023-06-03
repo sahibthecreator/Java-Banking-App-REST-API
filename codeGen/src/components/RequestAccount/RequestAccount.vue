@@ -82,7 +82,6 @@ export default {
   },
   methods: {
     async requestAccountBtn() {
-      console.log()
       try {
         const transactionData = {
           userId: this.$store.state.userId,

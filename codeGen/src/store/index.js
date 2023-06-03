@@ -138,8 +138,7 @@ const store = new Vuex.Store({
         },
         async createAccount({ commit, state }, accountData) {
             try {
-                const account = await createAccount(accountData, state.token);
-                commit('setAccounts', [...state.accounts, account]);
+                await createAccount(accountData, state.token);
             } catch (error) {
                 throw new Error(error.message);
             }

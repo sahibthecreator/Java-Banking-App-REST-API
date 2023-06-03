@@ -8,9 +8,7 @@
     </b-navbar-brand>
 
     <b-navbar-nav class="ml-auto">
-      <b-nav-item to="/dashboard"
-        ><img src="@/assets/Transaction/x.svg"
-      /></b-nav-item>
+      <b-nav-item to="/dashboard/employeePanel"><img src="@/assets/Transaction/x.svg" /></b-nav-item>
     </b-navbar-nav>
   </div>
   <div class="requestPage">
@@ -19,7 +17,7 @@
 
       <div class="inputRequestContainer">
         <span>User ID</span>
-        <input placeholder="ex: 12341231341"/>
+        <input placeholder="ex: 12341231341" v-model="userId" />
       </div>
 
       <div class="inputRequestContainer">
@@ -29,16 +27,14 @@
 
       <div class="inputRequestContainer">
         <span>Absolute limit</span>
-        <input type="number" step=".5" placeholder="12,20"/>
+        <input type="number" step=".5" placeholder="12,20" v-model="absoluteLimit" />
       </div>
-      <b-button variant="dark_primary" v-on:click=""
-        >Create</b-button
-      >
-      <p class="text-danger errorMsg">{{ errorMsg }}</p>
-      <span class="tos"
-        >By clicking request account, I authorize WAVR to initiate an account
-        request and accept the Terms of Services</span
-      >
+      <div>
+        <b-button variant="dark_primary" id="createAccBtn" v-on:click="createAccountBtn">Create</b-button>
+        <p class="text-danger errorMsg">{{ errorMsg }}</p>
+      </div>
+      <span class="tos">By clicking request account, I authorize WAVR to initiate an account
+        request and accept the Terms of Services</span>
     </div>
   </div>
 
@@ -50,8 +46,8 @@
         <div class="spinner"></div>
         <div class="loader">
           <div class="words">
-            <span class="word">Sending Request</span>
-            <span class="word">1 more second</span>
+            <span class="word">Validating data</span>
+            <span class="word">Creating Account</span>
           </div>
         </div>
       </div>
@@ -61,16 +57,11 @@
         <img src="@/assets/SuccessIcon.png" class="success icon" />
       </div>
       <div class="content" v-if="!loading">
-        <span class="title">Account request sent successfully</span>
+        <span class="title">Account created successfully</span>
       </div>
       <div class="actions">
-        <b-button
-          variant="dark_primary"
-          class="history"
-          v-on:click="this.$router.push('/dashboard')"
-          v-if="!loading"
-          >Return to dashboard</b-button
-        >
+        <b-button variant="dark_primary" class="history" v-on:click="this.$router.push('/dashboard/employeePanel')"
+          v-if="!loading">Return back</b-button>
       </div>
     </div>
   </div>
@@ -82,7 +73,9 @@ export default {
   name: 'RequestAccount',
   data() {
     return {
+      userId: "",
       selected: 'CURRENT',
+      absoluteLimit: 0,
       options: [
         { value: 'CURRENT', text: 'Current' },
         { value: 'SAVINGS', text: 'Savings' },
@@ -93,6 +86,30 @@ export default {
       errorMsg: '',
     };
   },
+  methods: {
+    async createAccountBtn() {
+      if (this.userId == "")
+        return this.errorMsg = "Please enter valid User ID"
+
+      try {
+        const accountData = {
+          userId: this.userId,
+          typeOfAccount: this.selected,
+          absoluteLimit: this.absoluteLimit
+        };
+        document.getElementById('createAccBtn').disabled = true;
+        await this.$store.dispatch('createAccount', accountData);
+        this.responsePopupEnabled = true;
+        this.loading = true;
+        await this.delay(1500);
+        this.loading = false;
+      } catch (error) {
+        this.errorMsg = error.toString().startsWith('Error: JSON parse error')
+          ? "User ID is invalid"
+          : error;
+      }
+    },
+  }
 }
 </script>
 
@@ -137,7 +154,7 @@ export default {
   align-items: center;
 }
 
-.requestPanel > span:nth-child(1) {
+.requestPanel>span:nth-child(1) {
   font-size: 24px;
 }
 
@@ -163,12 +180,12 @@ export default {
   margin: 0px auto;
 }
 
-.inputRequestContainer > span {
+.inputRequestContainer>span {
   font-size: 16px;
   font-weight: 500;
 }
 
-.inputRequestContainer > input {
+.inputRequestContainer>input {
   font-size: 20px;
   font-weight: 400;
   border: none;
@@ -176,7 +193,7 @@ export default {
   color: var(--gray-light);
 }
 
-.inputRequestContainer > select {
+.inputRequestContainer>select {
   font-size: 20px;
   font-weight: 400;
   border: none;
@@ -185,13 +202,13 @@ export default {
   box-shadow: none;
 }
 
-.requestPanel > button {
+.requestPanel>div button {
   max-width: 350px;
   width: 350px;
   min-width: 300px;
 }
 
-.inputRequestContainer > input::placeholder {
+.inputRequestContainer>input::placeholder {
   color: var(--gray-light);
 }
 
@@ -287,7 +304,9 @@ export default {
 }
 
 .errorMsg {
+  text-align: center;
   font-size: smaller;
+  margin-top: 5%;
   margin-bottom: 0;
 }
 

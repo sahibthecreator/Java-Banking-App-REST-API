@@ -28,6 +28,7 @@ export const getAccountsByUserId = async (userId, token) => {
 
 export const createAccount = async (accountData, token) => {
   try {
+    console.log(accountData);
     const response = await axios.post(`/accounts`, accountData, {
       headers: {
         Authorization: `Bearer ${token}`,
