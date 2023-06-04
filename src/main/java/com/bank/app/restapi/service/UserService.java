@@ -3,12 +3,15 @@ package com.bank.app.restapi.service;
 import com.bank.app.restapi.dto.LoginDTO;
 import com.bank.app.restapi.dto.LoginResponseDTO;
 import com.bank.app.restapi.dto.RegisterDTO;
+import com.bank.app.restapi.dto.TransactionDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.Account;
+import com.bank.app.restapi.model.Transaction;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.AccountRepository;
+import com.bank.app.restapi.repository.TransactionRepository;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
@@ -43,6 +46,8 @@ public class UserService {
     private final JwtService jwtService;
 
     private final AuthenticationManager authenticationManager;
+
+    private TransactionRepository transactionRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -95,7 +100,7 @@ public class UserService {
             User existingUser = existingUserOptional.get();
             BeanUtils.copyProperties(user, existingUser, "id"); // Exclude copying the "id" property
             System.out.println(existingUser);
-            //existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            // existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
             User savedUser = userRepository.save(existingUser);
             return userMapper.toDTO(savedUser);
@@ -136,6 +141,23 @@ public class UserService {
             throw new EntityNotFoundException("No user with following id " + id + " exists");
         }
         return user.get();
+    }
+
+    public double getRemainingDayLimit(UUID id) throws EntityNotFoundException {
+        User user = getUserById(id); // to check if userid is valid
+        List<Transaction> transactions = transactionRepository.findTransactionsByUserId(id);
+
+        LocalDate currentDate = LocalDate.now();
+        List<Transaction> filteredTransactions = transactions.stream()
+                .filter(t -> {
+                    LocalDate executionDate = t.getDateOfExecution().toLocalDate();
+                    return executionDate.equals(currentDate);
+                }).toList();
+        double totalSpentToday = filteredTransactions.stream()
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+
+        return user.getDayLimit() - totalSpentToday;
     }
 
     // Private methods

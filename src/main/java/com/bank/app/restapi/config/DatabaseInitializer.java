@@ -21,7 +21,6 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         private final UserService userService;
         private final AccountService accountService;
-        private final TransactionService transactionService;
         private final UserMapper userMapper;
 
         @Autowired
@@ -29,7 +28,6 @@ public class DatabaseInitializer implements CommandLineRunner {
                         TransactionService transactionService, UserMapper userMapper) {
                 this.userService = userService;
                 this.accountService = accountService;
-                this.transactionService = transactionService;
                 this.userMapper = userMapper;
         }
 

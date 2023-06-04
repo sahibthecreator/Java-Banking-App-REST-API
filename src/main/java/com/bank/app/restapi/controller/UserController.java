@@ -79,4 +79,16 @@ public class UserController {
         return ResponseEntity.status(200).body(map);
     }
 
+    @GetMapping("/{userId}/remaining-day-limit")
+    @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
+    public ResponseEntity<HashMap<String, Double>> getRemainingDayLimit(@PathVariable String userId,
+            HttpServletRequest request) {
+        UUID id = UUID.fromString(userId);
+        Double response = userService.getRemainingDayLimit(id);
+        HashMap<String, Double> map = new HashMap<>();
+        map.put("remainingDayLimit", response);
+
+        return ResponseEntity.status(200).body(map);
+    }
+
 }

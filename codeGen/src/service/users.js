@@ -26,6 +26,19 @@ export const getUsers = async (token) => {
   }
 };
 
+export const getRemainingDayLimit = async (userId, token) => {
+  try {
+    const response = await axios.get(`/users/${userId}/remaining-day-limit`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const createUser = async (userData, token) => {
   try {
     const response = await axios.post(`/users`, userData, {

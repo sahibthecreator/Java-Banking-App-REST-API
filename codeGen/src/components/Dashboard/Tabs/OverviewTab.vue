@@ -28,31 +28,28 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
       </div>
       <div class="card">
         <div class="header">
-          <span v-if="!currentAccount">Remaining daily balance</span>
+          <span v-if="!currentAccount">Remaining daily limit</span>
           <span v-else>IBAN</span>
           <b-icon-credit-card-fill></b-icon-credit-card-fill>
         </div>
         <span class="contentBig" v-if="!currentAccount">
-          € 200.23 (static)</span
-        >
+          € {{ remainingDayLimit }}</span>
         <span class="contentBig" v-else> {{ currentAccount.iban }}</span>
         <span class="contentSmall" v-if="!currentAccount">
-          12h 2m 12s remaining</span
-        >
+          12h 2m 12s remaining</span>
         <span class="contentSmall" v-else>
           {{ currentAccount.typeOfAccount }}
         </span>
       </div>
       <div class="card">
         <div class="header">
-          <span v-if="!currentAccount">Daily Transactions remaining</span>
+          <span v-if="!currentAccount">Transaction limit</span>
           <span v-else>Absolute limit</span>
           <b-icon-flag></b-icon-flag>
         </div>
-        <span class="contentBig" v-if="!currentAccount"> 12 (static)</span>
+        <span class="contentBig" v-if="!currentAccount"> € {{ user?.transactionLimit }}</span>
         <span class="contentBig" v-else>
-          € {{ formatPrice(currentAccount.absoluteLimit) }}</span
-        >
+          € {{ formatPrice(currentAccount.absoluteLimit) }}</span>
         <span class="contentSmall" v-if="!currentAccount && !user"> 109 </span>
       </div>
       <div class="card">
@@ -62,8 +59,7 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
           <b-icon-clock-history></b-icon-clock-history>
         </div>
         <span class="contentBig" v-if="!currentAccount">
-          - $213.47 (static)</span
-        >
+          - $213.47 (static)</span>
         <span class="contentBig" v-else>
           <span v-if="currentTransactions">None</span>
           <span v-if="!currentTransactions"> {{ currentTransactions[0].amount }}</span>
@@ -81,22 +77,12 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
           </h3>
         </div>
         <div class="accountsWrapper" v-if="!currentAccount">
-          <AccountWidgetV2
-            v-for="(account, index) in accounts"
-            :key="index"
-            :balance="account.balance"
-            :name="user.firstName"
-            :iban="account.iban"
-            :type="account.typeOfAccount"
-            @click.native="setCurrentAccountView(account)"
-          />
+          <AccountWidgetV2 v-for="(account, index) in accounts" :key="index" :balance="account.balance"
+            :name="user.firstName" :iban="account.iban" :type="account.typeOfAccount"
+            @click.native="setCurrentAccountView(account)" />
         </div>
-        <CurrentAccountPanelV2
-          :currentAccount="currentAccount"
-          :user="user"
-          @returnBack="returnDashboardView"
-          v-if="currentAccount"
-        >
+        <CurrentAccountPanelV2 :currentAccount="currentAccount" :user="user" @returnBack="returnDashboardView"
+          v-if="currentAccount">
         </CurrentAccountPanelV2>
       </div>
       <div class="card right">
@@ -113,11 +99,8 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
           </div>
         </div>
         <div class="transactionsWrapper">
-          <TransactionWidgetV2
-            v-for="(transaction, index) in currentTransactions"
-            :key="index"
-            :transaction="transaction"
-          />
+          <TransactionWidgetV2 v-for="(transaction, index) in currentTransactions" :key="index"
+            :transaction="transaction" />
         </div>
       </div>
     </div>
@@ -135,6 +118,7 @@ export default {
       transactions: null,
       balance: 0,
       currentAccount: null,
+      remainingDayLimit: null,
     };
   },
   mounted() {
@@ -175,6 +159,13 @@ export default {
         );
         this.transactions = transactions;
         this.currentTransactions = this.transactions;
+
+        let dayLimit = await this.$store.dispatch(
+          'getRemainingDayLimit',
+          this.$store.getters.getUserId
+        );
+
+        this.remainingDayLimit = dayLimit.remainingDayLimit;
       } catch (error) {
         console.log(error);
         if (this.user == null) {
@@ -213,6 +204,7 @@ export default {
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     padding: 25px 0px;
+
     .card {
       .header {
         display: flex;
