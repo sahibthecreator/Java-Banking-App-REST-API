@@ -1,23 +1,11 @@
 <script setup>
-import AccountWidgetV2 from './AccountWidgetV2.vue';
-import CurrentAccountPanelV2 from './CurrentAccountPanelV2.vue';
-import TransactionWidgetV2 from './TransactionWidgetV2.vue';
+import AccountWidgetV2 from '../AccountWidgetV2.vue';
+import CurrentAccountPanelV2 from '../CurrentAccountPanelV2.vue';
+import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
 </script>
 
 <template>
   <div class="dashboardPanel">
-    <div class="titleBar"><h1 id="title">Dashboard</h1></div>
-    <div class="secondTitleBar">
-      <div class="options">
-        <option class="selected">Overview</option>
-        <option>Accounts</option>
-        <option>Transactions</option>
-        <option>People</option>
-      </div>
-      <b-button variant="dark_primary" @click="relocate_to_transaction()"
-        >New Transaction</b-button
-      >
-    </div>
     <div class="infoCards">
       <div class="card">
         <div class="header">
@@ -40,26 +28,46 @@ import TransactionWidgetV2 from './TransactionWidgetV2.vue';
       </div>
       <div class="card">
         <div class="header">
-          <span>Remaining daily balance</span>
+          <span v-if="!currentAccount">Remaining daily balance</span>
+          <span v-else>IBAN</span>
           <b-icon-credit-card-fill></b-icon-credit-card-fill>
         </div>
-        <span class="contentBig"> € 200.23 (static)</span>
-        <span class="contentSmall"> 12h 2m 12s remaining</span>
+        <span class="contentBig" v-if="!currentAccount">
+          € 200.23 (static)</span
+        >
+        <span class="contentBig" v-else> {{ currentAccount.iban }}</span>
+        <span class="contentSmall" v-if="!currentAccount">
+          12h 2m 12s remaining</span
+        >
+        <span class="contentSmall" v-else>
+          {{ currentAccount.typeOfAccount }}
+        </span>
       </div>
       <div class="card">
         <div class="header">
-          <span>Daily Transactions remaining</span>
+          <span v-if="!currentAccount">Daily Transactions remaining</span>
+          <span v-else>Absolute limit</span>
           <b-icon-flag></b-icon-flag>
         </div>
-        <span class="contentBig"> 12 (static)</span>
-        <span class="contentSmall"> 12 of 15 </span>
+        <span class="contentBig" v-if="!currentAccount"> 12 (static)</span>
+        <span class="contentBig" v-else>
+          € {{ formatPrice(currentAccount.absoluteLimit) }}</span
+        >
+        <span class="contentSmall" v-if="!currentAccount && !user"> 109 </span>
       </div>
       <div class="card">
         <div class="header">
-          <span>monthly Balance Status</span>
+          <span v-if="!currentAccount">monthly Balance Status</span>
+          <span v-else>Latest Transaction</span>
           <b-icon-clock-history></b-icon-clock-history>
         </div>
-        <span class="contentBig"> - $213.47 (static)</span>
+        <span class="contentBig" v-if="!currentAccount">
+          - $213.47 (static)</span
+        >
+        <span class="contentBig" v-else>
+          <span v-if="currentTransactions">None</span>
+          <span v-if="!currentTransactions"> {{ currentTransactions[0].amount }}</span>
+        </span>
         <span class="contentSmall"> -2.1% from last month</span>
       </div>
     </div>
@@ -118,7 +126,7 @@ import TransactionWidgetV2 from './TransactionWidgetV2.vue';
 
 <script>
 export default {
-  name: 'Overview',
+  name: 'OverviewTab',
   data() {
     return {
       user: null,
@@ -185,7 +193,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .card {
   padding: 35px;
   background: var(--white);
@@ -200,48 +207,6 @@ export default {
   flex-direction: column;
   gap: 10px;
   padding: 30px;
-
-  .titleBar {
-    height: 75px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-
-    #title {
-      color: var(--gray-dark);
-    }
-  }
-  .secondTitleBar {
-    display: flex;
-    flex-direction: row;
-    .options {
-      display: flex;
-      flex-direction: row;
-      padding: 5px;
-      gap: 10px;
-      background: #ebebeb;
-      width: fit-content;
-      border-radius: 7px;
-
-      option {
-        padding: 5px 15px;
-        border-radius: 4px;
-        color: var(--gray-light);
-        cursor: pointer;
-      }
-
-      .selected {
-        color: var(--gray-dark);
-        background: var(--white);
-        box-shadow: 0 0 30px #14141417;
-        font-weight: 500;
-      }
-    }
-
-    button {
-      margin-left: auto;
-    }
-  }
 
   .infoCards {
     display: grid;
