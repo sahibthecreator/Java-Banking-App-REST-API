@@ -78,7 +78,7 @@ export default {
     return {
       accounts: null,
       totalBalance: 0,
-      expanded: true,
+      expanded: false,
     };
   },
   mounted() {
