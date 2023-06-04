@@ -36,7 +36,8 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
           € {{ remainingDayLimit }}</span>
         <span class="contentBig" v-else> {{ currentAccount.iban }}</span>
         <span class="contentSmall" v-if="!currentAccount">
-          12h 2m 12s remaining</span>
+          <span id="timer-text">... remaining</span></span
+        >
         <span class="contentSmall" v-else>
           {{ currentAccount.typeOfAccount }}
         </span>
@@ -62,7 +63,9 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
           - $213.47 (static)</span>
         <span class="contentBig" v-else>
           <span v-if="currentTransactions">None</span>
-          <span v-if="!currentTransactions"> {{ currentTransactions[0].amount }}</span>
+          <span v-if="!currentTransactions">
+            {{ currentTransactions[0].amount }}</span
+          >
         </span>
         <span class="contentSmall"> -2.1% from last month</span>
       </div>
@@ -108,6 +111,26 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
 </template>
 
 <script>
+var date = new Date();
+var second = date.getSeconds();
+var minute = date.getMinutes();
+var hour = date.getHours();
+var leftHour = 23 - hour;
+var leftMinute = 59 - minute;
+var leftSeconds = 59 - second;
+
+var leftTime = leftHour * 3600 + leftMinute * 60 + leftSeconds;
+
+function updateTimer() {
+  var timer = document.getElementById('timer-text');
+  var h = Math.floor(leftTime / 3600);
+  var m = Math.floor((leftTime - h * 3600) / 60);
+  var s = Math.floor(leftTime % 60);
+
+  timer.innerHTML = h + ' : ' + m + ' : ' + (s + 1) + ' remaining';
+
+  leftTime--;
+}
 export default {
   name: 'OverviewTab',
   data() {
@@ -119,10 +142,12 @@ export default {
       balance: 0,
       currentAccount: null,
       remainingDayLimit: null,
+      timer: null
     };
   },
   mounted() {
     this.getUserAndAccountsAndTransactions();
+    this.setTimer();
   },
   methods: {
     setCurrentAccountView(account) {
@@ -179,6 +204,12 @@ export default {
     relocate_to_request() {
       this.$router.push('dashboard/requestAccount');
     },
+    setTimer() {
+      if (!this.timer) {
+        setInterval(updateTimer, 1000); 
+        this.timer = true
+      }
+    }
   },
 };
 </script>
