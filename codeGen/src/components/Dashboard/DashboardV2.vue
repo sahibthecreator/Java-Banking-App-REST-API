@@ -3,6 +3,7 @@ import Navigation from '@/components/Navigation.vue';
 import AccountWidgetV2 from './AccountWidgetV2.vue';
 import CurrentAccountPanelV2 from './CurrentAccountPanelV2.vue';
 import TransactionWidgetV2 from './TransactionWidgetV2.vue';
+import Overview from './Overview.vue';
 </script>
 
 <template>
@@ -11,99 +12,7 @@ import TransactionWidgetV2 from './TransactionWidgetV2.vue';
   </div>
 
   <div class="dashboardPage">
-    <div class="dashboardPanel">
-      <div class="titleBar"><h1 id="title">Dashboard</h1></div>
-      <div class="secondTitleBar">
-        <div class="options">
-          <option class="selected">Overview</option>
-          <option>Accounts</option>
-          <option>Transactions</option>
-          <option>People</option>
-        </div>
-        <b-button variant="dark_primary" @click="relocate_to_transaction()">New Transaction</b-button>
-      </div>
-      <div class="infoCards">
-        <div class="card">
-          <div class="header">
-            <span v-if="!currentAccount">Total Balance</span>
-            <span v-else>Balance</span>
-            <b-icon-currency-euro></b-icon-currency-euro>
-          </div>
-          <span class="contentBig" v-if="!currentAccount"> € {{ formatPrice(accounts?.reduce((sum, account) => sum + account.balance, 0)) }} </span>
-          <span class="contentBig" v-else> € {{ formatPrice(currentAccount.balance) }} </span>
-          <span class="contentSmall"> +20.1% from last month</span>
-        </div>
-        <div class="card">
-          <div class="header">
-            <span>Remaining daily balance</span>
-            <b-icon-credit-card-fill></b-icon-credit-card-fill>
-          </div>
-          <span class="contentBig"> € 200.23 (static)</span>
-          <span class="contentSmall"> 12h 2m 12s remaining</span>
-        </div>
-        <div class="card">
-          <div class="header">
-            <span>Daily Transactions remaining</span>
-            <b-icon-flag></b-icon-flag>
-          </div>
-          <span class="contentBig"> 12 (static)</span>
-          <span class="contentSmall"> 12 of 15 </span>
-        </div>
-        <div class="card">
-          <div class="header">
-            <span>monthly Balance Status</span>
-            <b-icon-clock-history></b-icon-clock-history>
-          </div>
-          <span class="contentBig"> - $213.47 (static)</span>
-          <span class="contentSmall"> -2.1% from last month</span>
-        </div>
-      </div>
-
-      <div class="mainContent">
-        <div class="card left">
-          <div class="header">
-            <h3 v-if="!currentAccount">Accounts</h3>
-            <h3 v-else @click="currentAccount = null" style="cursor: pointer;">
-              <b-icon-arrow-left>
-
-              </b-icon-arrow-left> {{ currentAccount.iban }}</h3>
-          </div>
-          <div class="accountsWrapper" v-if="!currentAccount">
-            <AccountWidgetV2
-              v-for="(account, index) in accounts"
-              :key="index"
-              :balance="account.balance"
-              :name="user.firstName"
-              :iban="account.iban"
-              :type="account.typeOfAccount"
-              @click.native="setCurrentAccountView(account)"
-            />
-          </div>
-          <CurrentAccountPanelV2 :currentAccount="currentAccount" :user="user" @returnBack="returnDashboardView"
-        v-if="currentAccount">
-      </CurrentAccountPanelV2>
-        </div>
-        <div class="card right">
-          <div class="header">
-            <h3>Recent Actions</h3>
-            <div>
-              <p v-if="currentAccount">You made/received {{ currentTransactions.length }} transactions this week</p>
-              <p v-else>You made/received (to be implemented) transactions this week</p>
-            </div>
-            
-          </div>
-          <div class="transactionsWrapper">
-            <TransactionWidgetV2
-              v-for="(transaction, index) in currentTransactions"
-              :key="index"
-              :transaction="transaction"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-
-
+  <Overview />
   </div>
 </template>
 
@@ -118,85 +27,12 @@ export default {
       transactions: null,
       balance: 0,
       currentAccount: null,
-      chartOptions: {
-        chart: {
-          type: 'line',
-          zoom: {
-            enabled: false,
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        stroke: {
-          curve: 'straight',
-        },
-        title: {
-          text: 'Total Spent by Month',
-          align: 'left',
-        },
-        grid: {
-          row: {
-            colors: ['#f3f3f3', 'transparent'],
-            opacity: 0.5,
-          },
-        },
-        xaxis: {
-          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'], // Replace with actual month labels
-        },
-      },
-      chartSeries: [
-        {
-          name: 'Total Spent',
-          data: [480, 674, 400, 552, 122], // Replace with actual spent amounts
-        },
-      ],
     };
   },
-  mounted() {
-    this.getUserAndAccountsAndTransactions();
-  },
   methods: {
-    setCurrentAccountView(account) {
-      this.currentAccount = account;
-      this.currentTransactions = this.transactions.filter(
-        (t) =>
-          t.fromAccount == this.currentAccount.iban ||
-          t.toAccount == this.currentAccount.iban
-      );
-    },
-    returnDashboardView() {
-      this.currentAccount = null;
-      this.currentTransactions = this.transactions;
-    },
     formatPrice(value) {
       let val = (value / 1).toFixed(2).replace('.', ',');
       return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    },
-    async getUserAndAccountsAndTransactions() {
-      try {
-        let user = await this.$store.dispatch(
-          'getUser',
-          this.$store.getters.getUserId
-        );
-        this.user = user;
-        let accounts = await this.$store.dispatch(
-          'getAccountsByUserId',
-          this.$store.getters.getUserId
-        );
-        this.accounts = accounts;
-        let transactions = await this.$store.dispatch(
-          'getTransactionsByUserId',
-          this.$store.getters.getUserId
-        );
-        this.transactions = transactions;
-        this.currentTransactions = this.transactions;
-      } catch (error) {
-        console.log(error);
-        if (this.user == null) {
-          this.$store.dispatch('logout');
-        }
-      }
     },
     relocate_to_transaction() {
       this.$router.push({ name: 'transfer', params: { accounts: '22' } });

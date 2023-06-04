@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Login from '@/components/Login.vue';
 import Home from '@/components/Home.vue';
-import Dashboard from '@/components/Dashboard/Dashboard.vue';
 import DashboardV2 from '@/components/Dashboard/DashboardV2.vue';
 import Transaction from '@/components/Transaction/Transaction.vue';
 import RequestAccount from '@/components/RequestAccount/RequestAccount.vue';
@@ -19,8 +18,7 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'Home', component: Home, },
     { path: '/login', name: 'Log in', component: Login },
-    { path: '/dashboard', name: 'my dashboard', component: Dashboard, meta: { requiresAuth: true } },
-    { path: '/dashboard2', name: 'my dashboard2', component: DashboardV2, meta: { requiresAuth: true } },
+    { path: '/dashboard', name: 'my dashboard', component: DashboardV2, meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: '404 Not Found', component: NotFound },
     { path: '/dashboard/transaction', name: 'transfer', component: Transaction, meta: { requiresAuth: true} },
     { path: '/dashboard/requestAccount', name: 'request', component: RequestAccount, meta: { requiresAuth: true } },
