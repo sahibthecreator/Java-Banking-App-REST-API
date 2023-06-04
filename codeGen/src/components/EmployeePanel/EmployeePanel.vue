@@ -27,7 +27,7 @@ import UserWidget from './UserWidget.vue';
       <div class="rightPanel">
         <div class="actionPanel">
           <div class="actions">
-            <b-button variant="dark_primary" @click="">Create transaction</b-button>
+            <b-button variant="dark_primary" @click="this.$router.push('/dashboard/employeePanel/transaction')">Create transaction</b-button>
             <b-button variant="gray_dark" @click="this.$router.push('/dashboard/employeePanel/createAccount')">Create new
               bank account</b-button>
             <b-button variant="black" @click="">Maybe smth else here</b-button>

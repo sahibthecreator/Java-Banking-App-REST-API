@@ -1,5 +1,5 @@
 <template>
-  <div id="nav" >
+  <div id="nav">
     <b-navbar-brand to="/">
       <img src="@/assets/Logo.svg" alt="logo" id="logo" />
       <span id="logoTitle">WAVR</span>
@@ -58,6 +58,9 @@
           </ul>
         </div>
       </div>
+      <div class="inputContainer">
+        <input placeholder="Description" v-model="description" />
+      </div>
       <b-button variant="dark_primary" v-on:click="performTransaction" id="transferBtn">Transfer</b-button>
       <p class="text-danger errorMsg">{{ errorMsg }}</p>
       <span class="tos">By clicking transfer, I authorize WAVR to initiate the transaction detailed above</span>
@@ -102,6 +105,7 @@ export default {
       amount: "",
       accountFrom: "",
       accountTo: "",
+      description: "",
       showDropdown: false,
       showDropdownToAccount: false,
       accountOptions: this.$store.state.accounts,
@@ -127,7 +131,7 @@ export default {
           toAccount: this.accountTo,
           amount: this.amount,
           performingUser: this.$store.getters.getUserId,
-          description: "test",
+          description: this.description,
           typeOfTransaction: "TRANSFER"
         };
         await this.$store.dispatch('performTransaction', transactionData);
