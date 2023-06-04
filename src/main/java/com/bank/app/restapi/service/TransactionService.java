@@ -126,10 +126,13 @@ public class TransactionService {
         return transactionDTOs;
     }
 
-    public TransactionDTO addTransaction(TransactionDTO dto, TransactionType type) {
+    public TransactionDTO addTransaction(TransactionDTO dto, TransactionType type, UUID performingUserId) {
         Account sendingAccount = accountService.getAccountByIban(dto.getFromAccount());
         Account receivingAccount = accountService.getAccountByIban(dto.getToAccount());
 
+        validatePerformingUserLogic(userRepository.findById(performingUserId).orElseThrow(
+                () -> new EntityNotFoundException("Performing user not found")),
+                mapAccountIbanToOwner(sendingAccount));
         validateAccountLogic(sendingAccount, receivingAccount, type);
 
         Transaction t = new Transaction();
@@ -138,7 +141,7 @@ public class TransactionService {
         t.setAmount(validateAmount(dto.getAmount()));
         t.setTypeOfTransaction(type);
         t.setDateOfExecution(LocalDateTime.now());
-        t.setPerformingUser(userRepository.findById(dto.getPerformingUser()).orElseThrow(
+        t.setPerformingUser(userRepository.findById(performingUserId).orElseThrow(
                 () -> new EntityNotFoundException("Performing user not found")));
         t.setDescription(dto.getDescription());
 
@@ -181,13 +184,11 @@ public class TransactionService {
                 if (!accountToVerify.equals(accountService.getAccountDTOByIban("NL01INHO0000000001")) && !accountToVerifyIsSending) {
                     throw new AccessDeniedException("During deposit, transaction cannot be sent to an account other than the BANK's dedicated one");
                 }
-                //validateAccountsBasedOnAccountType(accountToVerify, transactionType);
                 break;
             case WITHDRAWAL:
                 if (!accountToVerify.equals(accountService.getAccountDTOByIban("NL01INHO0000000001")) && accountToVerifyIsSending) {
                     throw new AccessDeniedException("During withdrawal, transaction cannot be sent from an account other than the BANK's dedicated one");
                 }
-                //validateAccountsBasedOnAccountType(accountToVerify, transactionType);
                 break;
             case TRANSFER:
                 break;
@@ -221,6 +222,16 @@ public class TransactionService {
         validateAccountsBasedOnAccountType(sendingAccountToVerify, receivingAccountToVerify, transactionType);
         //Preventing self account transfer
         checkSelfAccountTransaction(sendingAccountToVerify, receivingAccountToVerify);
+    }
+
+    private void validatePerformingUserLogic(User performingUser, User ownerOfSendingAccount) {
+        if (performingUser.getRole() == UserType.USER) {
+            throw new AccessDeniedException("Cannot perform transactions. User is not customer.");
+        } else if (performingUser.getRole() == UserType.CUSTOMER) {
+            if (performingUser.getId() != ownerOfSendingAccount.getId()) {
+                throw new AccessDeniedException("Cannot perform transaction. User has no employee rights.");
+            }
+        }
     }
 
     private void checkSelfAccountTransaction(Account fromAccount, Account toAccount) {
