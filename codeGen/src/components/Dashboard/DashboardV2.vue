@@ -2,6 +2,7 @@
 import Navigation from '@/components/Navigation.vue';
 import AccountWidgetV2 from './AccountWidgetV2.vue';
 import TransactionWidgetV2 from './TransactionWidgetV2.vue';
+import CurrentAccountPanelV2 from './CurrentAccountPanelV2.vue';
 </script>
 
 <template>
@@ -27,7 +28,7 @@ import TransactionWidgetV2 from './TransactionWidgetV2.vue';
             <span>Total Balance</span>
             <i class="bi bi-currency-euro"></i>
           </div>
-          <span class="contentBig"> $45,232.89 </span>
+          <span class="contentBig"> € {{ formatPrice(accounts?.reduce((sum, account) => sum + account.balance, 0)) }} </span>
           <span class="contentSmall"> +20.1% from last month</span>
         </div>
         <div class="card">
@@ -35,7 +36,7 @@ import TransactionWidgetV2 from './TransactionWidgetV2.vue';
             <span>Remaining daily balance</span>
             <i class="bi bi-currency-euro"></i>
           </div>
-          <span class="contentBig"> $200.23 </span>
+          <span class="contentBig"> € 200.23 (static)</span>
           <span class="contentSmall"> 12h 2m 12s remaining</span>
         </div>
         <div class="card">
@@ -43,7 +44,7 @@ import TransactionWidgetV2 from './TransactionWidgetV2.vue';
             <span>Daily Transactions remaining</span>
             <i class="bi bi-currency-euro"></i>
           </div>
-          <span class="contentBig"> 12 </span>
+          <span class="contentBig"> 12 (static)</span>
           <span class="contentSmall"> 12 of 15 </span>
         </div>
         <div class="card">
@@ -51,7 +52,7 @@ import TransactionWidgetV2 from './TransactionWidgetV2.vue';
             <span>monthly Balance Status</span>
             <i class="bi bi-currency-euro"></i>
           </div>
-          <span class="contentBig"> - $213.47 </span>
+          <span class="contentBig"> - $213.47 (static)</span>
           <span class="contentSmall"> -2.1% from last month</span>
         </div>
       </div>
@@ -61,7 +62,7 @@ import TransactionWidgetV2 from './TransactionWidgetV2.vue';
           <div class="header">
             <h3>Accounts</h3>
           </div>
-          <div class="accountsWrapper">
+          <div class="accountsWrapper" v-if="!currentAccount">
             <AccountWidgetV2
               v-for="(account, index) in accounts"
               :key="index"
@@ -69,13 +70,21 @@ import TransactionWidgetV2 from './TransactionWidgetV2.vue';
               :name="user.firstName"
               :iban="account.iban"
               :type="account.typeOfAccount"
+              @click.native="setCurrentAccountView(account)"
             />
           </div>
+          <CurrentAccountPanelV2 :currentAccount="currentAccount" :user="user" @returnBack="returnDashboardView"
+        v-if="currentAccount">
+      </CurrentAccountPanelV2>
         </div>
         <div class="card right">
           <div class="header">
             <h3>Recent Actions</h3>
-            <p>You made/received 236 transactions this week</p>
+            <div>
+              <p v-if="currentAccount">You made/received {{ currentTransactions.length }} transactions this week</p>
+              <p v-else>You made/received (to be implemented) transactions this week</p>
+            </div>
+            
           </div>
           <div class="transactionsWrapper">
             <TransactionWidgetV2
