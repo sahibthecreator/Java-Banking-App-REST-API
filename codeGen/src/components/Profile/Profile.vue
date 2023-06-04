@@ -19,45 +19,24 @@
         </b-navbar-nav>
     </div>
     <div class="profilePage">
-        <div class="personalDetailsPanel">
-            <span>PERSONAL DETAILS</span>
-            <div class="personalDataContainer">
-                <h6>First name:<p class="personalData">{{ user ? user.firstName : "" }}</p>
+        <span class="dataTitle">PERSONAL DETAILS</span>
+        <div class="dataPanel">
+            <div class="dataContainer">
+                <h6>First name:<p class="data">{{ user ? user.firstName : "" }}</p>
                 </h6>
-                <h6>Last name: <p class="personalData">{{ user ? user.lastName : "" }}</p>
+                <h6>Last name: <p class="data">{{ user ? user.lastName : "" }}</p>
                 </h6>
-                <h6>BSN:<p class="personalData"> {{ user ? user.bsn : "" }}</p>
+                <h6>BSN:<p class="data"> {{ user ? user.bsn : "" }}</p>
                 </h6>
-                <h6>Date of birth:<p class="personalData"> {{ user ? user.dateOfBirth : "" }}</p>
+                <h6>Date of birth:<p class="data"> {{ user ? user.dateOfBirth : "" }}</p>
                 </h6>
-                <h6>Email: <input :value="user.email" type="text" class="personalData">
+                <h6>Email: <input v-model="user.email" type="text" class="data">
                 </h6>
-                <!-- <h6>Password: <input v-model="user.password" type="password" class="personalData" ref="passwordInput">
-                </h6> -->
             </div>
-            <b-button class="button" variant="dark_primary" v-on:click="updateUserDataBtn()">Update my data</b-button>
+            <b-button class="button" variant="dark_primary" v-on:click="updateUserBtn()">Update my data</b-button>
             <p class="text-danger errorMsg">{{ errorMsg }}</p>
             <span class="tos">You may change your email and password, but for other changes on personal data please call the
                 bank.</span>
-        </div>
-        <div class="accountsPanel">
-            <span>MY ACCOUNTS</span>
-            <div class="accountsContainer">
-                <b-table class="table" :items="accounts" :fields="accountFields"></b-table>
-            </div>
-            <b-button class="button" variant="dark_primary" v-on:click="requestAccountBtn()">Request new account</b-button>
-            <p class="text-danger errorMsg">{{ errorMsg }}</p>
-            <span class="tos">These are all your accounts.</span>
-        </div>
-        <div class="transactionHistoryPanel">
-            <span>MY TRANSACTIONS</span>
-            <div class="transactionHistoryContainer">
-                <b-table class="table" :items="transactions" :fields="transactionFields"></b-table>
-            </div>
-            <b-button class="button" variant="dark_primary" v-on:click="makeTransactionBtn()">Make new
-                transaction</b-button>
-            <p class="text-danger errorMsg">{{ errorMsg }}</p>
-            <span class="tos">This is your transaction history for the past month.</span>
         </div>
     </div>
 
@@ -69,7 +48,7 @@
                 <div class="spinner"></div>
                 <div class="loader">
                     <div class="words">
-                        <span class="word">Updating your data</span>
+                        <span class="word">Updating</span>
                         <span class="word">1 more second</span>
                     </div>
                 </div>
@@ -80,11 +59,11 @@
                 <img src="@/assets/SuccessIcon.png" class="success icon" />
             </div>
             <div class="content" v-if="!loading">
-                <span class="title">Your data updated successfully</span>
+                <span class="title">Data updated successfully</span>
             </div>
             <div class="actions">
-                <b-button variant="dark_primary" class="history" v-on:click="this.$router.push('/dashboard/profile')"
-                    v-if="!loading">Done</b-button>
+                <b-button variant="dark_primary" class="history" v-on:click="this.$router.push('/dashboard')"
+                    v-if="!loading">Return to dashboard</b-button>
             </div>
         </div>
     </div>
@@ -98,28 +77,13 @@ export default {
         return {
             userId: this.$store.state.userId,
             user: {
-                firstName: '',
-                lastName: '',
-                bsn: '',
-                dateOfBirth: '',
-                email: '',
-                password: ''
+                firstName: "",
+                lastName: "",
+                bsn: "",
+                dateOfBirth: "",
+                email: "",
             },
-            accounts: null,
-            transactions: null,
-            errorMsg: '',
-            accountFields: [
-                { key: 'iban', label: 'IBAN' },
-                { key: 'typeOfAccount', label: 'Account type' },
-                { key: 'balance', label: 'Balance' },
-            ],
-            transactionFields: [
-                { key: 'fromAccount', label: 'From IBAN' },
-                { key: 'toAccount', label: 'To IBAN' },
-                { key: 'typeOfTransaction', label: 'Transaction type' },
-                { key: 'amount', label: 'Amount' },
-                { key: 'dateOfExecution', label: 'Date' },
-            ],
+            errorMsg: "",
             responsePopupEnabled: false,
             loading: false,
             delay: (ms) => new Promise((res) => setTimeout(res, ms)),
@@ -129,18 +93,8 @@ export default {
     },
     mounted() {
         this.getUser();
-        this.getAccountsByUserId();
-        this.getTransactionsByUserId();
     },
     methods: {
-        // togglePasswordVisibility() {
-        //     const passwordInput = this.$refs.passwordInput;
-        //     if (passwordInput.type === 'password') {
-        //         passwordInput.type = 'text';
-        //     } else {
-        //         passwordInput.type = 'password';
-        //     }
-        // },
         async getUser() {
             try {
                 let user = await this.$store.dispatch('getUser', this.$store.getters.getUserId);
@@ -149,68 +103,19 @@ export default {
                 this.errorMsg = error;
             }
         },
-        async getAccountsByUserId() {
-            try {
-                this.accounts = await this.$store.dispatch('getAccountsByUserId', this.$store.getters.getUserId);
-            } catch (error) {
-                this.errorMsg = error;
-            }
-        },
-        async getTransactionsByUserId() {
-            try {
-                // let currentDate = new Date();
-                // let monthAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, currentDate.getDate());
-
-                // let filteredTransactions = (await this.$store.dispatch('getTransactionsByUserId', this.$store.getters.getUserId)).filter(transaction => {
-                //     let transactionDate = new Date(transaction.dateOfExecution);
-                //     return transactionDate >= monthAgo;
-                // });
-                // this.transactions = await [filteredTransactions];
-
-                this.transactions = await this.$store.dispatch('getTransactionsByUserId', this.$store.getters.getUserId);
-            } catch (error) {
-                this.errorMsg = error;
-            }
-        },
-        async requestAccountBtn() {
-            window.location.href = "/dashboard/requestAccount";
-        },
-        async makeTransactionBtn() {
-            this.$router.push({ name: 'transfer', params: { accounts: "22" } });
-        },
-        async updateUserDataBtn() {
+        async updateUserBtn() {
             try {
                 console.log('start updating')
-                const updateUserData = {
-                    firstName: this.user.firstName,
-                    lastName: this.user.lastName,
-                    bsn: this.user.bsn,
-                    dateOfBirth: this.user.dateOfBirth,
-                    email: this.user.email,
-                    password: this.user.password,
-                    role: this.user.role,
-                    dayLimit: this.user.dayLimit,
-                    transactionLimit: this.user.transactionLimit
-
-                };
-
-                const currentUser = { ...this.user };
-                const updatedUser = {
-                    ...currentUser,
-                    ...updateUserData
-                };;
-
-                console.log('continue updating')
 
                 await this.$store.dispatch('updateUser', {
                     userId: this.$store.state.userId,
-                    user: updatedUser
+                    userData: this.user
                 });
 
                 console.log('finish updating')
 
-                this.responsePopupEnabled = true;
                 this.loading = true;
+                this.responsePopupEnabled = true;
                 await this.delay(1500);
                 this.loading = false;
 
@@ -222,6 +127,11 @@ export default {
             this.notificationsEnabled = !this.notificationsEnabled;
         }
     },
+    // mutations: {
+    //     updateUserEmailInComponent(state, userEmail) {
+    //         state.user.email = userEmail;
+    //     },
+    // }
 };
 </script>
 
@@ -253,65 +163,37 @@ export default {
 
 }
 
-
-.personalDetailsPanel {
-    width: 20%;
-    margin: 20px auto;
-    height: 80%;
-    background: var(--white);
-    min-height: fit-content;
-    border-radius: 35px;
-    background-color: var(--white);
-    margin-top: 100px;
-    margin-left: 20px;
+.dataTitle {
     display: flex;
     flex-direction: column;
-    padding: 40px;
     align-items: center;
-}
-
-.accountsPanel {
-    width: 30%;
-    margin: 20px auto;
-    height: 80%;
-    background: var(--white);
-    min-height: fit-content;
-    border-radius: 35px;
-    background-color: var(--white);
-    margin-top: 100px;
-    margin-left: 20px;
-    display: flex;
-    flex-direction: column;
-    padding: 40px;
-    align-items: center;
-}
-
-.transactionHistoryPanel {
-    width: 40%;
-    margin: 20px auto;
-    height: 80%;
-    background: var(--white);
-    min-height: fit-content;
-    border-radius: 35px;
-    background-color: var(--white);
-    margin-top: 100px;
-    margin-left: 20px;
-    display: flex;
-    flex-direction: column;
-    padding: 40px;
-    align-items: center;
-}
-
-::v-deep .table tbody td {
-    font-size: small;
-    font-style: inherit;
+    width: 100%;
+    margin-top: 80px;
+    font-size: 20px;
+    font-weight: bold;
     color: var(--blue-dark);
+    margin-left: 20px;
 }
 
-.personalData {
-    font-size: small;
+
+.dataPanel {
+    width: 50%;
+    margin: 20px auto;
+    height: 80%;
+    background: var(--white);
+    min-height: fit-content;
+    border-radius: 35px;
+    background-color: var(--white);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    align-items: center;
+}
+
+.data {
+    font-size: medium;
     font-style: inherit;
-    margin-top: 5px;
+    margin-top: 20px;
     color: var(--blue-dark);
 }
 
@@ -330,7 +212,7 @@ export default {
 .button {
     position: absolute;
     bottom: 0;
-    margin-bottom: 80px;
+    margin-bottom: 50px;
 }
 
 .toggle-container {

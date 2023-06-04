@@ -52,6 +52,23 @@ export const updateUser = async (userId, userData, token) => {
   }
 };
 
+// export const updateUserEmail = async (userId, userEmail, token) => {
+//   try {
+//     console.log(userEmail);
+
+//     const response = await axios.patch(`/users/${userId}`, userEmail, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     console.log(userEmail);
+
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(error.response.data.error);
+//   }
+// };
+
 export const deleteUser = async (userId, token) => {
   try {
     const response = await axios.delete(`/users/${userId}`, {

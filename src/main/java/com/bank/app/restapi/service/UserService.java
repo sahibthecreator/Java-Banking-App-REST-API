@@ -90,10 +90,22 @@ public class UserService {
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
             BeanUtils.copyProperties(user, existingUser, "id"); // Exclude copying the "id" property
-            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
-
+            //existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            existingUser.setEmail(user.getEmail());
             User savedUser = userRepository.save(existingUser);
             return userMapper.toDTO(savedUser);
+        } else {
+            throw new EntityNotFoundException("No user with following id " + userId + " exists");
+        }
+    }
+
+    public String updateUserEmail(UUID userId, String email) throws EntityNotFoundException {
+        Optional<User> existingUserOptional = userRepository.findById(userId);
+        if (existingUserOptional.isPresent()) {
+            User existingUser = existingUserOptional.get();
+            existingUser.setEmail(email);
+            userRepository.save(existingUser);
+            return "Email has been updated";
         } else {
             throw new EntityNotFoundException("No user with following id " + userId + " exists");
         }
