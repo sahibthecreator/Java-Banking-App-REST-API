@@ -71,11 +71,11 @@ export default {
 #line {
   width: 2000px;
   height: 1px;
-  background-color: var(--gray-black);
+  background-color: var(--gray-light);
 }
 
 #nav {
-  height: 100px;
+  height: 75px;
   display: flex;
   flex-direction: row;
   align-items: center;
