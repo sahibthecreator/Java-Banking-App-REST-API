@@ -123,6 +123,9 @@ var leftTime = leftHour * 3600 + leftMinute * 60 + leftSeconds;
 
 function updateTimer() {
   var timer = document.getElementById('timer-text');
+  if (!timer) {
+  return;
+}
   var h = Math.floor(leftTime / 3600);
   var m = Math.floor((leftTime - h * 3600) / 60);
   var s = Math.floor(leftTime % 60);
