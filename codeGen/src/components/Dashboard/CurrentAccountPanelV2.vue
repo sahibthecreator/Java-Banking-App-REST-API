@@ -1,6 +1,5 @@
 <template>
   <div class="accountPage" v-if="currentAccount">
-    <button @click="returnDashboardView()">Back</button>
     <div class="flip-card">
       <div class="flip-card-inner">
         <div class="flip-card-front">
@@ -138,11 +137,6 @@ export default {
   props: {
     currentAccount: Object,
     user: Object,
-  },
-  methods: {
-    returnDashboardView() {
-      this.$emit('returnBack');
-    },
   },
 };
 </script>

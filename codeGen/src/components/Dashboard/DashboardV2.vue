@@ -1,8 +1,8 @@
 <script setup>
 import Navigation from '@/components/Navigation.vue';
 import AccountWidgetV2 from './AccountWidgetV2.vue';
-import TransactionWidgetV2 from './TransactionWidgetV2.vue';
 import CurrentAccountPanelV2 from './CurrentAccountPanelV2.vue';
+import TransactionWidgetV2 from './TransactionWidgetV2.vue';
 </script>
 
 <template>
@@ -25,16 +25,18 @@ import CurrentAccountPanelV2 from './CurrentAccountPanelV2.vue';
       <div class="infoCards">
         <div class="card">
           <div class="header">
-            <span>Total Balance</span>
-            <i class="bi bi-currency-euro"></i>
+            <span v-if="!currentAccount">Total Balance</span>
+            <span v-else>Balance</span>
+            <b-icon-currency-euro></b-icon-currency-euro>
           </div>
-          <span class="contentBig"> € {{ formatPrice(accounts?.reduce((sum, account) => sum + account.balance, 0)) }} </span>
+          <span class="contentBig" v-if="!currentAccount"> € {{ formatPrice(accounts?.reduce((sum, account) => sum + account.balance, 0)) }} </span>
+          <span class="contentBig" v-else> € {{ formatPrice(currentAccount.balance) }} </span>
           <span class="contentSmall"> +20.1% from last month</span>
         </div>
         <div class="card">
           <div class="header">
             <span>Remaining daily balance</span>
-            <i class="bi bi-currency-euro"></i>
+            <b-icon-credit-card-fill></b-icon-credit-card-fill>
           </div>
           <span class="contentBig"> € 200.23 (static)</span>
           <span class="contentSmall"> 12h 2m 12s remaining</span>
@@ -42,7 +44,7 @@ import CurrentAccountPanelV2 from './CurrentAccountPanelV2.vue';
         <div class="card">
           <div class="header">
             <span>Daily Transactions remaining</span>
-            <i class="bi bi-currency-euro"></i>
+            <b-icon-flag></b-icon-flag>
           </div>
           <span class="contentBig"> 12 (static)</span>
           <span class="contentSmall"> 12 of 15 </span>
@@ -50,7 +52,7 @@ import CurrentAccountPanelV2 from './CurrentAccountPanelV2.vue';
         <div class="card">
           <div class="header">
             <span>monthly Balance Status</span>
-            <i class="bi bi-currency-euro"></i>
+            <b-icon-clock-history></b-icon-clock-history>
           </div>
           <span class="contentBig"> - $213.47 (static)</span>
           <span class="contentSmall"> -2.1% from last month</span>
@@ -60,7 +62,11 @@ import CurrentAccountPanelV2 from './CurrentAccountPanelV2.vue';
       <div class="mainContent">
         <div class="card left">
           <div class="header">
-            <h3>Accounts</h3>
+            <h3 v-if="!currentAccount">Accounts</h3>
+            <h3 v-else @click="currentAccount = null" style="cursor: pointer;">
+              <b-icon-arrow-left>
+
+              </b-icon-arrow-left> {{ currentAccount.iban }}</h3>
           </div>
           <div class="accountsWrapper" v-if="!currentAccount">
             <AccountWidgetV2
