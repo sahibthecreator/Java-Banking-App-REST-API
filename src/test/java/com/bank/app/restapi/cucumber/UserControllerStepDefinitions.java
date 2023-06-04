@@ -210,7 +210,4 @@ public class UserControllerStepDefinitions {
         Assertions.assertNotNull(responseMap);
         Assertions.assertEquals("User "+ createdUserId +" has been permanently deleted", responseMap.get("message"));
     }
-
-
-
 }

@@ -103,6 +103,7 @@ public class TransactionControllerTest {
         verify(transactionService).getTransactionsByUserId(eq(userId));
     }
 
+    //TODO fix the test after the Authentication
     @Test
     public void testAddTransaction() throws Exception {
         TransactionDTO transaction = new TransactionDTO();
