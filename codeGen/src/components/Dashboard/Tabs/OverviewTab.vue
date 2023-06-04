@@ -147,6 +147,8 @@ function updateTimer() {
 
   leftTime--;
 }
+setInterval(updateTimer, 1000);
+
 export default {
   name: 'OverviewTab',
   data() {
@@ -157,12 +159,11 @@ export default {
       transactions: null,
       balance: 0,
       currentAccount: null,
-      timer: null
+      timer: null,
     };
   },
   mounted() {
     this.getUserAndAccountsAndTransactions();
-    this.setTimer();
   },
   methods: {
     setCurrentAccountView(account) {
@@ -212,12 +213,6 @@ export default {
     relocate_to_request() {
       this.$router.push('dashboard/requestAccount');
     },
-    setTimer() {
-      if (!this.timer) {
-        setInterval(updateTimer, 1000); 
-        this.timer = true
-      }
-    }
   },
 };
 </script>
