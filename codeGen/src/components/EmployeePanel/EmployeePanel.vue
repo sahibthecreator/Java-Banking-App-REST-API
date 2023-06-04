@@ -9,7 +9,7 @@ import UserWidget from './UserWidget.vue';
     <Navigation />
   </div>
 
-  <div class="employeePage">
+  <div class="employeePanel">
     <div class="pageGrid">
       <div class="userList d-flex">
         <div class="roleFilterBtns">
@@ -27,7 +27,8 @@ import UserWidget from './UserWidget.vue';
       <div class="rightPanel">
         <div class="actionPanel">
           <div class="actions">
-            <b-button variant="dark_primary" @click="this.$router.push('/dashboard/employeePanel/transaction')">Create transaction</b-button>
+            <b-button variant="dark_primary" @click="this.$router.push('/dashboard/employeePanel/transaction')">Create
+              transaction</b-button>
             <b-button variant="gray_dark" @click="this.$router.push('/dashboard/employeePanel/createAccount')">Create new
               bank account</b-button>
             <b-button variant="black" @click="">Maybe smth else here</b-button>
@@ -91,14 +92,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.employeePage {
-  background: url('@/assets/dashboard/bg.jpg');
-  background-repeat: no-repeat;
-  background-clip: border-box;
-  background-position-x: center;
-  background-size: cover;
-  height: 100vh;
+.employeePanel {
+  width: 90vw;
+  margin: auto;
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 30px;
+  // background: url('@/assets/dashboard/bg.jpg');
+  // background-repeat: no-repeat;
+  // background-clip: border-box;
+  // background-position-x: center;
+  // background-size: cover;
+  // height: 100vh;
+  // display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -110,9 +117,7 @@ export default {
     grid-gap: 100px;
 
     .userList {
-      background: var(--white);
       width: 40vw;
-      padding: 20px;
       height: 80vh;
       margin-top: auto;
       margin-bottom: auto;
@@ -122,11 +127,16 @@ export default {
       gap: 20px;
       overflow: auto;
       white-space: nowrap;
-      box-shadow: 0 0 30px #14141417;
+      padding: 35px;
+      background: var(--white);
+      box-shadow: 0 0 30px #1414140a;
       border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.125);
     }
 
     .rightPanel {
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.125);
       height: 80vh;
       display: flex;
       flex-direction: column;

@@ -61,6 +61,7 @@ public class AccountController {
     }
 
     @GetMapping("/iban")
+    @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<CustomerIbanDTO> getIbanByCustomerName(@RequestParam(required = false) String firstname,
             @RequestParam(required = false) String lastname) {
         CustomerIbanDTO customerIbanDTO = accountService.getIbanByUsername(firstname, lastname);

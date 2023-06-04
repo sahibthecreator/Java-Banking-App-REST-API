@@ -30,7 +30,7 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
         <div class="header">
           <span v-if="!currentAccount">Remaining daily limit</span>
           <span v-else>IBAN</span>
-          <b-icon-credit-card-fill></b-icon-credit-card-fill>
+          <b-icon-clock-history></b-icon-clock-history>
         </div>
         <span class="contentBig" v-if="!currentAccount">
           € {{ remainingDayLimit }}</span>
@@ -57,7 +57,7 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
         <div class="header">
           <span v-if="!currentAccount">monthly Balance Status</span>
           <span v-else>Latest Transaction</span>
-          <b-icon-clock-history></b-icon-clock-history>
+          <b-icon-credit-card-fill></b-icon-credit-card-fill>
         </div>
         <span class="contentBig" v-if="!currentAccount">
           - $213.47 (static)</span>

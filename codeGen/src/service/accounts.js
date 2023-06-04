@@ -26,6 +26,19 @@ export const getAccountsByUserId = async (userId, token) => {
   }
 };
 
+export const getIbanByName = async ({ firstName, lastName }, token) => {
+  try {
+    const response = await axios.get(`/accounts/iban?firstName=${firstName}&lastName=${lastName}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const createAccount = async (accountData, token) => {
   try {
     console.log(accountData);

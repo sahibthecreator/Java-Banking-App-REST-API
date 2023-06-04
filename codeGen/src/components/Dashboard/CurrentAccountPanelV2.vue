@@ -6,8 +6,8 @@
           <p class="heading_8264">WAVR BANKING</p>
           <svg
             viewBox="0 0 48 48"
-            height="36"
-            width="36"
+            height="64"
+            width="64"
             y="0px"
             x="0px"
             xmlns="http://www.w3.org/2000/svg"
@@ -29,8 +29,8 @@
           <svg
             xml:space="preserve"
             viewBox="0 0 50 50"
-            height="30px"
-            width="30px"
+            height="40px"
+            width="40px"
             y="0px"
             x="0px"
             xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -76,8 +76,8 @@
           <svg
             xml:space="preserve"
             viewBox="0 0 50 50"
-            height="20px"
-            width="20px"
+            height="30px"
+            width="30px"
             y="0px"
             x="0px"
             xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -165,67 +165,67 @@ export default {
 .heading_8264 {
   position: absolute;
   letter-spacing: 0.2em;
-  font-size: 0.5em;
+  font-size: 1vw;
   top: 2em;
-  left: 18.6em;
+  right: 2vw;
 }
 
 .logo {
   position: absolute;
-  top: 6.8em;
-  left: 11.7em;
+  bottom: 1em;
+  right: 3vw;
 }
 
 .chip {
   position: absolute;
   top: 2.3em;
-  left: 1.5em;
+  left: 2vw;
 }
 
 .contactless {
   position: absolute;
-  top: 3.5em;
-  left: 12.4em;
+  top: 5.5vw;
+  right: 2.5vw;
 }
 
 .number {
   position: absolute;
   font-weight: light;
-  font-size: 0.6em;
-  top: 8.3em;
-  left: 1.6em;
+  font-size: 0.9vw;
+  letter-spacing: 3px;
+  top: 8vw;
+  left: 3vw;
 }
 
 .valid_thru {
   position: absolute;
-  font-weight: bold;
-  top: 63%;
-  font-size: 7px;
-  left: 9%;
+  bottom: 3vw;
+  font-size: 0.6vw;
+  left: 3vw;
   color: white;
 }
 
 .date_8264 {
   position: absolute;
-  font-weight: bold;
-  font-size: 0.5em;
-  top: 13.6em;
-  left: 3.2em;
+  font-weight: bolder;
+  font-size: 0.9vw;
+  bottom: 1.5vw;
+  left: 3vw;
 }
 
 .name {
   position: absolute;
-  font-weight: bold;
-  font-size: 0.5em;
-  top: 16.1em;
-  left: 2em;
+  font-weight: normal;
+  font-size: 0.9vw;
+  bottom: 1.5vw;
+  left: 9vw;
 }
 
 .strip {
   position: absolute;
   background-color: black;
-  width: 15em;
-  height: 1.5em;
+  width: 100%;
+  height: 3vw;
   top: 2.4em;
   background: repeating-linear-gradient(
     45deg,
@@ -239,20 +239,20 @@ export default {
 .mstrip {
   position: absolute;
   background-color: rgb(255, 255, 255);
-  width: 8em;
+  width: 100%;
   height: 0.8em;
-  top: 5em;
-  left: 0.8em;
+  top:44%;
+  left: 0;
   border-radius: 2.5px;
 }
 
 .sstrip {
   position: absolute;
   background-color: rgb(255, 255, 255);
-  width: 4.1em;
-  height: 0.8em;
-  top: 5em;
-  left: 10em;
+  width: 20%;
+  height: 10%;
+  top: 21%;
+  left: 50%;
   border-radius: 2.5px;
 }
 
@@ -260,6 +260,7 @@ export default {
   font-weight: bold;
   text-align: center;
   margin: 0.2em;
+  font-size: 1.2vw;
   color: black;
 }
 

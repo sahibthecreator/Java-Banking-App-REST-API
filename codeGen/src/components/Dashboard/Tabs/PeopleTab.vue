@@ -4,7 +4,7 @@ import UserWidget from '../UserWidget.vue';
 
 <template>
   <div class="peoplePanel">
-    <b-input placeholder="enter username" />
+    <b-input placeholder="enter username" v-model="search" v-on:change="searchIban()" />
 
     <div class="card users">
       <UserWidget index="1" username="username here" iban="iban here" />
@@ -23,11 +23,34 @@ import UserWidget from '../UserWidget.vue';
 <script>
 export default {
   name: 'PeopleTab',
+  data() {
+    return {
+      search: "",
+      searchResults: null,
+    };
+  },
+  mounted() {
+  },
+  methods: {
+    async searchIban() {
+      try {
+        let request = {
+          firstName: this.search.split(' ')[0] ? this.search.split(' ')[0] : "",
+          lastName: this.search.split(' ')[1] ? this.search.split(' ')[1] : ""
+        }
+        let res = await this.$store.dispatch("getIbanByName", request);
+        console.log(res);
+        this.searchResults = res;
+      }
+      catch (e) {
+        console.log(e)
+      };
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
-
 .card {
   padding: 35px;
   background: var(--white);
@@ -56,30 +79,30 @@ export default {
     overflow: auto;
     white-space: nowrap;
 
-    
+
   }
 
   ::-webkit-scrollbar {
-        width: 15px;
-        transform: translateY(-10px);
-      }
+    width: 15px;
+    transform: translateY(-10px);
+  }
 
-      /* Track */
-      ::-webkit-scrollbar-track {
-        border: 1px var(--gray-black) solid;
-        margin: 20px;
-        border-radius: 30px;
-      }
+  /* Track */
+  ::-webkit-scrollbar-track {
+    border: 1px var(--gray-black) solid;
+    margin: 20px;
+    border-radius: 30px;
+  }
 
-      /* Handle */
-      ::-webkit-scrollbar-thumb {
-        background: var(--gray-dark);
-        border-radius: 10px;
-      }
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: var(--gray-dark);
+    border-radius: 10px;
+  }
 
-      /* Handle on hover */
-      ::-webkit-scrollbar-thumb:hover {
-        background: var(--gray-black);
-      }
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-black);
+  }
 }
 </style>
