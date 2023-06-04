@@ -58,14 +58,12 @@ public class TransactionController {
     }
 
     @PostMapping(value = { "", "{mappingNameHolder}", "{mappingNameHolder}/" })
-    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
+    //@PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<TransactionDTO> addTransaction(@PathVariable(required = false) String mappingNameHolder,
             @RequestBody TransactionDTO transaction, Authentication authentication) {
-                
-        // -- To get performing user id based on jwt token
+
         UserData userData = (UserData) authentication.getPrincipal();
         UUID performingUserId = userData.getId();
-        // -- Place it in service
 
         TransactionType typeOfTransaction;
         if (mappingNameHolder == null || mappingNameHolder.isEmpty()) {
@@ -77,6 +75,6 @@ public class TransactionController {
         } else {
             throw new IllegalArgumentException("Invalid value for mappingNameHolder in the URI");
         }
-        return ResponseEntity.status(201).body(transactionService.addTransaction(transaction, typeOfTransaction));
+        return ResponseEntity.status(201).body(transactionService.addTransaction(transaction, typeOfTransaction, performingUserId));
     }
 }

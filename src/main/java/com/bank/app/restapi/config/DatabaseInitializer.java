@@ -7,7 +7,6 @@ import com.bank.app.restapi.model.AccountType;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.service.AccountService;
-import com.bank.app.restapi.service.TransactionService;
 import com.bank.app.restapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -24,8 +23,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         private final UserMapper userMapper;
 
         @Autowired
-        public DatabaseInitializer(UserService userService, AccountService accountService,
-                        TransactionService transactionService, UserMapper userMapper) {
+        public DatabaseInitializer(UserService userService, AccountService accountService, UserMapper userMapper) {
                 this.userService = userService;
                 this.accountService = accountService;
                 this.userMapper = userMapper;
@@ -48,6 +46,21 @@ public class DatabaseInitializer implements CommandLineRunner {
                 userDto.setTransactionLimit(1000);
                 userService.update(userDto.getId(), userDto);
 
+                User customer = new User();
+                customer.setFirstName("Test");
+                customer.setLastName("Customer");
+                customer.setEmail("test@gmail.com");
+                customer.setPassword("0000");
+                customer.setBsn("832698724");
+                customer.setDateOfBirth(LocalDate.of(2004, 3, 23));
+                customer.setRole(UserType.CUSTOMER);
+                customer.setDayLimit(100);
+                customer.setTransactionLimit(50);
+                UserDTO customerDto = userService.register(userMapper.userToRegisterDTO(customer));
+                customerDto.setDayLimit(2000);
+                customerDto.setTransactionLimit(1000);
+                userService.update(customerDto.getId(), customerDto);
+
                 AccountDTO account1 = new AccountDTO();
                 account1.setIban("NL01ABNA1032456789");
                 account1.setBalance(220);
@@ -63,7 +76,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 account2.setIban("NL01ABNA0123456789");
                 account2.setBalance(110);
                 account2.setTypeOfAccount(AccountType.CURRENT);
-                account2.setUserId(userDto.getId());
+                account2.setUserId(customerDto.getId());
                 account2.setDateOfOpening(LocalDate.now());
                 account2.setAbsoluteLimit(0);
                 account2.setActive(true);
