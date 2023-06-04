@@ -19,7 +19,7 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
         <b-dropdown id="dropdown-offset" offset="-w" size="lg" variant="link" toggle-class="text-decoration-none"
           no-caret>
           <template #button-content>
-            <AccountIcon accountName="Root"></AccountIcon>
+            <AccountIcon accountName="Root" style="width: 57.59px; height: 57.59px;"></AccountIcon>
           </template>
           <b-dropdown-item to="">Settings</b-dropdown-item>
           <b-dropdown-item to="/dashboard">Dashboard</b-dropdown-item>

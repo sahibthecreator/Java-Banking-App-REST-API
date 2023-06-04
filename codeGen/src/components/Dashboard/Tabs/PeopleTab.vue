@@ -1,21 +1,38 @@
+<script setup>
+import UserWidget from '../UserWidget.vue';
+</script>
+
 <template>
   <div class="peoplePanel">
-    <b-input placeholder="hello"/>
+    <b-input placeholder="enter username" />
+
+    <div class="card users">
+      <UserWidget index="1" username="username here" iban="iban here" />
+      <UserWidget index="1" username="username here" iban="iban here" />
+      <UserWidget index="1" username="username here" iban="iban here" />
+      <UserWidget index="1" username="username here" iban="iban here" />
+      <UserWidget index="1" username="username here" iban="iban here" />
+      <UserWidget index="1" username="username here" iban="iban here" />
+      <UserWidget index="1" username="username here" iban="iban here" />
+      <UserWidget index="1" username="username here" iban="iban here" />
+      <UserWidget index="1" username="username here" iban="iban here" />
+    </div>
   </div>
 </template>
 
 <script>
-
 export default {
-  name: "PeopleTab"
-}
-
+  name: 'PeopleTab',
+};
 </script>
 
 <style lang="scss" scoped>
 
-* {
-  outline: 1px red solid;
+.card {
+  padding: 35px;
+  background: var(--white);
+  box-shadow: 0 0 30px #1414140a;
+  border-radius: 10px;
 }
 
 .peoplePanel {
@@ -26,11 +43,43 @@ export default {
   flex-direction: column;
   gap: 10px;
   padding: 30px;
-  align-items: center;
   justify-content: center;
 
-  input{ 
+  input {
     width: 200px;
   }
+
+  .users {
+    width: 100%;
+    // max-height: 610px;
+    height: 65vh;
+    overflow: auto;
+    white-space: nowrap;
+
+    
+  }
+
+  ::-webkit-scrollbar {
+        width: 15px;
+        transform: translateY(-10px);
+      }
+
+      /* Track */
+      ::-webkit-scrollbar-track {
+        border: 1px var(--gray-black) solid;
+        margin: 20px;
+        border-radius: 30px;
+      }
+
+      /* Handle */
+      ::-webkit-scrollbar-thumb {
+        background: var(--gray-dark);
+        border-radius: 10px;
+      }
+
+      /* Handle on hover */
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-black);
+      }
 }
-  </style>
+</style>
