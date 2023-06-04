@@ -1,1 +1,2 @@
-codeGen/node_modules/* linguist-vendored
+*.css linguist-vendored
+*.scss linguist-vendored
