@@ -46,7 +46,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 user.setDayLimit(100);
                 user.setTransactionLimit(50);
 
-                UserDTO userDto = userService.register(userMapper.toDTO(user));
+                UserDTO userDto = userService.register(userMapper.userToRegisterDTO(user));
 
                 AccountDTO account1 = new AccountDTO();
                 account1.setIban("NL01ABNA1032456789");

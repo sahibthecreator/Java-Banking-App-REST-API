@@ -1,5 +1,6 @@
 package com.bank.app.restapi.controller;
 
+import com.bank.app.restapi.dto.RegisterDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.service.UserService;
@@ -43,8 +44,8 @@ public class UserController {
 
     @PostMapping("")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
-    public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserDTO userDTO) {
-        UserDTO createdUserDTO = userService.register(userDTO);
+    public ResponseEntity<UserDTO> createUser(@RequestBody @Valid RegisterDTO registerDTO) {
+        UserDTO createdUserDTO = userService.register(registerDTO);
         return ResponseEntity.status(201).body(createdUserDTO);
     }
 

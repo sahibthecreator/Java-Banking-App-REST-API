@@ -2,6 +2,7 @@ package com.bank.app.restapi.service;
 
 import com.bank.app.restapi.dto.LoginDTO;
 import com.bank.app.restapi.dto.LoginResponseDTO;
+import com.bank.app.restapi.dto.RegisterDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.Account;
@@ -64,14 +65,13 @@ public class UserService {
         return userList.stream().map(userMapper::toDTO).toList();
     }
 
-    public UserDTO register(UserDTO userDTO) {
-        emailIsRegistered(userDTO.getEmail());
-        bsnIsValid(userDTO.getBsn());
-        
-        userDTO.setActive(true);
-        User user = userMapper.toEntity(userDTO);
+    public UserDTO register(RegisterDTO registerDTO) {
+        emailIsRegistered(registerDTO.getEmail());
+        bsnIsValid(registerDTO.getBsn());
+        User user = userMapper.registerDTOToUser(registerDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
+        user.setActive(true);
         user = this.userRepository.saveAndFlush(user);
         return userMapper.toDTO(user);
     }
