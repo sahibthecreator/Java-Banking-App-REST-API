@@ -4,6 +4,7 @@ import Login from '@/components/Login.vue';
 import Home from '@/components/Home.vue';
 import DashboardV2 from '@/components/Dashboard/DashboardV2.vue';
 import Transaction from '@/components/Transaction/Transaction.vue';
+import EmployeeTransaction from '@/components/Transaction/EmployeeTransaction.vue';
 import RequestAccount from '@/components/RequestAccount/RequestAccount.vue';
 import EmployeePanel from '@/components/EmployeePanel/EmployeePanel.vue'
 import CreateBankAccount from '@/components/CreateAccount/CreateAccount.vue';
@@ -24,6 +25,7 @@ const router = createRouter({
     { path: '/dashboard/requestAccount', name: 'request', component: RequestAccount, meta: { requiresAuth: true } },
     { path: '/dashboard/employeePanel', name: 'employeePanel', component: EmployeePanel, meta: { requiresAuth: true } },
     { path: '/dashboard/employeePanel/createAccount', name: 'createAccount', component: CreateBankAccount, meta: { requiresAuth: true } },
+    { path: '/dashboard/employeePanel/transaction', name: 'employeeTransfer', component: EmployeeTransaction, meta: { requiresAuth: true} },
   ],
 });
 
