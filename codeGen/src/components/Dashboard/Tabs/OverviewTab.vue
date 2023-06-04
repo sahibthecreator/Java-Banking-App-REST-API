@@ -62,10 +62,8 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
         <span class="contentBig" v-if="!currentAccount">
           - $213.47 (static)</span>
         <span class="contentBig" v-else>
-          <span v-if="currentTransactions">None</span>
-          <span v-if="!currentTransactions">
-            {{ currentTransactions[0].amount }}</span
-          >
+          <span v-if="currentTransactions[0]">{{ currentTransactions[0].amount }}</span>
+          <span v-else>None</span>
         </span>
         <span class="contentSmall"> -2.1% from last month</span>
       </div>
@@ -103,7 +101,7 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
         </div>
         <div class="transactionsWrapper">
           <TransactionWidgetV2 v-for="(transaction, index) in currentTransactions" :key="index"
-            :transaction="transaction" />
+            :transaction="transaction" :currentAccount="currentAccount"/>
         </div>
       </div>
     </div>
