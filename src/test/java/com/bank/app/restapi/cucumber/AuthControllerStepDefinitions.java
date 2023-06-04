@@ -89,7 +89,6 @@ public class AuthControllerStepDefinitions {
     public void iHaveRegistrationRequestWithDetails(String requestJson) throws IOException {
         RegisterDTO registerDTO = objectMapper.readValue(requestJson, RegisterDTO.class);
 
-        System.out.println(registerDTO);
         String url = "http://localhost:" + port + "/auth/register";
         registerResponse = restTemplate.postForEntity(url, registerDTO, UserDTO.class);
     }
