@@ -17,6 +17,7 @@ import com.bank.app.restapi.repository.AccountRequestRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -38,6 +39,7 @@ public class AccountService {
 
     private final AccountRequestRepository accountRequestRepository;
 
+    @Autowired
     private final UserService userService;
 
     private final AccountMapper accountMapper;

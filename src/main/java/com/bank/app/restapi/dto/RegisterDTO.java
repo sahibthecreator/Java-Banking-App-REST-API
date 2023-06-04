@@ -1,8 +1,9 @@
 package com.bank.app.restapi.dto;
 
+import java.time.LocalDate;
+
 import com.bank.app.restapi.model.UserType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,17 +13,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.UUID;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDTO {
-
-    private UUID id;
-
+public class RegisterDTO {
     @NotBlank(message = "First name can't be empty")
     private String firstName;
 
@@ -33,8 +28,7 @@ public class UserDTO {
     @NotBlank(message = "Email can't be empty")
     private String email;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    //@NotBlank(message = "Password can't be empty")
+    @NotBlank(message = "Password can't be empty")
     private String password;
 
     @NotBlank(message = "BSN can't be empty")
@@ -45,11 +39,4 @@ public class UserDTO {
     private LocalDate dateOfBirth;
 
     private UserType role;
-
-    private float dayLimit;
-
-    private float transactionLimit;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private boolean active;
 }

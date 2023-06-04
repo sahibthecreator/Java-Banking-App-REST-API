@@ -1,5 +1,6 @@
 package com.bank.app.restapi.controller;
 
+import com.bank.app.restapi.config.UserData;
 import com.bank.app.restapi.dto.TransactionDTO;
 import com.bank.app.restapi.model.TransactionType;
 import com.bank.app.restapi.service.TransactionService;
@@ -7,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -58,7 +60,13 @@ public class TransactionController {
     @PostMapping(value = { "", "{mappingNameHolder}", "{mappingNameHolder}/" })
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<TransactionDTO> addTransaction(@PathVariable(required = false) String mappingNameHolder,
-            @RequestBody TransactionDTO transaction) {
+            @RequestBody TransactionDTO transaction, Authentication authentication) {
+                
+        // -- To get performing user id based on jwt token
+        UserData userData = (UserData) authentication.getPrincipal();
+        UUID performingUserId = userData.getId();
+        // -- Place it in service
+
         TransactionType typeOfTransaction;
         if (mappingNameHolder == null || mappingNameHolder.isEmpty()) {
             typeOfTransaction = TransactionType.TRANSFER;

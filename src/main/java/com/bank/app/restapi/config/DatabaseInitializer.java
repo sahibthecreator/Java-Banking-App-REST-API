@@ -21,7 +21,6 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         private final UserService userService;
         private final AccountService accountService;
-        private final TransactionService transactionService;
         private final UserMapper userMapper;
 
         @Autowired
@@ -29,7 +28,6 @@ public class DatabaseInitializer implements CommandLineRunner {
                         TransactionService transactionService, UserMapper userMapper) {
                 this.userService = userService;
                 this.accountService = accountService;
-                this.transactionService = transactionService;
                 this.userMapper = userMapper;
         }
 
@@ -45,8 +43,10 @@ public class DatabaseInitializer implements CommandLineRunner {
                 user.setRole(UserType.EMPLOYEE);
                 user.setDayLimit(100);
                 user.setTransactionLimit(50);
-
-                UserDTO userDto = userService.register(userMapper.toDTO(user));
+                UserDTO userDto = userService.register(userMapper.userToRegisterDTO(user));
+                userDto.setDayLimit(2000);
+                userDto.setTransactionLimit(1000);
+                userService.update(userDto.getId(), userDto);
 
                 AccountDTO account1 = new AccountDTO();
                 account1.setIban("NL01ABNA1032456789");

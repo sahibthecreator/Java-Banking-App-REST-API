@@ -4,26 +4,25 @@ import AccountIcon from './AccountIcon.vue';
 
 <template>
   <div class="account">
-    <div class="d-flex">
+    <div class="d-flex info">
       <AccountIcon :accountName="name"></AccountIcon>
       <div class="title">
-        <p class="my-auto ml-3 font-weight-bolder">{{type}} Account</p>
+        <p class="my-auto ml-3">{{ type }} Account</p>
         <p class="my-auto ml-3 iban">{{ iban }}</p>
       </div>
+      <p class="balance">€ {{ formatPrice(balance) }}</p>
     </div>
-
-    <p class="balance">€ {{ formatPrice(balance) }}</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'AccountWidget',
+  name: 'AccountWidgetV2',
   props: {
     type: String,
     name: String,
     balance: Number,
-    iban: String
+    iban: String,
   },
   methods: {
     formatPrice(value) {
@@ -41,19 +40,32 @@ var formatter = new Intl.NumberFormat('de-DE', {
 
 <style lang="scss" scoped>
 .account {
-  background-color: white;
   padding: 10px 15px;
-  border-radius: 15px;
   cursor: pointer;
+  border-bottom: .5px var(--gray-light) solid;
 
-  .balance {
-    font-size: 2vw;
-    font-weight: 500;
-    text-align: left;
-  }
+  .info {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
 
-  .iban {
-    color: var(--gray-light);
+    .title {
+      p {
+        font-weight: 500;
+      }
+    }
+
+    .iban {
+      color: var(--gray-light);
+    }
+    .balance {
+      margin-bottom: 0px;
+      margin-left: auto;
+      font-size: 1.5rem;
+      font-weight: 00;
+      text-align: left;
+    }
   }
 }
 </style>

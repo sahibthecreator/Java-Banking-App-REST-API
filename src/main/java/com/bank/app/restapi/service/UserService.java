@@ -2,11 +2,16 @@ package com.bank.app.restapi.service;
 
 import com.bank.app.restapi.dto.LoginDTO;
 import com.bank.app.restapi.dto.LoginResponseDTO;
+import com.bank.app.restapi.dto.RegisterDTO;
+import com.bank.app.restapi.dto.TransactionDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.Account;
+import com.bank.app.restapi.model.Transaction;
 import com.bank.app.restapi.model.User;
+import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.repository.AccountRepository;
+import com.bank.app.restapi.repository.TransactionRepository;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
@@ -42,6 +47,8 @@ public class UserService {
 
     private final AuthenticationManager authenticationManager;
 
+    private TransactionRepository transactionRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -51,9 +58,10 @@ public class UserService {
             String email,
             LocalDate dateOfBirth,
             String bsn,
+            String role,
             String sortDirection,
             int limit) {
-        Specification<User> specification = buildSpecification(firstName, lastName, email, dateOfBirth, bsn);
+        Specification<User> specification = buildSpecification(firstName, lastName, email, dateOfBirth, bsn, role);
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "lastName", "firstName");
 
         Page<User> userPage = userRepository.findAll(specification, PageRequest.of(0, limit, sort));
@@ -62,12 +70,13 @@ public class UserService {
         return userList.stream().map(userMapper::toDTO).toList();
     }
 
-    public UserDTO register(UserDTO userDTO) {
-        emailIsRegistered(userDTO.getEmail());
-        bsnIsValid(userDTO.getBsn());
-        User user = userMapper.toEntity(userDTO);
+    public UserDTO register(RegisterDTO registerDTO) {
+        emailIsRegistered(registerDTO.getEmail());
+        bsnIsValid(registerDTO.getBsn());
+        User user = userMapper.registerDTOToUser(registerDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
+        user.setActive(true);
         user = this.userRepository.saveAndFlush(user);
         return userMapper.toDTO(user);
     }
@@ -92,6 +101,9 @@ public class UserService {
             BeanUtils.copyProperties(user, existingUser, "id"); // Exclude copying the "id" property
             //existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
             existingUser.setEmail(user.getEmail());
+            System.out.println(existingUser);
+
+
             User savedUser = userRepository.save(existingUser);
             return userMapper.toDTO(savedUser);
         } else {
@@ -122,7 +134,9 @@ public class UserService {
             this.userRepository.deleteById(id);
             return "User " + id + " has been permanently deleted";
         } else {
-            userOptional.get().setActive(false);
+            User deactivatedUser = userOptional.get();
+            deactivatedUser.setActive(false);
+            this.userRepository.saveAndFlush(deactivatedUser);
             return "User " + id + " has been deactivated";
         }
     }
@@ -143,6 +157,23 @@ public class UserService {
         return user.get();
     }
 
+    public double getRemainingDayLimit(UUID id) throws EntityNotFoundException {
+        User user = getUserById(id); // to check if userid is valid
+        List<Transaction> transactions = transactionRepository.findTransactionsByUserId(id);
+
+        LocalDate currentDate = LocalDate.now();
+        List<Transaction> filteredTransactions = transactions.stream()
+                .filter(t -> {
+                    LocalDate executionDate = t.getDateOfExecution().toLocalDate();
+                    return executionDate.equals(currentDate);
+                }).toList();
+        double totalSpentToday = filteredTransactions.stream()
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+
+        return user.getDayLimit() - totalSpentToday;
+    }
+
     // Private methods
 
     private Specification<User> buildSpecification(
@@ -150,7 +181,8 @@ public class UserService {
             String lastName,
             String email,
             LocalDate dateOfBirth,
-            String bsn) {
+            String bsn,
+            String role) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -172,6 +204,15 @@ public class UserService {
 
             if (bsn != null && !bsn.isEmpty()) {
                 predicates.add(criteriaBuilder.equal(root.get("bsn"), bsn));
+            }
+
+            if (bsn != null && !bsn.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("bsn"), bsn));
+            }
+
+            if (role != null) {
+                UserType userType = UserType.valueOf(role.toUpperCase());
+                predicates.add(criteriaBuilder.equal(root.get("role"), userType));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

@@ -16,15 +16,15 @@ export default {
 <style lang="scss" scoped>
 .accountIcon {
     background: url('@/assets/AccountIconBackground.webp');
-    width: 3vw;
-    height: 3vw;
+    width: 57.59px;
+    height: 57.59px;
     border-radius: 50%;
     display: flex;
 }
 
 .accountIcon p {
     font-weight: 500;
-    font-size: 1.5vw;
+    font-size: 1.5rem;
     color: white;
 }
 </style>

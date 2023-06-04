@@ -6,6 +6,8 @@ import com.bank.app.restapi.model.*;
 import com.bank.app.restapi.repository.TransactionRepository;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class TransactionService {
 
     private TransactionRepository transactionRepository;
+    @Autowired
     private AccountService accountService;
     private UserRepository userRepository;
 

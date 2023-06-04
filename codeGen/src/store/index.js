@@ -5,6 +5,7 @@ import { getAccounts, createAccount } from '@/service/accounts';
 import { getTransactions, getTransaction } from '@/service/transactions';
 import { approveRequest, denyRequest, getAccountsByUserId, getAllRequests, requestAccount } from '../service/accounts';
 import { getTransactionsByUserId, performTransaction } from '../service/transactions';
+import { getRemainingDayLimit } from '../service/users';
 
 // Vue.use(Vuex);
 
@@ -92,6 +93,14 @@ const store = new Vuex.Store({
                 throw new Error(error.message);
             }
         },
+        async getRemainingDayLimit({ commit, state }, userId) {
+            try {
+                const limit = await getRemainingDayLimit(userId, state.token);
+                return limit;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
         async createUser({ commit, state }, userData) {
             try {
                 const user = await createUser(userData, state.token);
@@ -123,8 +132,6 @@ const store = new Vuex.Store({
         async deleteUser({ commit, state }, userId) {
             try {
                 await deleteUser(userId, state.token);
-                const updatedUsers = state.users.filter((u) => u.id !== userId);
-                commit('setUsers', updatedUsers);
             } catch (error) {
                 throw new Error(error.message);
             }

@@ -12,14 +12,24 @@ import UserWidget from './UserWidget.vue';
   <div class="employeePage">
     <div class="pageGrid">
       <div class="userList d-flex">
-        <UserWidget v-for="(user, index) in users" :user="user" />
+        <div class="roleFilterBtns">
+          <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'USER' }"
+            v-on:click="setRoleFilter('USER')">User</b-button>
+
+          <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'CUSTOMER' }"
+            v-on:click="setRoleFilter('CUSTOMER')">Customer</b-button>
+          <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'EMPLOYEE' }"
+            v-on:click="setRoleFilter('EMPLOYEE')">Employee</b-button>
+        </div>
+        <UserWidget v-for="(user, index) in filteredUsers" :user="user" />
       </div>
 
       <div class="rightPanel">
         <div class="actionPanel">
           <div class="actions">
-            <b-button variant="dark_primary" @click="">Create transaction</b-button>
-            <b-button variant="gray_dark" @click="relocate_to_createAccount()">Create new bank account</b-button>
+            <b-button variant="dark_primary" @click="this.$router.push('/dashboard/employeePanel/transaction')">Create transaction</b-button>
+            <b-button variant="gray_dark" @click="this.$router.push('/dashboard/employeePanel/createAccount')">Create new
+              bank account</b-button>
             <b-button variant="black" @click="">Maybe smth else here</b-button>
           </div>
         </div>
@@ -39,12 +49,9 @@ export default {
   data() {
     return {
       users: null,
-      user: {
-        firstName: 'Yvan',
-        lastName: 'Roes',
-      },
-
-      requests: null
+      filteredUsers: null,
+      requests: null,
+      roleFilter: null,
     };
   },
   mounted() {
@@ -57,6 +64,7 @@ export default {
       try {
         let userList = await this.$store.dispatch('getUsers');
         this.users = userList;
+        this.filteredUsers = userList;
       } catch (error) {
         console.log(error);
         if (this.users == null) {
@@ -72,9 +80,12 @@ export default {
         console.log(error);
       }
     },
-    relocate_to_createAccount() {
-      this.$router.push('/dashboard/employeePanel/createAccount')
+    setRoleFilter(role) {
+      this.roleFilter = role;
+      this.filteredUsers = this.users.filter(u => u.role === role);
+      console.log(this.users);
     }
+
   },
 };
 </script>
@@ -175,6 +186,22 @@ export default {
         align-items: center;
         gap: 20px;
       }
+    }
+  }
+}
+
+.roleFilterBtns {
+  display: flex;
+  gap: 5%;
+
+  .btn {
+    &:focus {
+      box-shadow: none;
+    }
+
+    &.selected {
+      opacity: 0.8;
+      pointer-events: none;
     }
   }
 }

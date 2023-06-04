@@ -1,58 +1,46 @@
 <template>
   <div class="accountPage" v-if="currentAccount">
-    <div class="topPart">
-      <b-button variant="black" @click="returnDashboardView()"
-        >Return to dashboard</b-button
-      >
-      <div class="cardPanel">
-        <h1>
-          {{
-            currentAccount.typeOfAccount.charAt(0) +
-            currentAccount.typeOfAccount.toLowerCase().slice(1)
-          }}
-          Account
-        </h1>
-        <div class="flip-card">
-          <div class="flip-card-inner">
-            <div class="flip-card-front">
-              <p class="heading_8264">WAVR BANKING</p>
-              <svg
-                viewBox="0 0 48 48"
-                height="36"
-                width="36"
-                y="0px"
-                x="0px"
-                xmlns="http://www.w3.org/2000/svg"
-                class="logo"
-              >
-                <path
-                  d="M32 10A14 14 0 1 0 32 38A14 14 0 1 0 32 10Z"
-                  fill="#ff9800"
-                ></path>
-                <path
-                  d="M16 10A14 14 0 1 0 16 38A14 14 0 1 0 16 10Z"
-                  fill="#d50000"
-                ></path>
-                <path
-                  d="M18,24c0,4.755,2.376,8.95,6,11.48c3.624-2.53,6-6.725,6-11.48s-2.376-8.95-6-11.48 C20.376,15.05,18,19.245,18,24z"
-                  fill="#ff3d00"
-                ></path>
-              </svg>
-              <svg
-                xml:space="preserve"
-                viewBox="0 0 50 50"
-                height="30px"
-                width="30px"
-                y="0px"
-                x="0px"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                xmlns="http://www.w3.org/2000/svg"
-                id="Layer_1"
-                class="chip"
-                version="1.1"
-              >
-                <image
-                  href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+    <div class="flip-card">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <p class="heading_8264">WAVR BANKING</p>
+          <svg
+            viewBox="0 0 48 48"
+            height="36"
+            width="36"
+            y="0px"
+            x="0px"
+            xmlns="http://www.w3.org/2000/svg"
+            class="logo"
+          >
+            <path
+              d="M32 10A14 14 0 1 0 32 38A14 14 0 1 0 32 10Z"
+              fill="#ff9800"
+            ></path>
+            <path
+              d="M16 10A14 14 0 1 0 16 38A14 14 0 1 0 16 10Z"
+              fill="#d50000"
+            ></path>
+            <path
+              d="M18,24c0,4.755,2.376,8.95,6,11.48c3.624-2.53,6-6.725,6-11.48s-2.376-8.95-6-11.48 C20.376,15.05,18,19.245,18,24z"
+              fill="#ff3d00"
+            ></path>
+          </svg>
+          <svg
+            xml:space="preserve"
+            viewBox="0 0 50 50"
+            height="30px"
+            width="30px"
+            y="0px"
+            x="0px"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            xmlns="http://www.w3.org/2000/svg"
+            id="Layer_1"
+            class="chip"
+            version="1.1"
+          >
+            <image
+              href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
               AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAB6VBMVEUAAACNcTiVeUKVeUOY
               fEaafEeUeUSYfEWZfEaykleyklaXe0SWekSZZjOYfEWYe0WXfUWXe0WcgEicfkiXe0SVekSXekSW
               ekKYe0a9nF67m12ZfUWUeEaXfESVekOdgEmVeUWWekSniU+VeUKVeUOrjFKYfEWliE6WeESZe0GS
@@ -78,28 +66,28 @@
               cmVhdGUAMjAyMy0wMi0xM1QwODoxNToyOSswMDowMEUnN7UAAAAldEVYdGRhdGU6bW9kaWZ5ADIw
               MjMtMDItMTNUMDg6MTU6MjkrMDA6MDA0eo8JAAAAKHRFWHRkYXRlOnRpbWVzdGFtcAAyMDIzLTAy
               LTEzVDA4OjE1OjI5KzAwOjAwY2+u1gAAAABJRU5ErkJggg=="
-                  y="0"
-                  x="0"
-                  height="50"
-                  width="50"
-                  id="image0"
-                ></image>
-              </svg>
-              <svg
-                xml:space="preserve"
-                viewBox="0 0 50 50"
-                height="20px"
-                width="20px"
-                y="0px"
-                x="0px"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                xmlns="http://www.w3.org/2000/svg"
-                id="Layer_1"
-                class="contactless"
-                version="1.1"
-              >
-                <image
-                  href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAQAAAC0NkA6AAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+              y="0"
+              x="0"
+              height="50"
+              width="50"
+              id="image0"
+            ></image>
+          </svg>
+          <svg
+            xml:space="preserve"
+            viewBox="0 0 50 50"
+            height="20px"
+            width="20px"
+            y="0px"
+            x="0px"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            xmlns="http://www.w3.org/2000/svg"
+            id="Layer_1"
+            class="contactless"
+            version="1.1"
+          >
+            <image
+              href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAQAAAC0NkA6AAAABGdBTUEAALGPC/xhBQAAACBjSFJN
               AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAAJcEhZ
               cwAACxMAAAsTAQCanBgAAAAHdElNRQfnAg0IEzgIwaKTAAADDklEQVRYw+1XS0iUURQ+f5qPyjQf
               lGRFEEFK76koKGxRbWyVVLSOgsCgwjZBJJYuKogSIoOonUK4q3U0WVBWFPZYiIE6kuArG3VGzK/F
@@ -119,42 +107,25 @@
               MTNUMDg6MTk6NTYrMDA6MDCjlq7LAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIzLTAyLTEzVDA4OjE5
               OjU2KzAwOjAw0ssWdwAAACh0RVh0ZGF0ZTp0aW1lc3RhbXAAMjAyMy0wMi0xM1QwODoxOTo1Nisw
               MDowMIXeN6gAAAAASUVORK5CYII="
-                  y="0"
-                  x="0"
-                  height="50"
-                  width="50"
-                  id="image0"
-                ></image>
-              </svg>
-              <p class="number">{{ currentAccount.iban }}</p>
-              <p class="valid_thru">VALID THRU</p>
-              <p class="date_8264">1 2 / 2 4</p>
-              <p class="name">{{ user.firstName }} {{ user.lastName }}</p>
-            </div>
-            <div class="flip-card-back">
-              <div class="strip"></div>
-              <div class="mstrip"></div>
-              <div class="sstrip">
-                <p class="code">***</p>
-              </div>
-            </div>
+              y="0"
+              x="0"
+              height="50"
+              width="50"
+              id="image0"
+            ></image>
+          </svg>
+          <p class="number">{{ currentAccount.iban }}</p>
+          <p class="valid_thru">VALID THRU</p>
+          <p class="date_8264">1 2 / 2 4</p>
+          <p class="name">{{ user.firstName }} {{ user.lastName }}</p>
+        </div>
+        <div class="flip-card-back">
+          <div class="strip"></div>
+          <div class="mstrip"></div>
+          <div class="sstrip">
+            <p class="code">***</p>
           </div>
         </div>
-      </div>
-
-      <div class="cardPanel">
-        <h1>Balance</h1>
-        <h1>
-          <b>€ {{ currentAccount.balance }}</b>
-        </h1>
-      </div>
-
-      <div class="cardPanel">
-        <h1>Details</h1>
-        <p><b>IBAN: </b> {{ currentAccount.iban }}</p>
-        <p><b>Date of openning: </b> {{ currentAccount.dateOfOpening }}</p>
-        <p><b>Absolute limit: </b> {{ currentAccount.absoluteLimit }}</p>
-        <p><b>Is active: </b> {{ currentAccount.active ? 'Yes' : 'No' }}</p>
       </div>
     </div>
   </div>
@@ -167,49 +138,25 @@ export default {
     currentAccount: Object,
     user: Object,
   },
-  methods: {
-    returnDashboardView() {
-      this.$emit('returnBack');
-    },
-  },
 };
 </script>
 
 <style lang="scss" scoped>
 .accountPage {
-  .topPart {
-    display: flex;
-    justify-content: space-evenly;
-  }
-}
-
-.cardPanel {
-  background: white;
-  padding: 20px;
-  box-shadow: 0 0 30px #14141417;
-  border-radius: 35px;
-  width: min-content;
-  min-width: 25%;
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-
-  p {
-    white-space: nowrap;
-  }
-
-  h1 {
-    white-space: nowrap;
-    margin-bottom: 10%;
-  }
 }
 
 //credit card
 .flip-card {
   background-color: transparent;
-  width: 240px;
-  height: 154px;
+  width: 360px;
+  height: 231px;
+  aspect-ratio: 1;
   -webkit-perspective: 1000px;
   perspective: 1000px;
   color: white;
