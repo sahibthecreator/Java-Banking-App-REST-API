@@ -246,7 +246,7 @@ export default {
       }
 
       .contentBig {
-        font-size: xx-large;
+        font-size: 1.75rem;
       }
 
       .contentSmall {

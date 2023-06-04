@@ -165,60 +165,59 @@ export default {
 .heading_8264 {
   position: absolute;
   letter-spacing: 0.2em;
-  font-size: 1vw;
+  font-size: 1rem;
   top: 2em;
-  right: 2vw;
+  right: 2rem;
 }
 
 .logo {
   position: absolute;
   bottom: 1em;
-  right: 3vw;
+  right: 3rem;
 }
 
 .chip {
   position: absolute;
   top: 2.3em;
-  left: 2vw;
+  left: 2rem;
 }
 
 .contactless {
   position: absolute;
-  top: 5.5vw;
-  right: 2.5vw;
+  top: 5.5rem;
+  right: 2.5rem;
 }
 
 .number {
   position: absolute;
   font-weight: light;
-  font-size: 0.9vw;
+  font-size: .7rem;
   letter-spacing: 3px;
-  top: 8vw;
-  left: 3vw;
+  left: 3rem;
 }
 
 .valid_thru {
   position: absolute;
-  bottom: 3vw;
-  font-size: 0.6vw;
-  left: 3vw;
+  bottom: 3rem;
+  font-size: .7rem;
+  left: 3rem;
   color: white;
 }
 
 .date_8264 {
   position: absolute;
   font-weight: bolder;
-  font-size: 0.9vw;
-  bottom: 1.5vw;
-  left: 3vw;
+  font-size: 0.9rem;
+  bottom: 1.5rem;
+  left: 3rem;
 }
 
 .name {
   position: absolute;
   font-weight: normal;
-  font-size: 0.9vw;
-  bottom: 1.5vw;
-  left: 9vw;
+  font-size: 0.75rem;
+  bottom: 1.5rem;
+  left: 9rem;
 }
 
 .strip {
@@ -226,7 +225,7 @@ export default {
   background-color: black;
   width: 100%;
   height: 3vw;
-  top: 2.4em;
+  top: 2.4rem;
   background: repeating-linear-gradient(
     45deg,
     #303030,
@@ -260,7 +259,7 @@ export default {
   font-weight: bold;
   text-align: center;
   margin: 0.2em;
-  font-size: 1.2vw;
+  font-size: 1.2rem;
   color: black;
 }
 
