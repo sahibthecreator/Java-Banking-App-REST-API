@@ -27,6 +27,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.Console;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,11 +99,9 @@ public class UserService {
         Optional<User> existingUserOptional = userRepository.findById(userId);
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
-            BeanUtils.copyProperties(user, existingUser, "id"); // Exclude copying the "id" property
-            //existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
-            existingUser.setEmail(user.getEmail());
-            System.out.println(existingUser);
-
+            System.out.println(existingUser.isActive());
+            BeanUtils.copyProperties(user, existingUser, "id", "password", "active"); // Exclude copying the id ,active, pass property
+            System.out.println(existingUser.isActive());
 
             User savedUser = userRepository.save(existingUser);
             return userMapper.toDTO(savedUser);
