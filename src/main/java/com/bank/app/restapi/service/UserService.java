@@ -94,7 +94,8 @@ public class UserService {
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
             BeanUtils.copyProperties(user, existingUser, "id"); // Exclude copying the "id" property
-            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            System.out.println(existingUser);
+            //existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
             User savedUser = userRepository.save(existingUser);
             return userMapper.toDTO(savedUser);
