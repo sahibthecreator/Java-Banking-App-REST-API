@@ -157,7 +157,10 @@ public class UserService {
                 .mapToDouble(Transaction::getAmount)
                 .sum();
 
-        return user.getDayLimit() - totalSpentToday;
+        double remainingLimit = user.getDayLimit() - totalSpentToday;
+        double roundedRemainingLimit = Math.round(remainingLimit * 100.0) / 100.0;
+
+        return roundedRemainingLimit;
     }
 
     // Private methods

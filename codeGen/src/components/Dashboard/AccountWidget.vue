@@ -17,7 +17,7 @@ import AccountIcon from './AccountIcon.vue';
 
 <script>
 export default {
-  name: 'AccountWidgetV2',
+  name: 'AccountWidget',
   props: {
     type: String,
     name: String,

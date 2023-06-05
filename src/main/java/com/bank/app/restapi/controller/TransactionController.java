@@ -45,12 +45,14 @@ public class TransactionController {
     }
 
     @GetMapping(value = "{transactionId}")
+    @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<TransactionDTO> getTransactionById(@PathVariable UUID transactionId) {
         TransactionDTO result = transactionService.getTransactionById(transactionId);
         return ResponseEntity.status(200).body(result);
     }
 
     @GetMapping("userId/{userId}")
+    @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
     public ResponseEntity<List<TransactionDTO>> getTransactionsByUserId(@PathVariable UUID userId) {
         List<TransactionDTO> transactions = transactionService.getTransactionsByUserId(userId); // TODO IMplement not
                                                                                                 // found exception
@@ -58,7 +60,7 @@ public class TransactionController {
     }
 
     @PostMapping(value = { "", "{mappingNameHolder}", "{mappingNameHolder}/" })
-    //@PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
+    @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<TransactionDTO> addTransaction(@PathVariable(required = false) String mappingNameHolder,
             @RequestBody TransactionDTO transaction, Authentication authentication) {
 
@@ -75,6 +77,7 @@ public class TransactionController {
         } else {
             throw new IllegalArgumentException("Invalid value for mappingNameHolder in the URI");
         }
-        return ResponseEntity.status(201).body(transactionService.addTransaction(transaction, typeOfTransaction, performingUserId));
+        return ResponseEntity.status(201)
+                .body(transactionService.addTransaction(transaction, typeOfTransaction, performingUserId));
     }
 }

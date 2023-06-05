@@ -49,12 +49,14 @@ public class AccountController {
     }
 
     @GetMapping("/{iban}/accountInfo")
+    @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<AccountDTO> getAccountInfo(@PathVariable String iban) {
         AccountDTO accountDTO = accountService.getAccountDTOByIban(iban);
         return ResponseEntity.status(200).body(accountDTO);
     }
 
     @GetMapping("/{iban}/balance")
+    @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<AccountBalanceDTO> getAccountBalance(@PathVariable String iban) {
         AccountBalanceDTO accountBalanceDTO = accountService.getBalanceByIban(iban);
         return ResponseEntity.status(200).body(accountBalanceDTO);
@@ -69,18 +71,21 @@ public class AccountController {
     }
 
     @GetMapping("/{userId}")
+    @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
     public ResponseEntity<List<AccountDTO>> getAccountsByUserId(@PathVariable UUID userId) {
         List<AccountDTO> accounts = accountService.getAccountsByUserId(userId);
         return ResponseEntity.status(200).body(accounts);
     }
 
     @PatchMapping("/{iban}")
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<String> deactivateAccount(@PathVariable String iban) {
         String response = accountService.deactivateAccount(iban);
         return ResponseEntity.status(200).body(response);
     }
 
     @PatchMapping("/{iban}/activate")
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<String> activateAccount(@PathVariable String iban) {
         String response = accountService.activateAccount(iban);
         return ResponseEntity.status(200).body(response);
@@ -94,18 +99,21 @@ public class AccountController {
     }
 
     @GetMapping("/requests")
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<List<AccountRequestDTO>> getAllRequests() {
         List<AccountRequestDTO> requests = accountService.getAllRequests();
         return ResponseEntity.status(200).body(requests);
     }
 
     @PutMapping("/requests/{requestId}/approve")
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<AccountDTO> approveBankAccountRequest(@PathVariable UUID requestId) {
         AccountDTO createdAccountDTO = accountService.approveAccountRequest(requestId);
         return ResponseEntity.status(200).body(createdAccountDTO);
     }
 
     @PutMapping("/requests/{requestId}/deny")
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<AccountRequestDTO> denyBankAccountRequest(@PathVariable UUID requestId) {
         accountService.denyBankAccountRequest(requestId);
         return ResponseEntity.status(200).build();

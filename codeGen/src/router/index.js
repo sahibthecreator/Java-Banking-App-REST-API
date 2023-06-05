@@ -21,7 +21,7 @@ const router = createRouter({
     { path: '/login', name: 'Log in', component: Login },
     { path: '/dashboard', name: 'my dashboard', component: DashboardV2, meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: '404 Not Found', component: NotFound },
-    { path: '/dashboard/transaction', name: 'transaction', component: Transaction, meta: { requiresAuth: true} },
+    { path: '/dashboard/transaction', name: 'transfer', component: Transaction, meta: { requiresAuth: true} },
     { path: '/dashboard/requestAccount', name: 'request', component: RequestAccount, meta: { requiresAuth: true } },
     { path: '/dashboard/employeePanel', name: 'employeePanel', component: EmployeePanel, meta: { requiresAuth: true } },
     { path: '/dashboard/employeePanel/createAccount', name: 'createAccount', component: CreateBankAccount, meta: { requiresAuth: true } },

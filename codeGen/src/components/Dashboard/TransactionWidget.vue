@@ -10,30 +10,27 @@
       <p>{{ transaction.fromAccount }}</p>
       <p class="dateTime">{{ time }}</p>
     </div>
-    <div class="right" v-if="currentAccount.iban == transaction.toAccount">
-      <h5>+ €{{ transaction.amount }}</h5>
-    </div>
-    <div class="right" v-else>
-      <h5>- €{{ transaction.amount }}</h5>
+    <div class="right">
+      <h5>{{ currentAccount.iban == transaction.toAccount ? "+" : "-" }} €{{ transaction.amount }}</h5>
     </div>
   </div>
 
 
   <div class="transaction" @click="detailsPanelEnabled = true" v-else>
     <div class="left">
-      <p><b>From </b> {{ transaction.fromAccount }}</p>
+      <p>{{ transactionHeader }}</p>
       <p>{{ transaction.fromAccount }}</p>
       <p class="dateTime">{{ time }}</p>
     </div>
     <div class="right">
-      <h5>TBD ( -, +) €{{ transaction.amount }}</h5>
+      <h5>{{ transactionAmount }}</h5>
     </div>
   </div>
 
   <div class="card" v-if="detailsPanelEnabled">
     <div class="content">
       <p class="heading">
-        - €{{ transaction.amount }}
+        {{ accounts.some(account => account.iban === transaction.toAccount) ? "+" : "-" }} €{{ transaction.amount }}
         {{ transaction.typeOfTransaction.toLowerCase() }}
       </p>
       <p class="para">
@@ -55,23 +52,44 @@
 
 <script>
 export default {
-  name: 'TransactionWidgetV2',
+  name: 'TransactionWidget',
   props: {
     transaction: Object,
     currentAccount: String,
+    accounts: Array
   },
   data() {
     return {
       time: '',
       detailsPanelEnabled: false,
+      transactionHeader: "",
+      transactionAmount: "",
     };
   },
-  mounted: function () {
+  mounted() {
     const parts = this.transaction.dateOfExecution.split(' ');
     const timePart = parts[1];
     const time = timePart.split(':').slice(0, 2).join(':');
     this.time = time;
+    this.updateTransactionDetails(this.accounts, this.transaction);
   },
+  methods: {
+    updateTransactionDetails(accounts, transaction) {
+
+      const fromAccountExists = accounts.some(account => account.iban === transaction.fromAccount);
+      const toAccountExists = accounts.some(account => account.iban === transaction.toAccount);
+      if (fromAccountExists && toAccountExists) {
+        this.transactionHeader = `Exchanged from ${transaction.fromAccount} to ${transaction.toAccount}`;
+        this.transactionAmount = `€ ${transaction.amount}`;
+      } else if (toAccountExists) {
+        this.transactionHeader = `To ${transaction.toAccount}`;
+        this.transactionAmount = `+ €${transaction.amount}`;
+      } else if (fromAccountExists) {
+        this.transactionHeader = `From ${transaction.fromAccount}`;
+        this.transactionAmount = `- €${transaction.amount}`;
+      }
+    }
+  }
 };
 </script>
 
@@ -107,6 +125,7 @@ export default {
 }
 
 .transaction .right {
+  white-space: nowrap;
   display: flex;
   margin-left: auto;
 }
