@@ -28,7 +28,7 @@ export const getAccountsByUserId = async (userId, token) => {
 
 export const getIbanByName = async ({ firstName, lastName }, token) => {
   try {
-    const response = await axios.get(`/accounts/iban?firstName=${firstName}&lastName=${lastName}`, {
+    const response = await axios.get(`/accounts/iban?firstname=${firstName}&lastname=${lastName}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
