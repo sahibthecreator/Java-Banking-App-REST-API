@@ -11,8 +11,18 @@ import UserWidget from './UserWidget.vue';
 
   <div class="employeePanel">
     <div class="pageGrid">
-      <div class="userList d-flex">
+      <div class="userList d-flex" :class="{ 'expanded': userPanelExpanded }">
+        <div class="expandBtn" @click="userPanelExpanded = !userPanelExpanded">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+              d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z" />
+          </svg>
+        </div>
+
         <div class="roleFilterBtns">
+          <b-input v-if="userPanelExpanded" placeholder="enter username" v-model="search" @input="searchUsers" />
+
           <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'USER' }"
             v-on:click="setRoleFilter('USER')">User</b-button>
 
@@ -35,9 +45,15 @@ import UserWidget from './UserWidget.vue';
           </div>
         </div>
         <!-- <h2>Account requests</h2> -->
-        <div class="accountRequests">
-          <RequestWidget v-for="(request, index) in requests" :request="request" />
+        <div class='accountRequestsWrapper'>
+          <h1>Account Requests</h1>
+          <div class="accountRequests">
+            <RequestWidget v-for="(request, index) in requests" :request="request" />
+            <RequestWidget v-for="(request, index) in requests" :request="request" />
+            <RequestWidget v-for="(request, index) in requests" :request="request" />
+            <RequestWidget v-for="(request, index) in requests" :request="request" />
 
+          </div>
         </div>
       </div>
     </div>
@@ -53,12 +69,15 @@ export default {
       filteredUsers: null,
       requests: null,
       roleFilter: null,
+      userPanelExpanded: true,
+      search: "",
     };
   },
   mounted() {
     this.checkUser();
     this.getAllUsers();
     this.initAllRequests();
+    //this.searchUsers();
   },
 
   methods: {
@@ -100,6 +119,16 @@ export default {
       this.roleFilter = role;
       this.filteredUsers = this.users.filter(u => u.role === role);
       console.log(this.users);
+    },
+    searchUsers() {
+      this.roleFilter = null;
+      const searchResults = this.users.filter(user => {
+        const firstNameMatch = user.firstName.toLowerCase().includes(this.search.toLowerCase());
+        const lastNameMatch = user.lastName.toLowerCase().includes(this.search.toLowerCase());
+        return firstNameMatch || lastNameMatch;
+      });
+
+      this.filteredUsers = searchResults;
     }
 
   },
@@ -114,13 +143,6 @@ export default {
   flex-direction: column;
   gap: 10px;
   padding: 30px;
-  // background: url('@/assets/dashboard/bg.jpg');
-  // background-repeat: no-repeat;
-  // background-clip: border-box;
-  // background-position-x: center;
-  // background-size: cover;
-  // height: 100vh;
-  // display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -147,23 +169,45 @@ export default {
       box-shadow: 0 0 30px #1414140a;
       border-radius: 10px;
       border: 1px solid rgba(0, 0, 0, 0.125);
+      transition: all 0.5s;
+
+      &.expanded {
+        position: absolute;
+        z-index: 10;
+        width: 100%;
+
+        .roleFilterBtns {
+          width: 60%;
+        }
+      }
+
+      .expandBtn {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 0.6;
+        }
+      }
     }
 
     .rightPanel {
       border-radius: 10px;
-      border: 1px solid rgba(0, 0, 0, 0.125);
       height: 80vh;
       display: flex;
       flex-direction: column;
       gap: 100px;
 
       .actionPanel {
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.125);
         background: var(--white);
         width: 100%;
         padding: 40px;
         height: 30%;
         box-shadow: 0 0 30px #14141417;
-        border-radius: 10px;
         display: flex;
         flex-direction: row;
         gap: 20px;
@@ -197,10 +241,16 @@ export default {
         }
       }
 
+      .accountRequestsWrapper {
+        height: 43%;
+      }
+
       .accountRequests {
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.125);
         background: var(--white);
         width: 100%;
-        height: auto;
+        height: 100%;
         padding: 40px;
         box-shadow: 0 0 30px #14141417;
         border-radius: 10px;

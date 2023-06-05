@@ -26,6 +26,19 @@ export const getUsers = async (token) => {
   }
 };
 
+export const getUsersByName = async ({firstName, lastName}, token) => {
+  try {
+    const response = await axios.get(`/users?firstName=${firstName}&lastName=${lastName}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const getRemainingDayLimit = async (userId, token) => {
   try {
     const response = await axios.get(`/users/${userId}/remaining-day-limit`, {

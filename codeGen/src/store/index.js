@@ -5,7 +5,7 @@ import { getAccounts, createAccount } from '@/service/accounts';
 import { getTransactions, getTransaction } from '@/service/transactions';
 import { approveRequest, denyRequest, getAccountsByUserId, getAllRequests, getIbanByName, requestAccount } from '../service/accounts';
 import { getTransactionsByUserId, performTransaction } from '../service/transactions';
-import { getRemainingDayLimit } from '../service/users';
+import { getRemainingDayLimit, getUsersByName } from '../service/users';
 
 // Vue.use(Vuex);
 
@@ -89,6 +89,15 @@ const store = new Vuex.Store({
                 const user = await getUser(userId, state.token);
                 commit('setUser', user);
                 return user;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async getUsersByName({ commit, state }, request) {
+            try {
+                const users = await getUsersByName(request, state.token);
+                //commit('setUsers', users);
+                return users;
             } catch (error) {
                 throw new Error(error.message);
             }
