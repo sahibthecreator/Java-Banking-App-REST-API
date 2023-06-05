@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Login from '@/components/Login.vue';
 import Home from '@/components/Home.vue';
-import DashboardV2 from '@/components/Dashboard/DashboardV2.vue';
+import DashboardV2 from '@/components/Dashboard/Dashboard.vue';
 import Transaction from '@/components/Transaction/Transaction.vue';
 import EmployeeTransaction from '@/components/Transaction/EmployeeTransaction.vue';
 import RequestAccount from '@/components/RequestAccount/RequestAccount.vue';

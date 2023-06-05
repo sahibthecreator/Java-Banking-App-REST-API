@@ -1,7 +1,7 @@
 <script setup>
-import AccountWidgetV2 from '../AccountWidgetV2.vue';
-import CurrentAccountPanelV2 from '../CurrentAccountPanelV2.vue';
-import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
+import AccountWidgetV2 from '../AccountWidget.vue';
+import CurrentAccountPanelV2 from '../CurrentAccountPanel.vue';
+import TransactionWidgetV2 from '../TransactionWidget.vue';
 </script>
 
 <template>

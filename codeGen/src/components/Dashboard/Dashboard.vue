@@ -18,9 +18,8 @@ import PeopleTab from './Tabs/PeopleTab.vue';
         <option v-bind:id="currentTab == 1 ? 'selected' : ''" @click="switchTab(this, 'transactions')">Transactions</option>
         <option v-bind:id="currentTab == 2 ? 'selected' : ''" @click="switchTab(this, 'people')">People</option>
       </div>
-      <b-button variant="dark_primary" @click="relocate_to_transaction()"
-        >New Transaction</b-button
-      >
+      <b-button variant="black" @click="relocate_to_request()" style="margin-left: auto; margin-right: 20px;">Request account</b-button>
+      <b-button variant="dark_primary" @click="relocate_to_transaction()">New Transaction</b-button>
     </div>
     <OverviewTab v-if="currentTab==0"/>
     <TransactionTab v-if="currentTab==1"/>
@@ -118,10 +117,6 @@ export default {
         box-shadow: 0 0 30px #14141417;
         font-weight: 500;
       }
-    }
-
-    button {
-      margin-left: auto;
     }
   }
 }

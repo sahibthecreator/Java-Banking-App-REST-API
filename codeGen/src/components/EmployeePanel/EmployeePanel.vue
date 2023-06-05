@@ -56,11 +56,26 @@ export default {
     };
   },
   mounted() {
+    this.checkUser();
     this.getAllUsers();
     this.initAllRequests();
   },
 
   methods: {
+    async checkUser() {
+      try {
+        let user = await this.$store.dispatch(
+          'getUser',
+          this.$store.getters.getUserId
+        );
+        if (user.role != "EMPLOYEE") {
+          this.$router.push('404');
+        }
+      } catch (err) {
+        console.log('gtfo')
+      }
+    },
+
     async getAllUsers() {
       try {
         let userList = await this.$store.dispatch('getUsers');
