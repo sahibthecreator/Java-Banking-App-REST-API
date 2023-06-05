@@ -44,6 +44,10 @@ var formatter = new Intl.NumberFormat('de-DE', {
   cursor: pointer;
   border-bottom: .5px var(--gray-light) solid;
 
+  &:hover {
+    box-shadow: 0 0 10px #1414141d;
+  }
+
   .info {
     display: flex;
     flex-direction: row;
@@ -59,6 +63,7 @@ var formatter = new Intl.NumberFormat('de-DE', {
     .iban {
       color: var(--gray-light);
     }
+
     .balance {
       margin-bottom: 0px;
       margin-left: auto;

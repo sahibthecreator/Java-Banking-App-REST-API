@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.security.core.Authentication;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -102,12 +103,13 @@ public class TransactionControllerTest {
         verify(transactionService).getTransactionsByUserId(eq(userId));
     }
 
+    //TODO fix the test after the Authentication
     @Test
     public void testAddTransaction() throws Exception {
         TransactionDTO transaction = new TransactionDTO();
         transaction.setAmount(500.0f);
 
-        when(transactionService.addTransaction(any(TransactionDTO.class), any(TransactionType.class))).thenReturn(transaction);
+        when(transactionService.addTransaction(any(TransactionDTO.class), any(TransactionType.class), any(UUID.class))).thenReturn(transaction);
 
         mockMvc.perform(post("/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,6 +117,6 @@ public class TransactionControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.amount").value(500.0));
 
-        verify(transactionService).addTransaction(eq(transaction), eq(TransactionType.TRANSFER));
+        verify(transactionService).addTransaction(eq(transaction), eq(TransactionType.TRANSFER), eq(UUID.randomUUID()));
     }
 }

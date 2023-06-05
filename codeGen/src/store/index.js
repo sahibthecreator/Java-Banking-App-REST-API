@@ -3,7 +3,7 @@ import { login, register } from '@/service/auth';
 import { getUser, getUsers, createUser, updateUser, deleteUser } from '@/service/users';
 import { getAccounts, createAccount } from '@/service/accounts';
 import { getTransactions, getTransaction } from '@/service/transactions';
-import { approveRequest, denyRequest, getAccountsByUserId, getAllRequests, requestAccount } from '../service/accounts';
+import { approveRequest, denyRequest, getAccountsByUserId, getAllRequests, getIbanByName, requestAccount } from '../service/accounts';
 import { getTransactionsByUserId, performTransaction } from '../service/transactions';
 import { getRemainingDayLimit } from '../service/users';
 
@@ -150,6 +150,14 @@ const store = new Vuex.Store({
             try {
                 const accounts = await getAccounts(state.token);
                 commit('setAccounts', accounts);
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async getIbanByName({ commit, state }, { firstName, lastName }) {
+            try {
+                const ibans = await getIbanByName({ firstName, lastName }, state.token);
+                return ibans;
             } catch (error) {
                 throw new Error(error.message);
             }

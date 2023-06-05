@@ -1,12 +1,32 @@
 <template>
-  <div class="transaction" @click="detailsPanelEnabled = true">
+  <div class="transaction" @click="detailsPanelEnabled = true" v-if="currentAccount">
+    <div class="left" v-if="currentAccount.iban == transaction.toAccount">
+      <p><b>From </b> {{ transaction.fromAccount }}</p>
+      <p>{{ transaction.fromAccount }}</p>
+      <p class="dateTime">{{ time }}</p>
+    </div>
+    <div class="left" v-else>
+      <p><b>To </b> {{ transaction.toAccount }}</p>
+      <p>{{ transaction.fromAccount }}</p>
+      <p class="dateTime">{{ time }}</p>
+    </div>
+    <div class="right" v-if="currentAccount.iban == transaction.toAccount">
+      <h5>+ €{{ transaction.amount }}</h5>
+    </div>
+    <div class="right" v-else>
+      <h5>- €{{ transaction.amount }}</h5>
+    </div>
+  </div>
+
+
+  <div class="transaction" @click="detailsPanelEnabled = true" v-else>
     <div class="left">
-      <p><b>To</b> Sam Jhonson</p>
-      <p>{{ transaction.toAccount }}</p>
+      <p><b>From </b> {{ transaction.fromAccount }}</p>
+      <p>{{ transaction.fromAccount }}</p>
       <p class="dateTime">{{ time }}</p>
     </div>
     <div class="right">
-      <h5>- €{{ transaction.amount }}</h5>
+      <h5>TBD ( -, +) €{{ transaction.amount }}</h5>
     </div>
   </div>
 
@@ -38,6 +58,7 @@ export default {
   name: 'TransactionWidgetV2',
   props: {
     transaction: Object,
+    currentAccount: String,
   },
   data() {
     return {
@@ -64,6 +85,10 @@ export default {
   border-bottom: 1px var(--gray-light) solid;
   align-items: center;
   color: var(--gray-black);
+
+  &:hover {
+    box-shadow: 0 0 10px #1414141d;
+  }
 }
 
 .transaction .left p {

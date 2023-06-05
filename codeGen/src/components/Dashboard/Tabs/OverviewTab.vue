@@ -1,7 +1,7 @@
 <script setup>
-import AccountWidgetV2 from '../AccountWidgetV2.vue';
-import CurrentAccountPanelV2 from '../CurrentAccountPanelV2.vue';
-import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
+import AccountWidgetV2 from '../AccountWidget.vue';
+import CurrentAccountPanelV2 from '../CurrentAccountPanel.vue';
+import TransactionWidgetV2 from '../TransactionWidget.vue';
 </script>
 
 <template>
@@ -30,7 +30,7 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
         <div class="header">
           <span v-if="!currentAccount">Remaining daily limit</span>
           <span v-else>IBAN</span>
-          <b-icon-credit-card-fill></b-icon-credit-card-fill>
+          <b-icon-clock-history></b-icon-clock-history>
         </div>
         <span class="contentBig" v-if="!currentAccount">
           € {{ remainingDayLimit }}</span>
@@ -57,15 +57,13 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
         <div class="header">
           <span v-if="!currentAccount">monthly Balance Status</span>
           <span v-else>Latest Transaction</span>
-          <b-icon-clock-history></b-icon-clock-history>
+          <b-icon-credit-card-fill></b-icon-credit-card-fill>
         </div>
         <span class="contentBig" v-if="!currentAccount">
           - $213.47 (static)</span>
         <span class="contentBig" v-else>
-          <span v-if="currentTransactions">None</span>
-          <span v-if="!currentTransactions">
-            {{ currentTransactions[0].amount }}</span
-          >
+          <span v-if="currentTransactions[0]">{{ currentTransactions[0].amount }}</span>
+          <span v-else>None</span>
         </span>
         <span class="contentSmall"> -2.1% from last month</span>
       </div>
@@ -103,7 +101,7 @@ import TransactionWidgetV2 from '../TransactionWidgetV2.vue';
         </div>
         <div class="transactionsWrapper">
           <TransactionWidgetV2 v-for="(transaction, index) in currentTransactions" :key="index"
-            :transaction="transaction" />
+            :transaction="transaction" :currentAccount="currentAccount"/>
         </div>
       </div>
     </div>
@@ -246,7 +244,7 @@ export default {
       }
 
       .contentBig {
-        font-size: xx-large;
+        font-size: 1.75rem;
       }
 
       .contentSmall {

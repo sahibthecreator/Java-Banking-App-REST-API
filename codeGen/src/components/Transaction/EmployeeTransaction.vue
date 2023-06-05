@@ -6,7 +6,7 @@
         </b-navbar-brand>
 
         <b-navbar-nav class="ml-auto">
-            <b-nav-item to="/dashboard"><img src="@/assets/Transaction/x.svg" /></b-nav-item>
+            <b-nav-item to="/dashboard/employeePanel"><img src="@/assets/Transaction/x.svg" /></b-nav-item>
         </b-navbar-nav>
 
     </div>
