@@ -16,6 +16,8 @@ import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
+
+import org.modelmapper.internal.bytebuddy.dynamic.TypeResolutionStrategy.Active;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -98,8 +100,8 @@ public class UserService {
         Optional<User> existingUserOptional = userRepository.findById(userId);
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
-            BeanUtils.copyProperties(user, existingUser, "id"); // Exclude copying the "id" property
-            System.out.println(existingUser);
+            BeanUtils.copyProperties(user, existingUser, "id", "active", "password"); // Exclude copying the "id" property
+            // System.out.println(existingUser);
             // existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
             User savedUser = userRepository.save(existingUser);

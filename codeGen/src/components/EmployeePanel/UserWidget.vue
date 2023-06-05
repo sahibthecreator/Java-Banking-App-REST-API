@@ -16,7 +16,7 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
         </div>
       </div>
 
-     
+
     </div>
   </div>
   <div class="expanded userWidget" v-else>
@@ -31,7 +31,7 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
         <div class="detailCards">
           <div class="detailCard">
             <label>First Name</label>
-            <input type="text" v-model="user.firstName">
+            <input type="text" v-model="user.firstName" @input="editBtnContent = 'Save'">
           </div>
           <div class="detailCard">
             <label>Last Name</label>
@@ -61,8 +61,37 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
       </div>
 
       <div class="userControls">
-        <button class="button btn-warning" @click="updateUser()">Edit</button>
+        <button class="button btn-warning" @click="updateUser()">{{ editBtnContent }}</button>
         <button class="button btn-danger" @click="deleteUser()">{{ accounts == 0 ? 'Delete' : 'Deactivate' }}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" v-if="statusPopupCardEnabled">
+    <div class="header">
+      <!-- Loading -->
+      <div class="spinnerContainer" v-if="loading">
+        <div class="spinner"></div>
+        <div class="loader">
+          <div class="words">
+            <span class="word">Updating user</span>
+          </div>
+        </div>
+      </div>
+      <!-- /Loading -->
+
+      <div class="image" v-if="!loading">
+        <img src="@/assets/SuccessIcon.png" class="success icon" />
+      </div>
+      <div class="content" v-if="!loading">
+        <span class="title">{{ statusTitle }}</span>
+        <span v-if="ownEmailChanged()" class="title">{{ statusSubTitle }}</span>
+
+      </div>
+      <div class="actions">
+        <button type="button" class="history" @click="statusPopupCardEnabled = false"
+          v-if="!loading && !ownEmailChanged()">Close</button>
+        <button type="button" class="history" @click="goToLogin" v-if="!loading && ownEmailChanged()">Login</button>
       </div>
     </div>
   </div>
@@ -79,11 +108,20 @@ export default {
       accounts: null,
       totalBalance: 0,
       expanded: false,
+      statusPopupCardEnabled: false,
+      statusTitle: "",
+      statusSubTitle: "",
+      errorMsg: "",
+      loading: false,
+      initialEmail: "",
+      editBtnContent: "Edit",
+      delay: ms => new Promise(res => setTimeout(res, ms))
     };
+
   },
   mounted() {
     this.getAllAccounts();
-    console.log(this.user);
+    this.initialEmail = this.user.email;
   },
   watch: {
     user: {
@@ -94,8 +132,27 @@ export default {
     },
   },
   methods: {
-    updateUser() {
-      console.log('update dialog here');
+    async updateUser() {
+      console.table(this.user);
+      let request = {
+        userId: this.user.id,
+        userData: this.user
+      }
+      try {
+        await this.$store.dispatch('updateUser', request);
+        this.loading = true;
+        this.statusPopupCardEnabled = true;
+        this.statusTitle = `User updated successfully`;
+        if (this.ownEmailChanged()) {
+          this.statusTitle = `User updated successfully`;
+          this.statusSubTitle = `You need to login again because of changing your email`;
+        }
+        await this.delay(500);
+        this.loading = false;
+      } catch (error) {
+        alert(error.message);
+      }
+
     },
     async deleteUser() {
       if (confirm('Are you sure?')) {
@@ -122,6 +179,17 @@ export default {
         this.accounts = 0;
       }
     },
+    goToLogin() {
+      this.$store.dispatch('logout');
+      this.$router.push('/login')
+    },
+    ownEmailChanged() {
+      return this.initialEmail.localeCompare(this.user.email) && this.user.id == this.$store.state.userId
+    },
+    setEditBtnContentToSave() {
+      if (!editBtnContent == 'Save')
+        this.editBtnContent = 'Save'; ƒ
+    }
   },
 };
 </script>
@@ -138,7 +206,8 @@ export default {
   align-items: center;
   box-shadow: 0 0 30px #14141417;
   cursor: pointer;
-  &:hover{
+
+  &:hover {
     filter: contrast(1.1);
   }
 
@@ -322,6 +391,224 @@ export default {
         }
       }
     }
+  }
+}
+
+
+.card {
+  overflow: hidden;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: left;
+  border-radius: 0.5rem;
+  max-width: 30rem;
+
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background-color: #fff;
+  z-index: 30;
+}
+
+
+.header {
+  padding: 1.25rem 1rem 1rem 1rem;
+}
+
+.image {
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #e2feee;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  animation: animate .6s linear alternate-reverse infinite;
+  transition: .6s ease;
+
+  img {
+    height: 80%;
+    width: 80%;
+  }
+}
+
+
+.content {
+  margin-top: 0.75rem;
+  text-align: center;
+  gap: 10px;
+  white-space: normal;
+}
+
+.title {
+  color: #121212;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0 5px;
+  line-height: 1.5rem;
+
+  &:nth-child(2n) {
+    color: #858585;
+    font-size: 0.9rem;
+
+  }
+}
+
+.message {
+  margin-top: 0.5rem;
+  color: #595b5f;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.actions {
+  margin: 0.75rem 1rem;
+}
+
+.history {
+  display: inline-flex;
+  padding: 0.5rem 1rem;
+  margin-top: 10%;
+  background-color: #3f50ea;
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 500;
+  justify-content: center;
+  width: 100%;
+  border-radius: 0.375rem;
+  border: none;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    filter: contrast(1.2);
+  }
+}
+
+
+
+@keyframes animate {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.09);
+  }
+}
+
+.errorMsg {
+  font-size: smaller;
+  margin-bottom: 0;
+}
+
+.spinnerContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  border: 4px solid #0000;
+  border-radius: 50%;
+  border-right-color: #299fff;
+  animation: tri-spinner 1s infinite linear;
+}
+
+.spinner::before,
+.spinner::after {
+  content: "";
+  grid-area: 1/1;
+  margin: 2px;
+  border: inherit;
+  border-radius: 50%;
+  animation: tri-spinner 2s infinite;
+}
+
+.spinner::after {
+  margin: 8px;
+  animation-duration: 3s;
+}
+
+@keyframes tri-spinner {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.loader {
+  color: #4a4a4a;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-size: 23px;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 40px;
+  padding: 10px 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  border-radius: 8px;
+}
+
+.words {
+  overflow: hidden;
+}
+
+.word {
+  display: block;
+  height: 100%;
+  color: #299fff;
+  text-align: center;
+  animation: cycle-words 3s infinite;
+}
+
+@keyframes cycle-words {
+  0% {
+    -webkit-transform: translateY(50%);
+    transform: translateY(50%);
+  }
+
+  5% {
+    -webkit-transform: translateY(0%);
+    transform: translateY(0%);
+  }
+
+  30% {
+    -webkit-transform: translateY(0%);
+    transform: translateY(0%);
+  }
+
+  45% {
+    -webkit-transform: translateY(-105%);
+    transform: translateY(-105%);
+  }
+
+  65% {
+    -webkit-transform: translateY(-105%);
+    transform: translateY(-105%);
+  }
+
+  75% {
+    -webkit-transform: translateY(-200%);
+    transform: translateY(-200%);
+  }
+
+
+  90% {
+    -webkit-transform: translateY(-200%);
+    transform: translateY(-200%);
+  }
+
+  100% {
+    -webkit-transform: translateY(-300%);
+    transform: translateY(-300%);
   }
 }
 </style>
