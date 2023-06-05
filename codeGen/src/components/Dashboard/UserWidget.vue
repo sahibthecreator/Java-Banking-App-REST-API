@@ -27,7 +27,10 @@ export default {
 
   methods: {
     relocate_to_transaction() {
-      this.$router.push('dashboard/transaction');
+      //this.$router.push('dashboard/transaction');
+      //this.$router.push({ name: 'transaction', params: { receiverIban: "this.iban" } });
+      this.$router.push({ path: 'dashboard/transaction', query: { receiverIban: this.iban } });
+
     }
   }
 };
@@ -48,12 +51,14 @@ export default {
     color: var(--gray-light);
     font-weight: 500;
   }
-  .left > p {
+
+  .left>p {
     margin-left: -25px;
     margin-bottom: 0px;
     font-weight: 500;
   }
-  .left > p:nth-child(2) {
+
+  .left>p:nth-child(2) {
     color: var(--gray-light);
   }
 

@@ -104,7 +104,7 @@ export default {
     return {
       amount: "",
       accountFrom: "",
-      accountTo: "",
+      accountTo: this.$route.query.receiverIban? this.$route.query.receiverIban : "",
       description: "",
       showDropdown: false,
       showDropdownToAccount: false,
@@ -116,12 +116,14 @@ export default {
       delay: ms => new Promise(res => setTimeout(res, ms))
     }
   },
+  mounted() {
+  },
   computed: {
     filteredAccountOptions() {
-
       const filteredOptions = this.accountOptions.filter(option => option.iban != this.accountFrom);
       return filteredOptions;
-    }
+    },
+
   },
   methods: {
     async performTransaction() {

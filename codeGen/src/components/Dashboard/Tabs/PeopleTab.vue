@@ -26,7 +26,6 @@ export default {
   },
   methods: {
     async searchIban() {
-      console.log("searching");
       try {
         let request = {
           firstName: this.search.split(' ')[0] ? this.search.split(' ')[0] : "",
