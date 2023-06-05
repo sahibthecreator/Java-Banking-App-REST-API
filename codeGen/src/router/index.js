@@ -2,13 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Login from '@/components/Login.vue';
 import Home from '@/components/Home.vue';
-import DashboardV2 from '@/components/Dashboard/Dashboard.vue';
+import Dashboard from '@/components/Dashboard/Dashboard.vue';
 import Transaction from '@/components/Transaction/Transaction.vue';
 import EmployeeTransaction from '@/components/Transaction/EmployeeTransaction.vue';
 import RequestAccount from '@/components/RequestAccount/RequestAccount.vue';
 import EmployeePanel from '@/components/EmployeePanel/EmployeePanel.vue'
 import CreateBankAccount from '@/components/CreateAccount/CreateAccount.vue';
 import NotFound from '@/components/NotFound.vue';
+import ATM from '@/components/ATM/ATM.vue'
 import store from '../store'; // Import the Vuex store
 
 
@@ -19,7 +20,8 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'Home', component: Home, },
     { path: '/login', name: 'Log in', component: Login },
-    { path: '/dashboard', name: 'my dashboard', component: DashboardV2, meta: { requiresAuth: true } },
+    { path: '/dashboard', name: 'my dashboard', component: Dashboard, meta: { requiresAuth: true } },
+    { path: '/atm', name: 'ATM', component: ATM, meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: '404 Not Found', component: NotFound },
     { path: '/dashboard/transaction', name: 'transfer', component: Transaction, meta: { requiresAuth: true} },
     { path: '/dashboard/requestAccount', name: 'request', component: RequestAccount, meta: { requiresAuth: true } },
