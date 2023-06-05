@@ -29,6 +29,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.Console;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,12 +101,25 @@ public class UserService {
         Optional<User> existingUserOptional = userRepository.findById(userId);
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
-            BeanUtils.copyProperties(user, existingUser, "id", "active", "password"); // Exclude copying the "id" property
-            // System.out.println(existingUser);
-            // existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
+            System.out.println(existingUser.isActive());
+            BeanUtils.copyProperties(user, existingUser, "id", "password", "active"); // Exclude copying the id ,active, pass property
+            System.out.println(existingUser.isActive());
+            
             User savedUser = userRepository.save(existingUser);
             return userMapper.toDTO(savedUser);
+        } else {
+            throw new EntityNotFoundException("No user with following id " + userId + " exists");
+        }
+    }
+
+    public String updateUserEmail(UUID userId, String email) throws EntityNotFoundException {
+        Optional<User> existingUserOptional = userRepository.findById(userId);
+        if (existingUserOptional.isPresent()) {
+            User existingUser = existingUserOptional.get();
+            existingUser.setEmail(email);
+            userRepository.save(existingUser);
+            return "Email has been updated";
         } else {
             throw new EntityNotFoundException("No user with following id " + userId + " exists");
         }

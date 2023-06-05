@@ -12,7 +12,8 @@ import Navigation from '@/components/Navigation.vue'
     <div class="panel" id="leftHome">
       <div class="homeWrapper">
         <span>One Card,<br>Access anywhere<br><b id="WAVR"><span id="fade">WAVR</span> banking</b></span>
-        <span style="font-size: 16px;">Enjoy the maximum security and get more using our best services. No more complicated apps.</span>
+        <span style="font-size: 16px;">Enjoy the maximum security and get more using our best services. No more
+          complicated apps.</span>
         <div class="buttonsHome">
           <button @click="this.$router.push('/login')">Create an account</button>
           <button>Download <img src="@/assets/Apple.svg" style="width: 15px; transform: translateY(-2px);"> app</button>
@@ -40,6 +41,7 @@ export default {
   display: flex;
   flex-direction: row;
 }
+
 .panel {
   width: 50%;
   height: 100%;
@@ -54,10 +56,11 @@ export default {
   padding: 0 200px;
 }
 
-#leftHome > .homeWrapper {
+#leftHome>.homeWrapper {
   transform: translateY(75px);
   width: 375px;
 }
+
 #rightHome {
   position: relative;
 }
@@ -95,7 +98,7 @@ export default {
   gap: 10px;
 }
 
-.buttonsHome > button {
+.buttonsHome>button {
   font-size: 18px;
   background: var(--gray-black);
   border: 1px var(--gray-black) solid;
@@ -107,7 +110,7 @@ export default {
   justify-content: center;
 }
 
-.buttonsHome > button:nth-child(2) {
+.buttonsHome>button:nth-child(2) {
   background: var(--white);
   color: var(--gray-black);
 }
@@ -128,47 +131,52 @@ export default {
 }
 
 @media (max-width: 1000px) {
-.homePage {
-   flex-direction: column;
-}
+  .homePage {
+    flex-direction: column;
+  }
 
-#leftHome {
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
-   }
+  .panel {
+    width: 100%;
+    height: 50%;
+  }
 
-#rightHome {
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
-   margin-top: 150px;
-}
+  #leftHome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 
-.homeBG {
-   position: absolute;
-   flex-direction: column;
-   align-items: center;
-   width: 200%;
-   height: 180%;
-}
+  #rightHome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 150px;
+  }
 
-.activity{
-   position: absolute;
-   top: 0;
-   right: 0;
-   height: 100%;
-   width: 50%;
-}
+  .homeBG {
+    position: absolute;
+    flex-direction: column;
+    align-items: center;
+    width: 200%;
+    height: 180%;
+  }
 
-.accountImg {
-   position: absolute;
-   bottom: 0;
-   left: 0;
-   height: 140%;
-   width: 40%;
-}
+  .activity {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 50%;
+  }
+
+  .accountImg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 140%;
+    width: 40%;
+  }
 }
 </style>

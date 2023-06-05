@@ -8,9 +8,7 @@
     </b-navbar-brand>
 
     <b-navbar-nav class="ml-auto">
-      <b-nav-item to="/dashboard"
-        ><img src="@/assets/Transaction/x.svg"
-      /></b-nav-item>
+      <b-nav-item to="/dashboard"><img src="@/assets/Transaction/x.svg" /></b-nav-item>
     </b-navbar-nav>
   </div>
   <div class="requestPage">
@@ -20,14 +18,10 @@
         <span>Account type</span>
         <b-form-select v-model="selected" :options="options"></b-form-select>
       </div>
-      <b-button variant="dark_primary" v-on:click="requestAccountBtn()"
-        >Request account</b-button
-      >
+      <b-button variant="dark_primary" v-on:click="requestAccountBtn()">Request account</b-button>
       <p class="text-danger errorMsg">{{ errorMsg }}</p>
-      <span class="tos"
-        >By clicking request account, I authorize WAVR to initiate an account
-        request and accept the Terms of Services</span
-      >
+      <span class="tos">By clicking request account, I authorize WAVR to initiate an account
+        request and accept the Terms of Services</span>
     </div>
   </div>
 
@@ -53,13 +47,8 @@
         <span class="title">Account request sent successfully</span>
       </div>
       <div class="actions">
-        <b-button
-          variant="dark_primary"
-          class="history"
-          v-on:click="this.$router.push('/dashboard')"
-          v-if="!loading"
-          >Return to dashboard</b-button
-        >
+        <b-button variant="dark_primary" class="history" v-on:click="this.$router.push('/dashboard/employeePanel')"
+          v-if="!loading">Return to dashboard</b-button>
       </div>
     </div>
   </div>
@@ -142,7 +131,7 @@ export default {
   align-items: center;
 }
 
-.requestPanel > span:nth-child(1) {
+.requestPanel>span:nth-child(1) {
   font-size: 24px;
 }
 
@@ -168,12 +157,12 @@ export default {
   margin: 0px auto;
 }
 
-.inputRequestContainer > span {
+.inputRequestContainer>span {
   font-size: 16px;
   font-weight: 500;
 }
 
-.inputRequestContainer > input {
+.inputRequestContainer>input {
   font-size: 20px;
   font-weight: 400;
   border: none;
@@ -181,7 +170,7 @@ export default {
   color: var(--gray-light);
 }
 
-.inputRequestContainer > select {
+.inputRequestContainer>select {
   font-size: 20px;
   font-weight: 400;
   border: none;
@@ -190,13 +179,13 @@ export default {
   box-shadow: none;
 }
 
-.requestPanel > button {
+.requestPanel>button {
   max-width: 350px;
   width: 350px;
   min-width: 300px;
 }
 
-.inputRequestContainer > input::placeholder {
+.inputRequestContainer>input::placeholder {
   color: var(--gray-light);
 }
 

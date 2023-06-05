@@ -64,7 +64,7 @@ public class AuthControllerStepDefinitions {
     @Given("I have login request with email {string} and password {string}")
     public void iHaveLoginRequestWithEmailAndPassword(String email, String password) {
         LoginDTO loginDTO = new LoginDTO(email, password);
-        String url = "http://localhost:8080" + port + "/auth/login";
+        String url = "http://localhost:" + port + "/auth/login";
         loginResponse = restTemplate.postForEntity(url, loginDTO, LoginResponseDTO.class);
     }
 

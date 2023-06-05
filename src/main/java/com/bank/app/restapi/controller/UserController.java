@@ -68,6 +68,17 @@ public class UserController {
         return ResponseEntity.status(200).body(createdUserDTO);
     }
 
+    @PatchMapping("/{userId}")
+//    @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
+    public ResponseEntity<String> updateUserEmail (@PathVariable String userId, @RequestBody @Valid String userEmail,
+            HttpServletRequest request) {
+
+        UUID id = UUID.fromString(userId);
+        String response = userService.updateUserEmail(id, userEmail);
+
+        return ResponseEntity.status(200).body(response);
+    }
+
     @DeleteMapping("/{userId}")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<HashMap<String, String>> deleteUser(@PathVariable String userId, HttpServletRequest request) {

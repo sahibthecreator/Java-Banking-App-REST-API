@@ -127,6 +127,17 @@ const store = new Vuex.Store({
                 throw new Error(error.message);
             }
         },
+        // async updateUserEmail({ commit, state }, { userId, userEmail }) {
+        //     try {
+        //         console.log(userEmail);
+
+        //         await updateUserEmail(userId, userEmail, state.token);
+        //         commit('setUserEmail', userEmail);
+        //         commit('updateUserEmailInComponent', userEmail);
+        //     } catch (error) {
+        //         throw new Error(error.message);
+        //     }
+        // },
         async deleteUser({ commit, state }, userId) {
             try {
                 await deleteUser(userId, state.token);

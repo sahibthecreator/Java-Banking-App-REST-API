@@ -21,7 +21,7 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
           <template #button-content>
             <AccountIcon accountName="Root" style="width: 57.59px; height: 57.59px;"></AccountIcon>
           </template>
-          <b-dropdown-item to="">Settings</b-dropdown-item>
+          <b-dropdown-item to="/dashboard/profile">Profile</b-dropdown-item>
           <b-dropdown-item to="/dashboard">Dashboard</b-dropdown-item>
           <b-dropdown-item to="/dashboard/employeePanel">DB management</b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider>

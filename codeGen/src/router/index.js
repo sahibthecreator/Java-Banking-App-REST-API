@@ -8,6 +8,7 @@ import EmployeeTransaction from '@/components/Transaction/EmployeeTransaction.vu
 import RequestAccount from '@/components/RequestAccount/RequestAccount.vue';
 import EmployeePanel from '@/components/EmployeePanel/EmployeePanel.vue'
 import CreateBankAccount from '@/components/CreateAccount/CreateAccount.vue';
+import Profile from '@/components/Profile/Profile.vue';
 import NotFound from '@/components/NotFound.vue';
 import ATM from '@/components/ATM/ATM.vue'
 import store from '../store'; // Import the Vuex store
@@ -23,10 +24,11 @@ const router = createRouter({
     { path: '/dashboard', name: 'my dashboard', component: Dashboard, meta: { requiresAuth: true } },
     { path: '/atm', name: 'ATM', component: ATM, meta: { requiresAuth: true } },
     { path: '/:pathMatch(.*)*', name: '404 Not Found', component: NotFound },
-    { path: '/dashboard/transaction', name: 'transfer', component: Transaction, meta: { requiresAuth: true} },
+    { path: '/dashboard/transaction', name: 'transfer', component: Transaction, meta: { requiresAuth: true } },
     { path: '/dashboard/requestAccount', name: 'request', component: RequestAccount, meta: { requiresAuth: true } },
     { path: '/dashboard/employeePanel', name: 'employeePanel', component: EmployeePanel, meta: { requiresAuth: true } },
     { path: '/dashboard/employeePanel/createAccount', name: 'createAccount', component: CreateBankAccount, meta: { requiresAuth: true } },
+    { path: '/dashboard/profile', name: 'profile', component: Profile, meta: { requiresAuth: true } },
     { path: '/dashboard/employeePanel/transaction', name: 'employeeTransfer', component: EmployeeTransaction, meta: { requiresAuth: true} },
   ],
 });
