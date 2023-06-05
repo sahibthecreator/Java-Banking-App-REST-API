@@ -4,18 +4,10 @@ import UserWidget from '../UserWidget.vue';
 
 <template>
   <div class="peoplePanel">
-    <b-input placeholder="enter username" v-model="search" v-on:change="searchIban()" />
+    <b-input placeholder="enter username" v-model="search" @input="searchIban"/>
 
     <div class="card users">
-      <UserWidget index="1" username="username here" iban="iban here" />
-      <UserWidget index="1" username="username here" iban="iban here" />
-      <UserWidget index="1" username="username here" iban="iban here" />
-      <UserWidget index="1" username="username here" iban="iban here" />
-      <UserWidget index="1" username="username here" iban="iban here" />
-      <UserWidget index="1" username="username here" iban="iban here" />
-      <UserWidget index="1" username="username here" iban="iban here" />
-      <UserWidget index="1" username="username here" iban="iban here" />
-      <UserWidget index="1" username="username here" iban="iban here" />
+      <UserWidget v-for="(result, index) in searchResults" :username="result.firstName + ' ' + result.lastName" :index="index+1" :iban="result.iban" />
     </div>
   </div>
 </template>
@@ -30,16 +22,17 @@ export default {
     };
   },
   mounted() {
+    this.searchIban();
   },
   methods: {
     async searchIban() {
+      console.log("searching");
       try {
         let request = {
           firstName: this.search.split(' ')[0] ? this.search.split(' ')[0] : "",
           lastName: this.search.split(' ')[1] ? this.search.split(' ')[1] : ""
         }
         let res = await this.$store.dispatch("getIbanByName", request);
-        console.log(res);
         this.searchResults = res;
       }
       catch (e) {

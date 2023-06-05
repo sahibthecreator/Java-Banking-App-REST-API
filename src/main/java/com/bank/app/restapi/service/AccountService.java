@@ -141,18 +141,11 @@ public class AccountService {
         }
     }
 
-    public CustomerIbanDTO getIbanByUsername(String firstname, String lastname) {
-        List<String> ibans = accountRepository.findIbanByFirstNameAndLastName(firstname, lastname);
-
-        CustomerIbanDTO customerIbanDTO = new CustomerIbanDTO();
-        customerIbanDTO.setFirstName(firstname);
-        customerIbanDTO.setLastName(lastname);
-        customerIbanDTO.setIbanList(ibans);
-
-        if (ibans.isEmpty()) {
-            throw new EntityNotFoundException("No accounts found for user: " + firstname + " " + lastname);
-        }
-        return customerIbanDTO;
+    public List<CustomerIbanDTO> getIbanByUsername(String firstname, String lastname) {
+        firstname = firstname == null ? "" : firstname.toLowerCase();
+        lastname = lastname == null ? "" : lastname.toLowerCase();
+        List<CustomerIbanDTO> customerIbanDTOs = accountRepository.findIbanByFirstNameAndLastName(firstname, lastname);
+        return customerIbanDTOs;
     }
 
     public List<AccountDTO> getAccountsByUserId(UUID userId) {

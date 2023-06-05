@@ -21,5 +21,5 @@ public class CustomerIbanDTO {
     private String lastName;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<String> ibanList;
+    private String iban;
 }
