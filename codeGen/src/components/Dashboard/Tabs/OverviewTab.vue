@@ -196,6 +196,7 @@ export default {
         console.log(error);
         if (this.user == null) {
           this.$store.dispatch('logout');
+          location.reload();
         }
       }
     },
