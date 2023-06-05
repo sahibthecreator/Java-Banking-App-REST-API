@@ -114,19 +114,14 @@ class AccountControllerTest {
     }
 
     @Test
-    void getIbanByCustmerNameShouldReturnListOfIbans() {
-        List<String> ibans = accountRepository.findIbanByFirstNameAndLastName("Root", "Admin");
-        CustomerIbanDTO customerIbanDTO = CustomerIbanDTO.builder()
-                .firstName("Root")
-                .lastName("Admin")
-                .ibanList(ibans)
-                .build();
+    void getIbanByCustomerNameShouldReturnListOfIbans() {
+        List<CustomerIbanDTO> ibans = accountRepository.findIbanByFirstNameAndLastName("Root", "Admin");
 
-        when(accountService.getIbanByUsername("Root", "Admin")).thenReturn(customerIbanDTO);
+        when(accountService.getIbanByUsername("Root", "Admin")).thenReturn(ibans);
 
-        ResponseEntity<CustomerIbanDTO> response = accountController.getIbanByCustomerName("Root", "Admin");
+        ResponseEntity<List<CustomerIbanDTO>> response = accountController.getIbanByCustomerName("Root", "Admin");
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(customerIbanDTO, response.getBody());
+        assertEquals(ibans, response.getBody());
         verify(accountService, times(1)).getIbanByUsername("Root", "Admin");
     }
 
