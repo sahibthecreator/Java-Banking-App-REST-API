@@ -1,7 +1,7 @@
 <script setup>
-import AccountWidgetV2 from '../AccountWidget.vue';
-import CurrentAccountPanelV2 from '../CurrentAccountPanel.vue';
-import TransactionWidgetV2 from '../TransactionWidget.vue';
+import AccountWidget from '../AccountWidget.vue';
+import CurrentAccountPanel from '../CurrentAccountPanel.vue';
+import TransactionWidget from '../TransactionWidget.vue';
 </script>
 
 <template>
@@ -36,8 +36,7 @@ import TransactionWidgetV2 from '../TransactionWidget.vue';
           € {{ remainingDayLimit }}</span>
         <span class="contentBig" v-else> {{ currentAccount.iban }}</span>
         <span class="contentSmall" v-if="!currentAccount">
-          <span id="timer-text">... remaining</span></span
-        >
+          <span id="timer-text">... remaining</span></span>
         <span class="contentSmall" v-else>
           {{ currentAccount.typeOfAccount }}
         </span>
@@ -78,13 +77,13 @@ import TransactionWidgetV2 from '../TransactionWidget.vue';
           </h3>
         </div>
         <div class="accountsWrapper" v-if="!currentAccount">
-          <AccountWidgetV2 v-for="(account, index) in accounts" :key="index" :balance="account.balance"
+          <AccountWidget v-for="(account, index) in accounts" :key="index" :balance="account.balance"
             :name="user.firstName" :iban="account.iban" :type="account.typeOfAccount"
             @click.native="setCurrentAccountView(account)" />
         </div>
-        <CurrentAccountPanelV2 :currentAccount="currentAccount" :user="user" @returnBack="returnDashboardView"
+        <CurrentAccountPanel :currentAccount="currentAccount" :user="user" @returnBack="returnDashboardView"
           v-if="currentAccount">
-        </CurrentAccountPanelV2>
+        </CurrentAccountPanel>
       </div>
       <div class="card right">
         <div class="header">
@@ -95,13 +94,13 @@ import TransactionWidgetV2 from '../TransactionWidget.vue';
               this week
             </p>
             <p v-else>
-              You made/received (to be implemented) transactions this week
+              You made/received {{ currentTransactions?.length }} transactions this week
             </p>
           </div>
         </div>
         <div class="transactionsWrapper">
-          <TransactionWidgetV2 v-for="(transaction, index) in currentTransactions" :key="index"
-            :transaction="transaction" :currentAccount="currentAccount"/>
+          <TransactionWidget v-for="(transaction, index) in currentTransactions" :key="index" :transaction="transaction"
+            :currentAccount="currentAccount" :accounts="accounts" />
         </div>
       </div>
     </div>
@@ -122,8 +121,8 @@ var leftTime = leftHour * 3600 + leftMinute * 60 + leftSeconds;
 function updateTimer() {
   var timer = document.getElementById('timer-text');
   if (!timer) {
-  return;
-}
+    return;
+  }
   var h = Math.floor(leftTime / 3600);
   var m = Math.floor((leftTime - h * 3600) / 60);
   var s = Math.floor(leftTime % 60);
@@ -197,6 +196,7 @@ export default {
         console.log(error);
         if (this.user == null) {
           this.$store.dispatch('logout');
+          location.reload();
         }
       }
     },

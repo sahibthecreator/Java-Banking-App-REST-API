@@ -71,7 +71,7 @@ export default {
     const timePart = parts[1];
     const time = timePart.split(':').slice(0, 2).join(':');
     this.time = time;
-    this.updateTransactionDetails(this.accounts, this.transaction);
+
   },
   methods: {
     updateTransactionDetails(accounts, transaction) {

@@ -60,7 +60,7 @@ export default {
           if (this.user == null) {
             this.$store.dispatch('logout');
           }
-        }
+m         }
       },
     },
   },

@@ -30,6 +30,8 @@ public class SecurityConfig {
             "/auth/**",
             "/users/{userId}",
             "/accounts/**",
+            "/users/**",
+            "/transactions/**"
     };
 
     @Autowired

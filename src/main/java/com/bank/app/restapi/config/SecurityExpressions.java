@@ -1,12 +1,16 @@
 package com.bank.app.restapi.config;
 
+import java.nio.file.AccessDeniedException;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Component("securityExpressions")
 public class SecurityExpressions {
-    public boolean isSameUserOrEmployee(String userId, Authentication authentication) {
+    public boolean isSameUserOrEmployee(String userId, Authentication authentication) throws AccessDeniedException {
+        
+
         if (userId == null && authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_EMPLOYEE")))
             return true;
 

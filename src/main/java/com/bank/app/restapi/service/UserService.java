@@ -16,6 +16,8 @@ import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
+
+import org.modelmapper.internal.bytebuddy.dynamic.TypeResolutionStrategy.Active;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -99,10 +101,11 @@ public class UserService {
         Optional<User> existingUserOptional = userRepository.findById(userId);
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
+
             System.out.println(existingUser.isActive());
             BeanUtils.copyProperties(user, existingUser, "id", "password", "active"); // Exclude copying the id ,active, pass property
             System.out.println(existingUser.isActive());
-
+            
             User savedUser = userRepository.save(existingUser);
             return userMapper.toDTO(savedUser);
         } else {
@@ -170,7 +173,10 @@ public class UserService {
                 .mapToDouble(Transaction::getAmount)
                 .sum();
 
-        return user.getDayLimit() - totalSpentToday;
+        double remainingLimit = user.getDayLimit() - totalSpentToday;
+        double roundedRemainingLimit = Math.round(remainingLimit * 100.0) / 100.0;
+
+        return roundedRemainingLimit;
     }
 
     // Private methods
