@@ -184,12 +184,12 @@ public class TransactionService {
     private void validateAccountsBasedOnTransactionType(Account accountToVerify, boolean accountToVerifyIsSending, TransactionType transactionType) {
         switch (transactionType) {
             case DEPOSIT:
-                if (!accountToVerify.equals(accountService.getAccountDTOByIban("NL01INHO0000000001")) && !accountToVerifyIsSending) {
+                if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001")) && !accountToVerifyIsSending) {
                     throw new AccessDeniedException("During deposit, transaction cannot be sent to an account other than the BANK's dedicated one");
                 }
                 break;
             case WITHDRAWAL:
-                if (!accountToVerify.equals(accountService.getAccountDTOByIban("NL01INHO0000000001")) && accountToVerifyIsSending) {
+                if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001")) && accountToVerifyIsSending) {
                     throw new AccessDeniedException("During withdrawal, transaction cannot be sent from an account other than the BANK's dedicated one");
                 }
                 break;
