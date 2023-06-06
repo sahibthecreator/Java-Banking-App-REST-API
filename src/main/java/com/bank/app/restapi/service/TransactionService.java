@@ -181,7 +181,7 @@ public class TransactionService {
         return amount;
     }
 
-    private Account validateAccountsBasedOnTransactionType(Account accountToVerify, boolean accountToVerifyIsSending,
+    private void validateAccountsBasedOnTransactionType(Account accountToVerify, boolean accountToVerifyIsSending,
             TransactionType transactionType) {
         switch (transactionType) {
             case DEPOSIT:
