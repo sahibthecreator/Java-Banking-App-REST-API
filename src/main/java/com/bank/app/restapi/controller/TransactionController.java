@@ -26,7 +26,7 @@ public class TransactionController {
     }
 
     @GetMapping()
-    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
+    @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<List<TransactionDTO>> getTransactions(
             @RequestParam(value = "iban", required = false) String iban,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate,
@@ -34,10 +34,14 @@ public class TransactionController {
             @RequestParam(value = "minAmount", required = false) Float minAmount,
             @RequestParam(value = "maxAmount", required = false) Float maxAmount,
             @RequestParam(value = "exactAmount", required = false) Float exactAmount,
-            @RequestParam(value = "typeOfTransaction", required = false) TransactionType typeOfTransaction) {
+            @RequestParam(value = "typeOfTransaction", required = false) TransactionType typeOfTransaction,
+            Authentication authentication) {
+
+        UserData userData = (UserData) authentication.getPrincipal();
+        UUID callingUserId = userData.getId();
 
         List<TransactionDTO> transactions = transactionService.getTransactions(iban, minAmount, maxAmount, exactAmount,
-                typeOfTransaction, startDate, endDate);
+                typeOfTransaction, startDate, endDate, callingUserId);
 
         int statusCode = transactions.isEmpty() ? 204 : 200;
 

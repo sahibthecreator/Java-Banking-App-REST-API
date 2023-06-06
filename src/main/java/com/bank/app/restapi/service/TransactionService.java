@@ -59,11 +59,14 @@ public class TransactionService {
     }
 
     public List<TransactionDTO> getTransactions(String iban, Float minAmount, Float maxAmount, Float exactAmount,
-            TransactionType typeOfTransaction, LocalDate startDate, LocalDate endDate) {
+            TransactionType typeOfTransaction, LocalDate startDate, LocalDate endDate, UUID callingUserId) {
 
         Specification<Transaction> specification = Specification.where(null);
 
         if (iban != null && !iban.isEmpty()) {
+            validateGetTransactionsLogic(userRepository.findById(callingUserId).orElseThrow(
+                            () -> new EntityNotFoundException("Calling user not found")),
+                    mapAccountIbanToOwner(accountService.getAccountByIban(iban)));
             specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.or(
                     criteriaBuilder.equal(root.get("fromAccount").get("iban"), iban),
                     criteriaBuilder.equal(root.get("toAccount").get("iban"), iban)));
@@ -200,8 +203,6 @@ public class TransactionService {
             default:
                 throw new IllegalArgumentException("Undefined type of transaction");
         }
-
-        return accountToVerify;
     }
 
     private void validateAccountsBasedOnAccountType(Account sendingAccountToVerify, Account receivingAccountToVerify,
@@ -240,6 +241,16 @@ public class TransactionService {
         } else if (performingUser.getRole() == UserType.CUSTOMER) {
             if (performingUser.getId() != ownerOfSendingAccount.getId()) {
                 throw new AccessDeniedException("Cannot perform transaction. User has no employee rights.");
+            }
+        }
+    }
+
+    private void validateGetTransactionsLogic(User callingUser, User ownerOfRequestedIban) {
+        if (callingUser.getRole() == UserType.USER) {
+            throw new AccessDeniedException("Cannot get transactions. User is not customer.");
+        } else if (callingUser.getRole() == UserType.CUSTOMER) {
+            if (callingUser.getId() != ownerOfRequestedIban.getId()) {
+                throw new AccessDeniedException("Cannot get transaction. User has no employee rights.");
             }
         }
     }
