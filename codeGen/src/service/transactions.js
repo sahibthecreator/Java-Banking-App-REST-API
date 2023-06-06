@@ -27,6 +27,31 @@ export const performTransaction = async (transactionData, token) => {
   }
 };
 
+export const depositATM = async (depositData, token) => {
+  try {
+    const response = await axios.post(`/transactions`, depositData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const withdrawATM = async (withdrawData, token) => {
+  try {
+    const response = await axios.post(`/transactions`, withdrawData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const getTransactionsByUserId = async (userId, token) => {
   try {
     const response = await axios.get(`/transactions/userId/${userId}`, {

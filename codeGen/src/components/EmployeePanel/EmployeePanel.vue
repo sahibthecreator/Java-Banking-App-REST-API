@@ -2,6 +2,8 @@
 import Navigation from '@/components/Navigation.vue';
 import RequestWidget from './RequestWidget.vue';
 import UserWidget from './UserWidget.vue';
+import AccountWidgetExpandable from './AccountWidgetExpandable.vue';
+
 </script>
 
 <template>
@@ -11,7 +13,7 @@ import UserWidget from './UserWidget.vue';
 
   <div class="employeePanel">
     <div class="pageGrid">
-      <div class="userList d-flex" :class="{ 'expanded': userPanelExpanded }">
+      <div class="userList d-flex" :class="{ 'expanded': userPanelExpanded }" v-if="currentTab == 0">
         <div class="expandBtn" @click="userPanelExpanded = !userPanelExpanded">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
             class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">
@@ -21,17 +23,47 @@ import UserWidget from './UserWidget.vue';
         </div>
 
         <div class="roleFilterBtns">
-          <b-input v-if="userPanelExpanded" placeholder="enter username" v-model="search" @input="searchUsers" />
+          <div class="options">
+            <option v-bind:id="currentTab == 0 ? 'selected' : ''" @click="currentTab = 0">Users</option>
+            <option v-bind:id="currentTab == 1 ? 'selected' : ''" @click="currentTab = 1">Accounts
+            </option>
+          </div>
+          <div>
+            <b-input v-if="userPanelExpanded" placeholder="enter username" v-model="search" @input="searchUsers" />
 
-          <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'USER' }"
-            v-on:click="setRoleFilter('USER')">User</b-button>
+            <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'USER' }"
+              v-on:click="setRoleFilter('USER')">User</b-button>
 
-          <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'CUSTOMER' }"
-            v-on:click="setRoleFilter('CUSTOMER')">Customer</b-button>
-          <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'EMPLOYEE' }"
-            v-on:click="setRoleFilter('EMPLOYEE')">Employee</b-button>
+            <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'CUSTOMER' }"
+              v-on:click="setRoleFilter('CUSTOMER')">Customer</b-button>
+            <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'EMPLOYEE' }"
+              v-on:click="setRoleFilter('EMPLOYEE')">Employee</b-button>
+          </div>
         </div>
+
         <UserWidget v-for="(user, index) in filteredUsers" :user="user" />
+      </div>
+
+      <!----------------- Accounts Panel ------------------->
+      <div class="userList accountsList d-flex" :class="{ 'expanded': userPanelExpanded }" v-if="currentTab == 1">
+        <div class="expandBtn" @click="userPanelExpanded = !userPanelExpanded">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-arrows-angle-expand" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+              d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z" />
+          </svg>
+        </div>
+
+        <div class="roleFilterBtns">
+          <div class="options">
+            <option v-bind:id="currentTab == 0 ? 'selected' : ''" @click="currentTab = 0">Users</option>
+            <option v-bind:id="currentTab == 1 ? 'selected' : ''" @click="currentTab = 1">Accounts
+            </option>
+          </div>
+          <b-input v-if="userPanelExpanded" placeholder="enter iban" v-model="search" @input="searchUsers" />
+        </div>
+        <AccountWidgetExpandable v-for="(account, index) in accounts" :account="account"
+          :user="mapAccountToUser(account)" />
       </div>
 
       <div class="rightPanel">
@@ -66,18 +98,21 @@ export default {
   data() {
     return {
       users: null,
+      accounts: null,
       filteredUsers: null,
       requests: null,
       roleFilter: null,
-      userPanelExpanded: true,
+      userPanelExpanded: false,
+      accountsPanelEnabled: false,
       search: "",
+      currentTab: 0
     };
   },
   mounted() {
     this.checkUser();
     this.getAllUsers();
+    this.initAllAccounts();
     this.initAllRequests();
-    //this.searchUsers();
   },
 
   methods: {
@@ -103,7 +138,21 @@ export default {
       } catch (error) {
         console.log(error);
         if (this.users == null) {
-          console.log('Connection refused');
+          this.$store.dispatch('logout');
+          this.$router.push('/login')
+        }
+      }
+    },
+    async initAllAccounts() {
+      try {
+        let accounts = await this.$store.dispatch('getAccounts');
+        this.accounts = accounts;
+        console.table(accounts[0]);
+      } catch (error) {
+        console.log(error);
+        if (this.users == null) {
+          this.$store.dispatch('logout');
+          this.$router.push('/login')
         }
       }
     },
@@ -129,6 +178,10 @@ export default {
       });
 
       this.filteredUsers = searchResults;
+    },
+    mapAccountToUser(account) {
+      const user = this.users.find(u => u.id === account.userId);
+      return user;
     }
 
   },
@@ -164,7 +217,7 @@ export default {
       gap: 20px;
       overflow: auto;
       white-space: nowrap;
-      padding: 35px;
+      padding: 10px 35px;
       background: var(--white);
       box-shadow: 0 0 30px #1414140a;
       border-radius: 10px;
@@ -190,6 +243,31 @@ export default {
         &:hover {
           opacity: 0.6;
         }
+      }
+    }
+
+    .options {
+      display: flex;
+      flex-direction: row;
+      padding: 5px;
+      gap: 10px;
+      background: #ebebeb;
+      width: fit-content;
+      border-radius: 7px;
+      margin-bottom: 1rem;
+
+      option {
+        padding: 5px 15px;
+        border-radius: 4px;
+        color: var(--gray-light);
+        cursor: pointer;
+      }
+
+      #selected {
+        color: var(--gray-dark);
+        background: var(--white);
+        box-shadow: 0 0 30px #14141417;
+        font-weight: 500;
       }
     }
 
@@ -267,6 +345,9 @@ export default {
 
 .roleFilterBtns {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
   gap: 5%;
 
   .btn {

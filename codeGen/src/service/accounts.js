@@ -53,6 +53,43 @@ export const createAccount = async (accountData, token) => {
   }
 };
 
+export const updateAccount = async ({ iban, accountData }, token) => {
+  try {
+    const response = await axios.put(`/accounts/${iban}`, accountData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const deactivateAccount = async (iban, token) => {
+  try {
+    const response = await axios.patch(`/accounts/${iban}`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const activateAccount = async (iban, token) => {
+  try {
+    const response = await axios.patch(`/accounts/${iban}/activate`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const requestAccount = async (requestData, token) => {
   try {
     const response = await axios.post(`/accounts/requests`, requestData, {

@@ -3,7 +3,7 @@ import { login, register } from '@/service/auth';
 import { getUser, getUsers, createUser, updateUser, deleteUser } from '@/service/users';
 import { getAccounts, createAccount } from '@/service/accounts';
 import { getTransactions, getTransaction } from '@/service/transactions';
-import { approveRequest, denyRequest, getAccountsByUserId, getAllRequests, getIbanByName, requestAccount } from '../service/accounts';
+import { activateAccount, approveRequest, deactivateAccount, denyRequest, getAccountsByUserId, getAllRequests, getIbanByName, requestAccount, updateAccount } from '../service/accounts';
 import { getTransactionsByUserId, performTransaction } from '../service/transactions';
 import { getRemainingDayLimit, getUsersByName } from '../service/users';
 
@@ -127,17 +127,6 @@ const store = new Vuex.Store({
                 throw new Error(error.message);
             }
         },
-        // async updateUserEmail({ commit, state }, { userId, userEmail }) {
-        //     try {
-        //         console.log(userEmail);
-
-        //         await updateUserEmail(userId, userEmail, state.token);
-        //         commit('setUserEmail', userEmail);
-        //         commit('updateUserEmailInComponent', userEmail);
-        //     } catch (error) {
-        //         throw new Error(error.message);
-        //     }
-        // },
         async deleteUser({ commit, state }, userId) {
             try {
                 await deleteUser(userId, state.token);
@@ -159,6 +148,7 @@ const store = new Vuex.Store({
             try {
                 const accounts = await getAccounts(state.token);
                 commit('setAccounts', accounts);
+                return accounts;
             } catch (error) {
                 throw new Error(error.message);
             }
@@ -174,6 +164,29 @@ const store = new Vuex.Store({
         async createAccount({ commit, state }, accountData) {
             try {
                 await createAccount(accountData, state.token);
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async updateAccount({ commit, state }, { iban, accountData }) {
+            try {
+                await updateAccount({ iban, accountData }, state.token);
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async deactivateAccount({ commit, state }, iban) {
+            try {
+                const res = await deactivateAccount(iban, state.token);
+                return res;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async activateAccount({ commit, state }, iban) {
+            try {
+                const res = await activateAccount(iban, state.token);
+                return res;
             } catch (error) {
                 throw new Error(error.message);
             }
