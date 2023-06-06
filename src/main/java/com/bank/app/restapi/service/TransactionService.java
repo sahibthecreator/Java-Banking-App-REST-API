@@ -135,7 +135,7 @@ public class TransactionService {
 
         validatePerformingUserLogic(userRepository.findById(performingUserId).orElseThrow(
                 () -> new EntityNotFoundException("Performing user not found")),
-                mapAccountIbanToOwner(sendingAccount));
+                mapAccountIbanToOwner(sendingAccount), mapAccountIbanToOwner(receivingAccount), type);
         validateAccountLogic(sendingAccount, receivingAccount, type);
 
         Transaction t = new Transaction();
@@ -235,20 +235,40 @@ public class TransactionService {
         checkSelfAccountTransaction(sendingAccountToVerify, receivingAccountToVerify);
     }
 
-    private void validatePerformingUserLogic(User performingUser, User ownerOfSendingAccount) {
-        if (performingUser.getRole() == UserType.USER) {
-            throw new AccessDeniedException("Cannot perform transactions. User is not customer.");
-        } else if (performingUser.getRole() == UserType.CUSTOMER) {
-            if (performingUser.getId() != ownerOfSendingAccount.getId()) {
-                throw new AccessDeniedException("Cannot perform transaction. User has no employee rights.");
-            }
+    private void validatePerformingUserLogic(User performingUser, User ownerOfSendingAccount, User ownerOfReceivingAccount, TransactionType transactionType) {
+        switch (transactionType) {
+            case TRANSFER, DEPOSIT:
+                ThrowExceptionForUserRole(performingUser.getRole());
+                if (performingUser.getRole() == UserType.CUSTOMER) {
+                    if (performingUser.getId() != ownerOfSendingAccount.getId()) {
+                        throw new AccessDeniedException("Cannot perform transaction. Customer is not owner of the sending account.");
+                    }
+                }
+                break;
+            case WITHDRAWAL:
+                ThrowExceptionForUserRole(performingUser.getRole());
+                if (performingUser.getRole() == UserType.CUSTOMER) {
+                    if (performingUser.getId() != ownerOfReceivingAccount.getId()) {
+                        throw new AccessDeniedException("Cannot perform transaction. Customer is not owner of the receiving account.");
+                    }
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Undefined type of transaction");
+        }
+
+    }
+
+    //I have this check on a lot of places, might as well make it a method
+    private void ThrowExceptionForUserRole(UserType role) {
+        if (role == UserType.USER) {
+            throw new AccessDeniedException("Cannot perform/get transactions. User is not customer.");
         }
     }
 
     private void validateGetTransactionsLogic(User callingUser, User ownerOfRequestedIban) {
-        if (callingUser.getRole() == UserType.USER) {
-            throw new AccessDeniedException("Cannot get transactions. User is not customer.");
-        } else if (callingUser.getRole() == UserType.CUSTOMER) {
+        ThrowExceptionForUserRole(callingUser.getRole());
+        if (callingUser.getRole() == UserType.CUSTOMER) {
             if (callingUser.getId() != ownerOfRequestedIban.getId()) {
                 throw new AccessDeniedException("Cannot get transaction. User has no employee rights.");
             }
