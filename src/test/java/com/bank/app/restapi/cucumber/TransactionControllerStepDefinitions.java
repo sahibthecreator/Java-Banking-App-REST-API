@@ -36,10 +36,10 @@ public class TransactionControllerStepDefinitions {
         String iban = "NL16INHO76255591";
 
         List<TransactionDTO> transactions = new ArrayList<>();
-        Mockito.when(transactionService.getTransactions(iban, null, null, null, null, null, null))
+        Mockito.when(transactionService.getTransactions(iban, null, null, null, null, null, null, null))
                 .thenReturn(transactions);
 
-        multipleTransactionsResponse = transactionController.getTransactions(iban, null, null, null, null, null, null);
+        multipleTransactionsResponse = transactionController.getTransactions(iban, null, null, null, null, null, null, null);
     }
 
     @Then("I should receive a response with status {int} and a list of transactions")

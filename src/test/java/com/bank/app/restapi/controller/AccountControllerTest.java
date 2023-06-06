@@ -1,17 +1,13 @@
 package com.bank.app.restapi.controller;
 
-import com.bank.app.restapi.controller.AccountController;
 import com.bank.app.restapi.dto.AccountBalanceDTO;
 import com.bank.app.restapi.dto.AccountDTO;
 import com.bank.app.restapi.dto.CustomerIbanDTO;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
-import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.AccountType;
-import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.service.AccountService;
 
-import org.glassfish.jaxb.core.v2.TODO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +47,7 @@ class AccountControllerTest {
     void getAllShouldReturnListOfAccounts() {
         List<AccountDTO> mockAccounts = Arrays.asList(new AccountDTO(), new AccountDTO());// createMockAccounts();
 
-          when(accountService.getAccounts(null, null, null, null, null, true, null, 10)).thenReturn(mockAccounts);
+        when(accountService.getAccounts(null, null, null, null, null, true, null, 10)).thenReturn(mockAccounts);
 
         ResponseEntity<List<AccountDTO>> response = accountController.getAccounts(null, null, null, null, null, true,
                 null, 10);
