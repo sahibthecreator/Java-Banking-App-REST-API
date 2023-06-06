@@ -83,7 +83,8 @@ import Navigation from '@/components/Navigation.vue';
             <div class="actions">
                 <button type="button" class="history" @click="statusPopupCardEnabled = false"
                     v-if="!loading && !ifEmailChanged()">Close</button>
-                <button type="button" class="history" @click="goToLogin()" v-if="!loading && ifEmailChanged()">Login</button>
+                <button type="button" class="history" @click="goToLogin()"
+                    v-if="!loading && ifEmailChanged()">Login</button>
             </div>
         </div>
     </div>
@@ -153,26 +154,6 @@ export default {
             }
 
         },
-        async updateUserBtn() {
-            try {
-                console.log('start updating')
-
-                await this.$store.dispatch('updateUser', {
-                    userId: this.$store.state.userId,
-                    userData: this.user
-                });
-
-                console.log('finish updating')
-
-                this.loading = true;
-                this.responsePopupEnabled = true;
-                await this.delay(1500);
-                this.loading = false;
-
-            } catch (error) {
-                this.errorMsg = error;
-            }
-        },
         async getAllAccounts() {
             try {
                 let accounts = await this.$store.dispatch(
@@ -199,11 +180,6 @@ export default {
             this.$router.push('/login')
         },
     },
-    // mutations: {
-    //     updateUserEmailInComponent(state, userEmail) {
-    //         state.user.email = userEmail;
-    //     },
-    // }
 };
 </script>
 

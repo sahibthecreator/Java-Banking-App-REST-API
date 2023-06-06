@@ -28,6 +28,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import jakarta.persistence.criteria.Predicate;
 
@@ -120,6 +121,15 @@ public class AccountService {
 
         Account account = accountMapper.toEntity(bank);
         account = accountRepository.saveAndFlush(account);
+    }
+
+    public void updateAbsoluteLimit(String iban, AccountDTO accountDTO) throws EntityNotFoundException {
+        Account existingAccount = accountRepository.findByIban(iban);
+        if (existingAccount == null) {
+            throw new EntityNotFoundException("Account with following iban: " + iban + " not found");
+        }
+        existingAccount.setAbsoluteLimit(accountDTO.getAbsoluteLimit());
+        accountRepository.save(existingAccount);
     }
 
     public String deactivateAccount(String iban) {
@@ -282,8 +292,8 @@ public class AccountService {
     }
 
     private void setLimits(User user) {
-        user.setDayLimit(2000);
-        user.setTransactionLimit(500);
+        user.setDayLimit(user.getDayLimit());
+        user.setTransactionLimit(user.getTransactionLimit());
     }
 
     private String calculateCheckDigit(String iban) {

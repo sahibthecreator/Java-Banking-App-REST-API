@@ -54,7 +54,7 @@ public class TransactionController {
     @GetMapping("userId/{userId}")
     @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
     public ResponseEntity<List<TransactionDTO>> getTransactionsByUserId(@PathVariable UUID userId) {
-        List<TransactionDTO> transactions = transactionService.getTransactionsByUserId(userId); // TODO IMplement not
+        List<TransactionDTO> transactions = transactionService.getTransactionsByUserId(userId); // TODO Implement not
                                                                                                 // found exception
         return ResponseEntity.ok(transactions);
     }

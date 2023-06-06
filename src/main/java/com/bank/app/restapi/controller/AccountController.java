@@ -77,6 +77,13 @@ public class AccountController {
         return ResponseEntity.status(200).body(accounts);
     }
 
+    @PutMapping("/{iban}")
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
+    public ResponseEntity<String> updateAccountAbsoluteLimit(@PathVariable String iban, @RequestBody @Valid AccountDTO accountDTO) {
+        accountService.updateAbsoluteLimit(iban, accountDTO);
+        return ResponseEntity.status(200).build();
+    }
+
     @PatchMapping("/{iban}")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<String> deactivateAccount(@PathVariable String iban) {

@@ -102,7 +102,6 @@ public class UserService {
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
 
-            System.out.println(existingUser.isActive());
             BeanUtils.copyProperties(user, existingUser, "id", "password", "active"); // Exclude copying the id ,active, pass property
             System.out.println(existingUser.isActive());
             
