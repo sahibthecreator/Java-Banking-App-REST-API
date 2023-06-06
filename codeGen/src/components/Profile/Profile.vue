@@ -1,47 +1,65 @@
-<script setup></script>
+<script setup>
+import Navigation from '@/components/Navigation.vue';
+</script>
 
 <template>
-    <div id="nav">
-        <b-navbar-brand to="/">
-            <img src="@/assets/Logo.svg" alt="logo" id="logo" />
-            <span id="logoTitle">WAVR</span>
-        </b-navbar-brand>
-
-        <div class="toggle-container">
-            <h6 class="toggle-title">Receive notifications</h6>
-            <div class="toggle-switch" :class="{ 'enabled': notificationsEnabled }" @click="toggleNotifications">
-                <div class="circle"></div>
-            </div>
-        </div>
-
-        <b-navbar-nav class="ml-auto">
-            <b-nav-item to="/dashboard"><img src="@/assets/Transaction/x.svg" /></b-nav-item>
-        </b-navbar-nav>
+    <div id="header">
+        <navigation />
     </div>
     <div class="profilePage">
-        <span class="dataTitle">PERSONAL DETAILS</span>
-        <div class="dataPanel">
-            <div class="dataContainer">
-                <h6>First name:<p class="data">{{ user ? user.firstName : "" }}</p>
-                </h6>
-                <h6>Last name: <p class="data">{{ user ? user.lastName : "" }}</p>
-                </h6>
-                <h6>BSN:<p class="data"> {{ user ? user.bsn : "" }}</p>
-                </h6>
-                <h6>Date of birth:<p class="data"> {{ user ? user.dateOfBirth : "" }}</p>
-                </h6>
-                <h6>Email: <input v-model="user.email" type="text" class="data">
-                </h6>
+        <div class="dataWrapper">
+
+            <h1 class="dataTitle">PERSONAL DETAILS</h1>
+            <div class="d-flex userCard">
+                <AccountIcon :accountName="user.firstName" class="icon"></AccountIcon>
+                <div class="userInfo">
+                    <div class="detailCards">
+                        <div class="detailCard">
+                            <label>First Name</label>
+                            <input class="editable" type="text" v-model="user.firstName" @input="editBtnContent = 'Save'">
+                        </div>
+                        <div class="detailCard">
+                            <label>Last Name</label>
+                            <input class="editable" type="text" v-model="user.lastName">
+                        </div>
+                    </div>
+                    <div class="detailCard">
+                        <label>Email</label>
+                        <input class="editable" type="text" v-model="user.email">
+                    </div>
+                    <div class="detailCard">
+                        <label>BSN</label>
+                        <span type="text">{{ user.bsn }}</span>
+                    </div>
+                    <div class="detailCard">
+                        <label>Day Limit</label>
+                        <span type="text">€ {{ user.dayLimit }} </span>
+                    </div>
+                    <div class="detailCard">
+                        <label>Transaction Limit</label>
+                        <span type="text">€ {{ user.transactionLimit }} </span>
+                    </div>
+                    <div class="detailCard">
+                        <label>Accounts</label>
+                        <span type="text">{{ accounts }}</span>
+                    </div>
+                    <div class="detailCard">
+                        <label>Total Balance</label>
+                        <span type="text">€ {{ totalBalance }}</span>
+                    </div>
+                </div>
+
+                <div class="userControls">
+                    <button class="button btn-warning" @click="updateUser()">{{ editBtnContent }}</button>
+                    <button class="button btn-danger" @click="goToLogin()">Logout</button>
+                </div>
             </div>
-            <b-button class="button" variant="dark_primary" v-on:click="updateUserBtn()">Update my data</b-button>
-            <p class="text-danger errorMsg">{{ errorMsg }}</p>
-            <span class="tos">You may change your email and password, but for other changes on personal data please call the
-                bank.</span>
         </div>
+
     </div>
 
     <!-- popup -->
-    <div class="card" v-if="responsePopupEnabled">
+    <div class="card" v-if="statusPopupCardEnabled">
         <div class="header">
             <!-- Loading -->
             <div class="spinnerContainer" v-if="loading">
@@ -59,11 +77,13 @@
                 <img src="@/assets/SuccessIcon.png" class="success icon" />
             </div>
             <div class="content" v-if="!loading">
-                <span class="title">Data updated successfully</span>
+                <span class="title">{{ statusTitle }}</span>
+                <span v-if="ifEmailChanged()" class="title">{{ statusSubTitle }}</span>
             </div>
             <div class="actions">
-                <b-button variant="dark_primary" class="history" v-on:click="this.$router.push('/dashboard')"
-                    v-if="!loading">Return to dashboard</b-button>
+                <button type="button" class="history" @click="statusPopupCardEnabled = false"
+                    v-if="!loading && !ifEmailChanged()">Close</button>
+                <button type="button" class="history" @click="goToLogin()" v-if="!loading && ifEmailChanged()">Login</button>
             </div>
         </div>
     </div>
@@ -83,25 +103,55 @@ export default {
                 dateOfBirth: "",
                 email: "",
             },
+            accounts: null,
+            totalBalance: 0,
             errorMsg: "",
             responsePopupEnabled: false,
             loading: false,
             delay: (ms) => new Promise((res) => setTimeout(res, ms)),
-            notificationsEnabled: false,
-
+            editBtnContent: "Edit",
+            statusPopupCardEnabled: false,
+            statusTitle: "",
+            statusSubTitle: "",
+            initialEmail: "",
         };
     },
     mounted() {
         this.getUser();
+        this.getAllAccounts();
+
     },
     methods: {
         async getUser() {
             try {
                 let user = await this.$store.dispatch('getUser', this.$store.getters.getUserId);
                 this.user = user;
+                this.initialEmail = user.email;
             } catch (error) {
                 this.errorMsg = error;
             }
+        },
+        async updateUser() {
+            console.table(this.user);
+            let request = {
+                userId: this.$store.state.userId,
+                userData: this.user
+            }
+            try {
+                await this.$store.dispatch('updateUser', request);
+                this.loading = true;
+                this.statusPopupCardEnabled = true;
+                this.statusTitle = `User updated successfully`;
+                if (this.ifEmailChanged()) {
+                    this.statusTitle = `User updated successfully`;
+                    this.statusSubTitle = `You need to login again because of changing your email`;
+                }
+                await this.delay(500);
+                this.loading = false;
+            } catch (error) {
+                alert(error.message);
+            }
+
         },
         async updateUserBtn() {
             try {
@@ -123,9 +173,31 @@ export default {
                 this.errorMsg = error;
             }
         },
+        async getAllAccounts() {
+            try {
+                let accounts = await this.$store.dispatch(
+                    'getAccountsByUserId',
+                    this.$store.state.userId,
+                );
+                this.accounts = accounts.length;
+
+                let value = accounts?.reduce((sum, account) => sum + account.balance, 0)
+                let val = (value / 1).toFixed(2).replace('.', ',');
+                this.totalBalance = val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            } catch (error) {
+                this.accounts = 0;
+            }
+        },
         toggleNotifications() {
             this.notificationsEnabled = !this.notificationsEnabled;
-        }
+        },
+        ifEmailChanged() {
+            return this.initialEmail.localeCompare(this.user.email);
+        },
+        goToLogin() {
+            this.$store.dispatch('logout');
+            this.$router.push('/login')
+        },
     },
     // mutations: {
     //     updateUserEmailInComponent(state, userEmail) {
@@ -149,18 +221,12 @@ export default {
 }
 
 .profilePage {
-    background: url('@/assets/dashboard/bg.jpg');
-    background-repeat: repeat;
-    background-clip: border-box;
-    background-position-x: center;
-    background-size: 100% 100%;
-    height: 100%;
+    height: fit-content;
+    width: 95%;
+    background-color: var(--white);
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    padding: 10px 0;
-
+    padding: 10px 5%;
 }
 
 .dataTitle {
@@ -172,7 +238,6 @@ export default {
     font-size: 20px;
     font-weight: bold;
     color: var(--blue-dark);
-    margin-left: 20px;
 }
 
 
@@ -462,6 +527,111 @@ export default {
     100% {
         -webkit-transform: translateY(-300%);
         transform: translateY(-300%);
+    }
+}
+
+
+.userCard {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5%;
+
+
+    .userInfo {
+        .detailCards {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+
+            .detailCard {
+                width: 48%;
+            }
+        }
+
+        .detailCard {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+
+
+            input,
+            span {
+                border: none;
+                color: var(--gray-light);
+                background: rgb(238, 238, 238);
+                box-shadow: 0 0 30px #1414140a;
+                border-radius: 7px;
+                border: 1px solid rgba(0, 0, 0, 0.125);
+                padding: 4px;
+
+                &:focus {
+                    outline: none;
+                }
+
+                &.editable {
+                    background: var(--white);
+                    color: rgb(8, 8, 8);
+                }
+            }
+
+            span {
+                cursor: not-allowed;
+            }
+
+            label {
+                font-size: small;
+                margin-bottom: 1%;
+                margin-top: 2%;
+                color: var(--gray-light);
+            }
+        }
+
+        .infoList {
+            width: 100%;
+            flex-direction: column;
+            color: var(--gray-light);
+            display: flex;
+            gap: 5px;
+
+            // span {
+            //   margin-block: 10px;
+            //   padding-inline: 10px;
+            //   border-radius: 35px;
+            //   background: var(--gray-black);
+            // }
+        }
+    }
+
+    .userControls {
+        margin: 10% 0 5% 0;
+        width: fit-content;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 85%;
+
+        button {
+            height: fit-content;
+            padding-block: 5px;
+            width: 47%;
+            border-radius: 7px;
+            background-color: var(--gray-black);
+            border: none;
+            color: white;
+            cursor: pointer;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.103);
+            position: relative;
+            overflow: hidden;
+            transition-duration: 0.3s;
+
+            &:active {
+                transform: translate(5px, 5px);
+                transition-duration: 0.3s;
+            }
+        }
     }
 }
 </style>
