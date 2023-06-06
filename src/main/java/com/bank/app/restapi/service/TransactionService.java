@@ -33,7 +33,7 @@ public class TransactionService {
     private TransactionMapper transactionMapper;
 
     public TransactionService(TransactionRepository transactionRepository, AccountService accountService,
-                              UserRepository userRepository, Environment environment, TransactionMapper transactionMapper) {
+            UserRepository userRepository, Environment environment, TransactionMapper transactionMapper) {
         this.transactionRepository = transactionRepository;
         this.accountService = accountService;
         this.userRepository = userRepository;
@@ -45,11 +45,11 @@ public class TransactionService {
         Specification<Transaction> specification = Specification.where(null);
 
         if (iban != null && !iban.isEmpty() && today != null) {
-            specification = specification.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("fromAccount").get("iban"), iban));
+            specification = specification.and(
+                    (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("fromAccount").get("iban"), iban));
 
-            specification = specification.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("dateOfExecution").as(Date.class), Date.valueOf(today)));
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder
+                    .equal(root.get("dateOfExecution").as(Date.class), Date.valueOf(today)));
 
             List<Transaction> transactions = transactionRepository.findAll(specification);
             return transactions.stream().map(transactionMapper::toDTO).toList();
@@ -178,16 +178,21 @@ public class TransactionService {
         return amount;
     }
 
-    private Account validateAccountsBasedOnTransactionType(Account accountToVerify, boolean accountToVerifyIsSending, TransactionType transactionType) {
+    private Account validateAccountsBasedOnTransactionType(Account accountToVerify, boolean accountToVerifyIsSending,
+            TransactionType transactionType) {
         switch (transactionType) {
             case DEPOSIT:
-                if (!accountToVerify.equals(accountService.getAccountDTOByIban("NL01INHO0000000001")) && !accountToVerifyIsSending) {
-                    throw new AccessDeniedException("During deposit, transaction cannot be sent to an account other than the BANK's dedicated one");
+                if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001"))
+                        && !accountToVerifyIsSending) {
+                    throw new AccessDeniedException(
+                            "During deposit, transaction cannot be sent to an account other than the BANK's dedicated one");
                 }
                 break;
             case WITHDRAWAL:
-                if (!accountToVerify.equals(accountService.getAccountDTOByIban("NL01INHO0000000001")) && accountToVerifyIsSending) {
-                    throw new AccessDeniedException("During withdrawal, transaction cannot be sent from an account other than the BANK's dedicated one");
+                if (!accountToVerify.equals(accountService.getAccountByIban("NL01INHO0000000001"))
+                        && accountToVerifyIsSending) {
+                    throw new AccessDeniedException(
+                            "During withdrawal, transaction cannot be sent from an account other than the BANK's dedicated one");
                 }
                 break;
             case TRANSFER:
@@ -199,28 +204,33 @@ public class TransactionService {
         return accountToVerify;
     }
 
-    private void validateAccountsBasedOnAccountType(Account sendingAccountToVerify, Account receivingAccountToVerify, TransactionType transactionType) {
-        if (sendingAccountToVerify.getTypeOfAccount() == AccountType.SAVINGS || receivingAccountToVerify.getTypeOfAccount() == AccountType.SAVINGS) {
+    private void validateAccountsBasedOnAccountType(Account sendingAccountToVerify, Account receivingAccountToVerify,
+            TransactionType transactionType) {
+        if (sendingAccountToVerify.getTypeOfAccount() == AccountType.SAVINGS
+                || receivingAccountToVerify.getTypeOfAccount() == AccountType.SAVINGS) {
             if (transactionType == TransactionType.DEPOSIT || transactionType == TransactionType.WITHDRAWAL) {
-                throw new AccessDeniedException("Cannot perform " + transactionType.name() + " transaction, involving a savings account");
+                throw new AccessDeniedException(
+                        "Cannot perform " + transactionType.name() + " transaction, involving a savings account");
             } else if (transactionType == TransactionType.TRANSFER) {
                 UUID sendingUser = sendingAccountToVerify.getUser().getId();
                 UUID receivingUser = receivingAccountToVerify.getUser().getId();
                 if (!sendingUser.equals(receivingUser)) {
-                    throw new AccessDeniedException("When involving a savings account, both the sending and the receiving account must be on the same user.");
+                    throw new AccessDeniedException(
+                            "When involving a savings account, both the sending and the receiving account must be on the same user.");
                 }
             }
         }
     }
 
-    private void validateAccountLogic(Account sendingAccountToVerify, Account receivingAccountToVerify, TransactionType transactionType) {
-        //For sending account
+    private void validateAccountLogic(Account sendingAccountToVerify, Account receivingAccountToVerify,
+            TransactionType transactionType) {
+        // For sending account
         validateAccountsBasedOnTransactionType(sendingAccountToVerify, true, transactionType);
-        //For receiving account
+        // For receiving account
         validateAccountsBasedOnTransactionType(receivingAccountToVerify, false, transactionType);
-        //For sending and receiving - SAVINGS exception logic
+        // For sending and receiving - SAVINGS exception logic
         validateAccountsBasedOnAccountType(sendingAccountToVerify, receivingAccountToVerify, transactionType);
-        //Preventing self account transfer
+        // Preventing self account transfer
         checkSelfAccountTransaction(sendingAccountToVerify, receivingAccountToVerify);
     }
 
@@ -264,13 +274,13 @@ public class TransactionService {
         checkCustomerDailyLimit(ownerOfSendingAccount.getDayLimit(), fromAccount.getIban(), amount);
     }
 
-    private void checkCustomerDailyLimit (float dayLimit, String ownerIban, float amountToSend) {
+    private void checkCustomerDailyLimit(float dayLimit, String ownerIban, float amountToSend) {
         float ownerDayLimit = dayLimit;
 
-        List<TransactionDTO> todaysTransactionsFromSendingUser = this.getTodaysTransactionsFromSendingUser(ownerIban, LocalDate.now());
+        List<TransactionDTO> todaysTransactionsFromSendingUser = this.getTodaysTransactionsFromSendingUser(ownerIban,
+                LocalDate.now());
         float sentMoneyToday = 0;
-        for (TransactionDTO t:
-             todaysTransactionsFromSendingUser) {
+        for (TransactionDTO t : todaysTransactionsFromSendingUser) {
             sentMoneyToday = sentMoneyToday + t.getAmount();
         }
 

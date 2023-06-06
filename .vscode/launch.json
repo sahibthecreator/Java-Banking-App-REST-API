@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "RestapiApplication",
+            "request": "launch",
+            "mainClass": "com.bank.app.restapi.RestapiApplication",
+            "projectName": "restapi"
+        },
+        {
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",

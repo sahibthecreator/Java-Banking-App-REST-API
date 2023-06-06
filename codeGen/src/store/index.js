@@ -4,7 +4,7 @@ import { getUser, getUsers, createUser, updateUser, deleteUser } from '@/service
 import { getAccounts, createAccount } from '@/service/accounts';
 import { getTransactions, getTransaction } from '@/service/transactions';
 import { activateAccount, approveRequest, deactivateAccount, denyRequest, getAccountsByUserId, getAllRequests, getIbanByName, requestAccount, updateAccount } from '../service/accounts';
-import { getTransactionsByUserId, performTransaction } from '../service/transactions';
+import { depositATM, getTransactionsByUserId, performTransaction, withdrawATM } from '../service/transactions';
 import { getRemainingDayLimit, getUsersByName } from '../service/users';
 
 // Vue.use(Vuex);
@@ -195,6 +195,22 @@ const store = new Vuex.Store({
             try {
                 const transaction = await performTransaction(transactionData, state.token);
                 return transaction;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async depositATM({ commit, state }, requestData) {
+            try {
+                const request = await depositATM(requestData, state.token);
+                return request;
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        },
+        async withdrawATM({ commit, state }, requestData) {
+            try {
+                const request = await withdrawATM(requestData, state.token);
+                return request;
             } catch (error) {
                 throw new Error(error.message);
             }

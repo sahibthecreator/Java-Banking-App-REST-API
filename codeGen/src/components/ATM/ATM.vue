@@ -8,12 +8,10 @@
     </b-navbar-brand>
 
     <b-navbar-nav class="ml-auto">
-      <b-nav-item to="/dashboard"
-        ><img src="@/assets/Transaction/x.svg"
-      /></b-nav-item>
+      <b-nav-item to="/dashboard"><img src="@/assets/Transaction/x.svg" /></b-nav-item>
     </b-navbar-nav>
   </div>
-  <div class="requestPage">
+  <div class="requestPage" id="atmPage">
     <div class="requestPanel">
       <span>ATM</span>
       <div class="inputRequestContainer">
@@ -23,21 +21,13 @@
 
       <div class="inputRequestContainer">
         <span>amount</span>
-        <b-input
-          placeholder="ex: 20.0"
-          type="number"
-          step="any"
-          min="0"
-          v-model="data.amount"
-        ></b-input>
+        <b-input placeholder="ex: 20.0" type="number" step="any" min="0" v-model="data.amount"></b-input>
       </div>
-      <b-button variant="dark_primary" v-on:click="deposit()">Deposit</b-button>
-      <b-button variant="dark_primary" v-on:click="widraw()">Withdraw</b-button>
+      <b-button variant="dark_primary" v-on:click="deposit()" id="depositBtn">Deposit</b-button>
+      <b-button variant="dark_primary" v-on:click="widraw()" id="withdrawBtn">Withdraw</b-button>
       <p class="text-danger errorMsg">{{ errorMsg }}</p>
-      <span class="tos"
-        >By clicking Withdraw or Deposit, I authorize WAVR to initiate a
-        transaction and accept the Terms of Services</span
-      >
+      <span class="tos">By clicking Withdraw or Deposit, I authorize WAVR to initiate a
+        transaction and accept the Terms of Services</span>
     </div>
   </div>
 
@@ -63,13 +53,8 @@
         <span class="title">Action performed successfully</span>
       </div>
       <div class="actions">
-        <b-button
-          variant="dark_primary"
-          class="history"
-          v-on:click="this.$router.push('/dashboard')"
-          v-if="!loading"
-          >Return to dashboard</b-button
-        >
+        <b-button variant="dark_primary" class="history" v-on:click="this.$router.push('/dashboard')"
+          v-if="!loading">Return to dashboard</b-button>
       </div>
     </div>
   </div>
@@ -80,11 +65,12 @@ export default {
   data() {
     return {
       selected: 'CURRENT',
-      responsePopupEnabled: false,
       data: {
         iban: null,
         amount: null,
       },
+      responsePopupEnabled: false,
+      responseMsg: "",
       loading: false,
       delay: (ms) => new Promise((res) => setTimeout(res, ms)),
       errorMsg: '',
@@ -92,10 +78,36 @@ export default {
   },
   methods: {
     async deposit() {
-      console.log('deposit', this.data);
+      try {
+        this.$store.dispatch("depositATM", this.data);
+        this.loading = true;
+        this.responsePopupEnabled = true;
+        this.responseMsg = `You successfully added €${this.data.amount} to ${this.data.iban} account`;
+        document.getElementById("atmPage").style.filter = "blur(5px)";
+        document.getElementById("atmPage").style.cursor = "default";
+        document.getElementById("depositBtn").disabled = true;
+        document.getElementById("withdrawBtn").disabled = true;
+        await this.delay(1000);
+        this.loading = false;
+      } catch (e) {
+        console.error(e.message);
+      }
     },
     async widraw() {
-      console.log('withdraw', this.data);
+      try {
+        this.$store.dispatch("withdrawATM", this.data);
+        this.loading = true;
+        this.responsePopupEnabled = true;
+        this.responseMsg = `You successfully added €${this.data.amount} to ${this.data.iban} account`;
+        document.getElementById("atmPage").style.filter = "blur(5px)";
+        document.getElementById("atmPage").style.cursor = "default";
+        document.getElementById("depositBtn").disabled = true;
+        document.getElementById("withdrawBtn").disabled = true;
+        await this.delay(1000);
+        this.loading = false;
+      } catch (e) {
+        console.error(e.message);
+      }
     },
   },
 };
@@ -142,7 +154,7 @@ export default {
   align-items: center;
 }
 
-.requestPanel > span:nth-child(1) {
+.requestPanel>span:nth-child(1) {
   font-size: 24px;
 }
 
@@ -168,12 +180,12 @@ export default {
   margin: 0px auto;
 }
 
-.inputRequestContainer > span {
+.inputRequestContainer>span {
   font-size: 16px;
   font-weight: 500;
 }
 
-.inputRequestContainer > input {
+.inputRequestContainer>input {
   font-size: 20px;
   font-weight: 400;
   border: none;
@@ -181,7 +193,7 @@ export default {
   color: var(--gray-light);
 }
 
-.inputRequestContainer > select {
+.inputRequestContainer>select {
   font-size: 20px;
   font-weight: 400;
   border: none;
@@ -190,13 +202,13 @@ export default {
   box-shadow: none;
 }
 
-.requestPanel > button {
+.requestPanel>button {
   max-width: 350px;
   width: 350px;
   min-width: 300px;
 }
 
-.inputRequestContainer > input::placeholder {
+.inputRequestContainer>input::placeholder {
   color: var(--gray-light);
 }
 

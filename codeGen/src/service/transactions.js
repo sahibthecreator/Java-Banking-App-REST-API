@@ -29,7 +29,12 @@ export const performTransaction = async (transactionData, token) => {
 
 export const depositATM = async (depositData, token) => {
   try {
-    const response = await axios.post(`/transactions`, depositData, {
+    let request = {
+      "fromAccount": "NL01INHO0000000001",
+      "toAccount": depositData.iban,
+      "amount": depositData.amount
+    }
+    const response = await axios.post(`/transactions/withdraw`, request, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
@@ -41,7 +46,12 @@ export const depositATM = async (depositData, token) => {
 };
 export const withdrawATM = async (withdrawData, token) => {
   try {
-    const response = await axios.post(`/transactions`, withdrawData, {
+    let request = {
+      "fromAccount": withdrawData.iban,
+      "toAccount": "NL01INHO0000000001",
+      "amount": withdrawData.amount
+    }
+    const response = await axios.post(`/transactions/deposit`, request, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
