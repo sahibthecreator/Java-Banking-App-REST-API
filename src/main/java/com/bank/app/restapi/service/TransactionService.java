@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class TransactionService {
@@ -41,32 +39,36 @@ public class TransactionService {
         this.transactionMapper = transactionMapper;
     }
 
-    private List<TransactionDTO> getTodaysTransactionsFromSendingUser(String iban, LocalDate today) {
-        Specification<Transaction> specification = Specification.where(null);
+    public List<TransactionDTO> getTransactions(String iban, Float minAmount, Float maxAmount, Float exactAmount,
+            TransactionType typeOfTransaction, LocalDate startDate, LocalDate endDate) {
 
-        if (iban != null && !iban.isEmpty() && today != null) {
-            specification = specification.and(
-                    (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("fromAccount").get("iban"), iban));
+    int defaultLimit = Integer.parseInt(environment.getProperty("api.transaction.default-limit", "100"));
 
-            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder
-                    .equal(root.get("dateOfExecution").as(Date.class), Date.valueOf(today)));
+        List<Transaction> transactions = transactionRepository.findAll(
+                applyQueryFilter(iban,
+                                minAmount,
+                                maxAmount,
+                                exactAmount,
+                                typeOfTransaction,
+                                startDate,
+                                endDate,
+                                null));
 
-            List<Transaction> transactions = transactionRepository.findAll(specification);
-            return transactions.stream().map(transactionMapper::toDTO).toList();
-        }
+        return transactions.stream().map(transactionMapper::toDTO).limit((defaultLimit)).toList();
 
-        throw new RuntimeException("Internal error. Could not retrieve IBAN and/or Today's date.");
     }
 
-    public List<TransactionDTO> getTransactions(String iban, Float minAmount, Float maxAmount, Float exactAmount,
+    private Specification<Transaction> applyQueryFilter(String iban, Float minAmount, Float maxAmount, Float exactAmount,
             TransactionType typeOfTransaction, LocalDate startDate, LocalDate endDate, UUID callingUserId) {
 
         Specification<Transaction> specification = Specification.where(null);
 
         if (iban != null && !iban.isEmpty()) {
-            validateGetTransactionsLogic(userRepository.findById(callingUserId).orElseThrow(
-                            () -> new EntityNotFoundException("Calling user not found")),
-                    mapAccountIbanToOwner(accountService.getAccountByIban(iban)));
+            if (callingUserId != null) {
+                validateGetTransactionsLogic(userRepository.findById(callingUserId).orElseThrow(
+                                () -> new EntityNotFoundException("Calling user not found")),
+                        mapAccountIbanToOwner(accountService.getAccountByIban(iban)));
+            }
             specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.or(
                     criteriaBuilder.equal(root.get("fromAccount").get("iban"), iban),
                     criteriaBuilder.equal(root.get("toAccount").get("iban"), iban)));
@@ -107,11 +109,7 @@ public class TransactionService {
                     Date.valueOf(endDate)));
         }
 
-        int defaultLimit = Integer.parseInt(environment.getProperty("api.transaction.default-limit", "100"));
-
-        List<Transaction> transactions = transactionRepository.findAll(specification);
-        return transactions.stream().map(transactionMapper::toDTO).limit((defaultLimit)).toList();
-
+        return specification;
     }
 
     public TransactionDTO getTransactionById(UUID transactionId) {
@@ -119,7 +117,32 @@ public class TransactionService {
                 () -> new EntityNotFoundException("Transaction not found"));
     }
 
-    public List<TransactionDTO> getTransactionsByUserId(UUID userId) {
+    public List<TransactionDTO> getTransactionsByUserId(UUID userId, String iban, Float minAmount, Float maxAmount, Float exactAmount,
+            TransactionType typeOfTransaction, LocalDate startDate, LocalDate endDate, UUID callingUserId) {
+//        List<Transaction> transactionsAfterUserIdApplied = transactionRepository.findTransactionsByUserId(userId);
+//
+//        List<Transaction> transactionsAfterQueryFiltersApplied = transactionRepository.findAll(
+//                applyQueryFilter(iban,
+//                        minAmount,
+//                        maxAmount,
+//                        exactAmount,
+//                        typeOfTransaction,
+//                        startDate,
+//                        endDate,
+//                        callingUserId));
+//
+//        Set<Transaction> combinedTransactions = new HashSet<>();
+//        combinedTransactions.addAll(transactionsAfterUserIdApplied);
+//        combinedTransactions.addAll(transactionsAfterQueryFiltersApplied);
+//
+//        List<Transaction> CombinedTransactionsToList = new ArrayList<>(combinedTransactions);
+//
+//        // Convert the list of Transaction entities to TransactionDTOs
+//        List<TransactionDTO> transactionDTOs = CombinedTransactionsToList.stream()
+//                .map(transactionMapper::toDTO).toList();
+//
+//        return transactionDTOs;
+
         List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId);
 
         // Convert the list of Transaction entities to TransactionDTOs
@@ -270,7 +293,7 @@ public class TransactionService {
         ThrowExceptionForUserRole(callingUser.getRole());
         if (callingUser.getRole() == UserType.CUSTOMER) {
             if (callingUser.getId() != ownerOfRequestedIban.getId()) {
-                throw new AccessDeniedException("Cannot get transaction. User has no employee rights.");
+                throw new AccessDeniedException("Cannot get transaction. Customer has no employee rights to look at other IBANs.");
             }
         }
     }
@@ -319,6 +342,23 @@ public class TransactionService {
             throw new IllegalArgumentException("Day limit has been reached.");
         }
 
+    }
+
+    private List<TransactionDTO> getTodaysTransactionsFromSendingUser(String iban, LocalDate today) {
+        Specification<Transaction> specification = Specification.where(null);
+
+        if (iban != null && !iban.isEmpty() && today != null) {
+            specification = specification.and(
+                    (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("fromAccount").get("iban"), iban));
+
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder
+                    .equal(root.get("dateOfExecution").as(Date.class), Date.valueOf(today)));
+
+            List<Transaction> transactions = transactionRepository.findAll(specification);
+            return transactions.stream().map(transactionMapper::toDTO).toList();
+        }
+
+        throw new RuntimeException("Internal error. Could not retrieve IBAN and/or Today's date.");
     }
 
     private User mapAccountIbanToOwner(Account account) {

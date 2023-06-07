@@ -26,7 +26,7 @@ public class TransactionController {
     }
 
     @GetMapping()
-    @PreAuthorize("@securityExpressions.loggedIn(authentication)")
+    @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<List<TransactionDTO>> getTransactions(
             @RequestParam(value = "iban", required = false) String iban,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate,
@@ -34,14 +34,10 @@ public class TransactionController {
             @RequestParam(value = "minAmount", required = false) Float minAmount,
             @RequestParam(value = "maxAmount", required = false) Float maxAmount,
             @RequestParam(value = "exactAmount", required = false) Float exactAmount,
-            @RequestParam(value = "typeOfTransaction", required = false) TransactionType typeOfTransaction,
-            Authentication authentication) {
-
-        UserData userData = (UserData) authentication.getPrincipal();
-        UUID callingUserId = userData.getId();
+            @RequestParam(value = "typeOfTransaction", required = false) TransactionType typeOfTransaction) {
 
         List<TransactionDTO> transactions = transactionService.getTransactions(iban, minAmount, maxAmount, exactAmount,
-                typeOfTransaction, startDate, endDate, callingUserId);
+                typeOfTransaction, startDate, endDate);
 
         int statusCode = transactions.isEmpty() ? 204 : 200;
 
@@ -57,10 +53,26 @@ public class TransactionController {
 
     @GetMapping("userId/{userId}")
     @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
-    public ResponseEntity<List<TransactionDTO>> getTransactionsByUserId(@PathVariable UUID userId) {
-        List<TransactionDTO> transactions = transactionService.getTransactionsByUserId(userId); // TODO Implement not
-                                                                                                // found exception
-        return ResponseEntity.ok(transactions);
+    public ResponseEntity<List<TransactionDTO>> getTransactionsByUserId(
+            @PathVariable UUID userId,
+            @RequestParam(value = "iban", required = false) String iban,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate endDate,
+            @RequestParam(value = "minAmount", required = false) Float minAmount,
+            @RequestParam(value = "maxAmount", required = false) Float maxAmount,
+            @RequestParam(value = "exactAmount", required = false) Float exactAmount,
+            @RequestParam(value = "typeOfTransaction", required = false) TransactionType typeOfTransaction,
+            Authentication authentication) {
+
+        UserData userData = (UserData) authentication.getPrincipal();
+        UUID performingUserId = userData.getId();
+
+        List<TransactionDTO> transactions = transactionService.getTransactionsByUserId(userId, iban, minAmount, maxAmount, exactAmount,
+                typeOfTransaction, startDate, endDate, performingUserId);
+
+        int statusCode = transactions.isEmpty() ? 204 : 200;
+
+        return ResponseEntity.status(statusCode).body(transactions);
     }
 
     @PostMapping(value = { "", "{mappingNameHolder}", "{mappingNameHolder}/" })
