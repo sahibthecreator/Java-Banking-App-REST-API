@@ -33,6 +33,7 @@ public class AccountRequest {
     @Column(name = "accountType")
     private AccountType accountType;
 
+    //Why not ENUM?
     @Column(name = "status")
     private String status;
 }

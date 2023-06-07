@@ -48,6 +48,7 @@ public class AccountController {
         return ResponseEntity.status(201).body(accountService.createAccount(accountDTO));
     }
 
+    //Why not accounts/{iban}?
     @GetMapping("/{iban}/accountInfo")
     @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<AccountDTO> getAccountInfo(@PathVariable String iban) {
@@ -62,6 +63,8 @@ public class AccountController {
         return ResponseEntity.status(200).body(accountBalanceDTO);
     }
 
+    //Retrieves all users if no parameter values are put?
+    //Why not /accounts/findCustomers?
     @GetMapping("/iban")
     @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<List<CustomerIbanDTO>> getIbanByCustomerName(@RequestParam(required = false) String firstname,
@@ -84,6 +87,7 @@ public class AccountController {
         return ResponseEntity.status(200).build();
     }
 
+    //Why not accounts/{iban}/deactivate ?
     @PatchMapping("/{iban}")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<String> deactivateAccount(@PathVariable String iban) {
