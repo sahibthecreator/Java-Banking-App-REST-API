@@ -39,7 +39,9 @@ public class UserController {
             @RequestParam(defaultValue = "20") int limit) {
         List<UserDTO> users = userService.getAll(firstName, lastName, email, dateOfBirth, bsn, role, sort, limit);
 
-        return ResponseEntity.status(200).body(users);
+        int statusCode = users.isEmpty() ? 204 : 200;
+
+        return ResponseEntity.status(statusCode).body(users);
     }
 
     @PostMapping("")
