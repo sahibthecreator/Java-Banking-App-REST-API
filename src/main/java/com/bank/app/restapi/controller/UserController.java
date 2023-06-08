@@ -2,12 +2,10 @@ package com.bank.app.restapi.controller;
 
 import com.bank.app.restapi.dto.RegisterDTO;
 import com.bank.app.restapi.dto.UserDTO;
-import com.bank.app.restapi.model.UserType;
 import com.bank.app.restapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

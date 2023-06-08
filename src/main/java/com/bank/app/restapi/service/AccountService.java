@@ -6,17 +6,12 @@ import com.bank.app.restapi.dto.AccountRequestDTO;
 import com.bank.app.restapi.dto.CustomerIbanDTO;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.dto.mapper.AccountRequestMapper;
-import com.bank.app.restapi.model.Account;
-import com.bank.app.restapi.model.AccountRequest;
-import com.bank.app.restapi.model.AccountType;
-import com.bank.app.restapi.model.User;
-import com.bank.app.restapi.model.UserType;
+import com.bank.app.restapi.model.*;
 import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.repository.AccountRequestRepository;
-
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,9 +23,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import jakarta.persistence.criteria.Predicate;
 
 @Service
 @AllArgsConstructor

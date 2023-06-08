@@ -25,6 +25,7 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
+    // GET /transactions endpoint, available for employees to retrieve transactions based on multiple criticises.
     @GetMapping()
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<List<TransactionDTO>> getTransactions(
@@ -39,11 +40,13 @@ public class TransactionController {
         List<TransactionDTO> transactions = transactionService.getTransactions(iban, minAmount, maxAmount, exactAmount,
                 typeOfTransaction, startDate, endDate);
 
+        //Returns 204 if no content was found and if there is content
         int statusCode = transactions.isEmpty() ? 204 : 200;
 
         return ResponseEntity.status(statusCode).body(transactions);
     }
 
+    // GET /transactions/{transactionId} endpoint, available to retrieve a specific transactions.
     @GetMapping(value = "{transactionId}")
     @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<TransactionDTO> getTransactionById(@PathVariable UUID transactionId) {
@@ -51,6 +54,8 @@ public class TransactionController {
         return ResponseEntity.status(200).body(result);
     }
 
+    // GET /transactions/userId/{userId} endpoint, available for customer
+    // (but also reachable for employees) to retrieve transactions based on multiple criticises.
     @GetMapping(value = "userId/{userId}")
     @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
     public ResponseEntity<List<TransactionDTO>> getTransactionsByUserId(
@@ -64,22 +69,32 @@ public class TransactionController {
             @RequestParam(value = "typeOfTransaction", required = false) TransactionType typeOfTransaction,
             Authentication authentication) {
 
+        //Storing the user that called this endpoint to perform some business logic
         UserData userData = (UserData) authentication.getPrincipal();
         UUID performingUserId = userData.getId();
 
         List<TransactionDTO> transactions = transactionService.getTransactionsByUserId(userId, iban, minAmount, maxAmount, exactAmount,
                 typeOfTransaction, startDate, endDate, performingUserId);
 
+        //Returns 204 if no content was found and if there is content
         int statusCode = transactions.isEmpty() ? 204 : 200;
 
         return ResponseEntity.status(statusCode).body(transactions);
     }
 
+    // POST /transactions
+    // POST /transactions/deposit
+    // POST /transactions/withdrawal
+    // All 3 endpoints are written in one controller method with added validation.
+    // There are 3 endpoints for the 3 cases of transactions (transfer/ deposit, withdrawal),
+    // to adhere to the project guide requirement
+    // All money flows are done through transactions, DEPOSITING AND WITHDRAWING BEING SPECIAL CASES
     @PostMapping(value = { "", "{mappingNameHolder}", "{mappingNameHolder}/" })
     @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<TransactionDTO> addTransaction(@PathVariable(required = false) String mappingNameHolder,
             @RequestBody TransactionDTO transaction, Authentication authentication) {
 
+        //Storing the user that called this endpoint to perform some business logic
         UserData userData = (UserData) authentication.getPrincipal();
         UUID performingUserId = userData.getId();
 

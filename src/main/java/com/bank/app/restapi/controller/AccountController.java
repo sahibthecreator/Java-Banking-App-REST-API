@@ -48,7 +48,6 @@ public class AccountController {
         return ResponseEntity.status(201).body(accountService.createAccount(accountDTO));
     }
 
-    //Why not accounts/{iban}?
     @GetMapping("/{iban}/accountInfo")
     @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<AccountDTO> getAccountInfo(@PathVariable String iban) {
@@ -63,9 +62,6 @@ public class AccountController {
         return ResponseEntity.status(200).body(accountBalanceDTO);
     }
 
-    //Retrieves all users if no parameter values are put?
-    //Why not 204 response when empty?
-    //Why not /accounts/findCustomers?
     @GetMapping("/iban")
     @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<List<CustomerIbanDTO>> getIbanByCustomerName(@RequestParam(required = false) String firstname,
@@ -134,5 +130,4 @@ public class AccountController {
         accountService.denyBankAccountRequest(requestId);
         return ResponseEntity.status(200).build();
     }
-
 }
