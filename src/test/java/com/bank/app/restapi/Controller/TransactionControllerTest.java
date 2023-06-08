@@ -105,7 +105,7 @@ public class TransactionControllerTest {
         TransactionDTO transaction = new TransactionDTO();
         transaction.setAmount(500.0f);
 
-        when(transactionService.addTransaction(any(TransactionDTO.class), any(TransactionType.class))).thenReturn(transaction);
+        when(transactionService.addTransaction(any(TransactionDTO.class), any(TransactionType.class), any(UUID.class))).thenReturn(transaction);
 
         mockMvc.perform(post("/transactions")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -113,6 +113,6 @@ public class TransactionControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.amount").value(500.0));
 
-        verify(transactionService).addTransaction(eq(transaction), eq(TransactionType.TRANSFER));
+        verify(transactionService).addTransaction(eq(transaction), eq(TransactionType.TRANSFER), eq(UUID.randomUUID()));
     }
 }

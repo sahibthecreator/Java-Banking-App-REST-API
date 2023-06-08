@@ -51,7 +51,7 @@ public class TransactionController {
         return ResponseEntity.status(200).body(result);
     }
 
-    @GetMapping("userId/{userId}")
+    @GetMapping(value = "userId/{userId}")
     @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
     public ResponseEntity<List<TransactionDTO>> getTransactionsByUserId(
             @PathVariable UUID userId,

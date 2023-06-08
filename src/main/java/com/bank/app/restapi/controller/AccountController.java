@@ -64,6 +64,7 @@ public class AccountController {
     }
 
     //Retrieves all users if no parameter values are put?
+    //Why not 204 response when empty?
     //Why not /accounts/findCustomers?
     @GetMapping("/iban")
     @PreAuthorize("@securityExpressions.loggedIn(authentication)")

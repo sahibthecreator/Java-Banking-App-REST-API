@@ -3,6 +3,7 @@ package com.bank.app.restapi.service;
 import com.bank.app.restapi.dto.TransactionDTO;
 import com.bank.app.restapi.dto.mapper.TransactionMapper;
 import com.bank.app.restapi.model.*;
+import com.bank.app.restapi.repository.AccountRepository;
 import com.bank.app.restapi.repository.TransactionRepository;
 import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,16 +25,18 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
     @Autowired
     private AccountService accountService;
+    private AccountRepository accountRepository;
     private UserRepository userRepository;
 
     private final Environment environment;
 
     private TransactionMapper transactionMapper;
 
-    public TransactionService(TransactionRepository transactionRepository, AccountService accountService,
+    public TransactionService(TransactionRepository transactionRepository, AccountService accountService, AccountRepository accountRepository,
             UserRepository userRepository, Environment environment, TransactionMapper transactionMapper) {
         this.transactionRepository = transactionRepository;
         this.accountService = accountService;
+        this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.environment = environment;
         this.transactionMapper = transactionMapper;
@@ -62,6 +65,15 @@ public class TransactionService {
             TransactionType typeOfTransaction, LocalDate startDate, LocalDate endDate, UUID callingUserId) {
 
         Specification<Transaction> specification = Specification.where(null);
+
+        if (callingUserId != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.or(
+                    criteriaBuilder.in(root.get("fromAccount").get("iban")).value(
+                            accountRepository.findIbanByUserId(callingUserId)),
+                    criteriaBuilder.in(root.get("toAccount").get("iban")).value(
+                            accountRepository.findIbanByUserId(callingUserId))
+            ));
+        }
 
         if (iban != null && !iban.isEmpty()) {
             if (callingUserId != null) {
@@ -119,6 +131,8 @@ public class TransactionService {
 
     public List<TransactionDTO> getTransactionsByUserId(UUID userId, String iban, Float minAmount, Float maxAmount, Float exactAmount,
             TransactionType typeOfTransaction, LocalDate startDate, LocalDate endDate, UUID callingUserId) {
+
+
 //        List<Transaction> transactionsAfterUserIdApplied = transactionRepository.findTransactionsByUserId(userId);
 //
 //        List<Transaction> transactionsAfterQueryFiltersApplied = transactionRepository.findAll(
@@ -143,7 +157,17 @@ public class TransactionService {
 //
 //        return transactionDTOs;
 
-        List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId);
+        //List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId);
+
+        List<Transaction> transactions = transactionRepository.findAll(
+                applyQueryFilter(iban,
+                        minAmount,
+                        maxAmount,
+                        exactAmount,
+                        typeOfTransaction,
+                        startDate,
+                        endDate,
+                        callingUserId));
 
         // Convert the list of Transaction entities to TransactionDTOs
         List<TransactionDTO> transactionDTOs = transactions.stream()
