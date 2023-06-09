@@ -34,8 +34,9 @@ public class UserController {
             @RequestParam(required = false) String bsn,
             @RequestParam(required = false) String role,
             @RequestParam(defaultValue = "asc") String sort,
-            @RequestParam(defaultValue = "20") int limit) {
-        List<UserDTO> users = userService.getAll(firstName, lastName, email, dateOfBirth, bsn, role, sort, limit);
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
+        List<UserDTO> users = userService.getAll(firstName, lastName, email, dateOfBirth, bsn, role, sort, limit, offset);
 
         int statusCode = users.isEmpty() ? 204 : 200;
 
@@ -66,17 +67,6 @@ public class UserController {
         UserDTO createdUserDTO = userService.update(id, userDTO);
 
         return ResponseEntity.status(200).body(createdUserDTO);
-    }
-
-    @PatchMapping("/{userId}")
-//    @PreAuthorize("@securityExpressions.isSameUserOrEmployee(#userId, authentication)")
-    public ResponseEntity<String> updateUserEmail (@PathVariable String userId, @RequestBody @Valid String userEmail,
-            HttpServletRequest request) {
-
-        UUID id = UUID.fromString(userId);
-        String response = userService.updateUserEmail(id, userEmail);
-
-        return ResponseEntity.status(200).body(response);
     }
 
     @DeleteMapping("/{userId}")

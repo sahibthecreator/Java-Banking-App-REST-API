@@ -59,11 +59,12 @@ public class UserService {
             String bsn,
             String role,
             String sortDirection,
-            int limit) {
+            int limit,
+            int offset) {
         Specification<User> specification = buildSpecification(firstName, lastName, email, dateOfBirth, bsn, role);
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "lastName", "firstName");
 
-        Page<User> userPage = userRepository.findAll(specification, PageRequest.of(0, limit, sort));
+        Page<User> userPage = userRepository.findAll(specification, PageRequest.of(offset, limit, sort));
         List<User> userList = userPage.getContent();
 
         return userList.stream().map(userMapper::toDTO).toList();
@@ -106,18 +107,6 @@ public class UserService {
 
             User savedUser = userRepository.save(existingUser);
             return userMapper.toDTO(savedUser);
-        } else {
-            throw new EntityNotFoundException("No user with following id " + userId + " exists");
-        }
-    }
-
-    public String updateUserEmail(UUID userId, String email) throws EntityNotFoundException {
-        Optional<User> existingUserOptional = userRepository.findById(userId);
-        if (existingUserOptional.isPresent()) {
-            User existingUser = existingUserOptional.get();
-            existingUser.setEmail(email);
-            userRepository.save(existingUser);
-            return "Email has been updated";
         } else {
             throw new EntityNotFoundException("No user with following id " + userId + " exists");
         }

@@ -62,7 +62,7 @@ export default {
     return {
       input: null,
       transactions: null,
-      exportBtnsEnabled: true,
+      exportBtnsEnabled: false,
     };
   },
   mounted() {
@@ -104,7 +104,7 @@ export default {
         headStyles: { fillColor: "#233da3" },
       });
 
-      doc.save('transaction_report.pdf');
+      doc.save('wavr_statement.pdf');
     },
     exportCsv() {
       const headers = ['Transaction Type', 'From Account', 'To Account', 'Amount (Euro)', 'Description', 'Date'];
@@ -124,7 +124,7 @@ export default {
 
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'transaction_report.csv';
+      link.download = 'wavr_statement.csv';
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
