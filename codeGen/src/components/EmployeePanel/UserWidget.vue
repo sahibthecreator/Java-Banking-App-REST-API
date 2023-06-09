@@ -46,18 +46,31 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
           <label>BSN</label>
           <input type="text" v-model="user.bsn">
         </div>
+        <div class="detailCards">
+          <div class="detailCard">
+            <label>Day Limit</label>
+            <input type="text" v-model="user.dayLimit">
+          </div>
+          <div class="detailCard">
+            <label>Transaction Limit</label>
+            <input type="text" v-model="user.transactionLimit">
+          </div>
+        </div>
         <div class="detailCard">
           <label>Active</label>
           <span type="text">{{ user.active ? 'Yes' : 'No' }} </span>
         </div>
-        <div class="detailCard">
-          <label>Accounts</label>
-          <span type="text">{{ accounts }}</span>
+        <div class="detailCards">
+          <div class="detailCard">
+            <label>Accounts</label>
+            <span type="text">{{ accounts }}</span>
+          </div>
+          <div class="detailCard">
+            <label>Total Balance</label>
+            <span type="text">€ {{ totalBalance }}</span>
+          </div>
         </div>
-        <div class="detailCard">
-          <label>Total Balance</label>
-          <span type="text">€ {{ totalBalance }}</span>
-        </div>
+
       </div>
 
       <div class="userControls">
@@ -323,7 +336,7 @@ export default {
           span {
             border: none;
             color: var(--gray-light);
-            background: var(--white);
+            background: rgb(229, 229, 229);
             box-shadow: 0 0 30px #1414140a;
             border-radius: 7px;
             border: 1px solid rgba(0, 0, 0, 0.125);
@@ -333,6 +346,12 @@ export default {
               outline: none;
             }
           }
+
+          input {
+            background: var(--white);
+            color: rgb(8, 8, 8);
+          }
+
 
           span {
             cursor: not-allowed;

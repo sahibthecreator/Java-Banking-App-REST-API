@@ -97,7 +97,7 @@ import AccountIcon from '../Dashboard/AccountIcon.vue';
                 <span class="title">{{ statusTitle }}</span>
             </div>
             <div class="actions">
-                <button type="button" class="history" @click="closePopup()" v-if="!loading">Close</button>
+                <button type="button" class="history" @click="statusPopupCardEnabled = false" v-if="!loading">Close</button>
             </div>
         </div>
     </div>
@@ -153,10 +153,12 @@ export default {
                     case true:
                         await this.$store.dispatch('deactivateAccount', this.account.iban);
                         this.statusTitle = `Account was deactivated`;
+                        this.account.active = false;
                         break;
                     case false:
                         await this.$store.dispatch('activateAccount', this.account.iban);
                         this.statusTitle = `Account was activated`;
+                        this.account.active = true;
                         break;
                 }
                 this.loading = true;
@@ -170,12 +172,6 @@ export default {
                 this.statusPopupCardEnabled = true;
             }
         },
-        closePopup() {
-            if (this.error)
-                this.statusPopupCardEnabled = false;
-            else
-                document.location.reload();
-        }
     },
 };
 
@@ -240,7 +236,6 @@ var formatter = new Intl.NumberFormat('de-DE', {
             gap: 3%;
             flex-grow: 1;
             width: 100%;
-
         }
 
         .userControls {
@@ -283,7 +278,7 @@ var formatter = new Intl.NumberFormat('de-DE', {
             span {
                 border: none;
                 color: var(--gray-light);
-                background: rgb(238, 238, 238);
+                background: rgb(229, 229, 229);
                 box-shadow: 0 0 30px #1414140a;
                 border-radius: 7px;
                 border: 1px solid rgba(0, 0, 0, 0.125);
