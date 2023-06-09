@@ -16,9 +16,11 @@ import TransactionWidget from '../TransactionWidget.vue';
         <span class="contentBig" v-if="!currentAccount">
           €
           {{
+            accounts ?
             formatPrice(
               accounts?.reduce((sum, account) => sum + account.balance, 0)
             )
+            : "0"
           }}
         </span>
         <span class="contentBig" v-else>
@@ -33,7 +35,7 @@ import TransactionWidget from '../TransactionWidget.vue';
           <b-icon-clock-history></b-icon-clock-history>
         </div>
         <span class="contentBig" v-if="!currentAccount">
-          € {{ remainingDayLimit }}</span>
+          € {{ remainingDayLimit ? remainingDayLimit : "0" }}</span>
         <span class="contentBig" v-else> {{ currentAccount.iban }}</span>
         <span class="contentSmall" v-if="!currentAccount">
           <span id="timer-text">... remaining</span></span>

@@ -47,7 +47,7 @@
         <span class="title">Account request sent successfully</span>
       </div>
       <div class="actions">
-        <b-button variant="dark_primary" class="history" v-on:click="this.$router.push('/dashboard/employeePanel')"
+        <b-button variant="dark_primary" class="history" v-on:click="this.$router.push('/dashboard')"
           v-if="!loading">Return to dashboard</b-button>
       </div>
     </div>

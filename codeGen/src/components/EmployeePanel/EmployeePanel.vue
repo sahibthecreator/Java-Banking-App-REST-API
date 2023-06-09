@@ -28,7 +28,7 @@ import AccountWidgetExpandable from './AccountWidgetExpandable.vue';
             <option v-bind:id="currentTab == 1 ? 'selected' : ''" @click="currentTab = 1">Accounts
             </option>
           </div>
-          <div>
+          <div class="userFilterBtns">
             <b-input v-if="userPanelExpanded" placeholder="enter username" v-model="search" @input="searchUsers" />
 
             <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'USER' }"
@@ -81,10 +81,6 @@ import AccountWidgetExpandable from './AccountWidgetExpandable.vue';
           <h1>Account Requests</h1>
           <div class="accountRequests">
             <RequestWidget v-for="(request, index) in requests" :request="request" />
-            <RequestWidget v-for="(request, index) in requests" :request="request" />
-            <RequestWidget v-for="(request, index) in requests" :request="request" />
-            <RequestWidget v-for="(request, index) in requests" :request="request" />
-
           </div>
         </div>
       </div>
@@ -349,6 +345,10 @@ export default {
   align-items: center;
   height: auto;
   gap: 5%;
+  .userFilterBtns{
+    display: flex;
+    gap: 5%;
+  }
 
   .btn {
     &:focus {
