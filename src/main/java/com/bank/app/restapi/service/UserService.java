@@ -76,6 +76,8 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
         user.setActive(true);
+        user.setDayLimit(0);
+        user.setTransactionLimit(0);
         user = this.userRepository.saveAndFlush(user);
         return userMapper.toDTO(user);
     }
@@ -98,9 +100,10 @@ public class UserService {
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
 
-            BeanUtils.copyProperties(user, existingUser, "id", "password", "active"); // Exclude copying the id ,active, pass property
+            BeanUtils.copyProperties(user, existingUser, "id", "password", "active"); // Exclude copying the id ,active,
+                                                                                      // pass property
             System.out.println(existingUser.isActive());
-            
+
             User savedUser = userRepository.save(existingUser);
             return userMapper.toDTO(savedUser);
         } else {

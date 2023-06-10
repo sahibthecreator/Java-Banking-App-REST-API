@@ -285,8 +285,8 @@ public class AccountService {
     }
 
     private void setLimits(User user) {
-        user.setDayLimit(user.getDayLimit());
-        user.setTransactionLimit(user.getTransactionLimit());
+        user.setDayLimit(user.getDayLimit() != 0 ? user.getDayLimit() : 100);
+        user.setTransactionLimit(user.getTransactionLimit() != 0 ? user.getTransactionLimit() : 50);
     }
 
     private String calculateCheckDigit(String iban) {
