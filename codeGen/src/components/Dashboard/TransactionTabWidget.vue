@@ -23,7 +23,7 @@ Array.prototype.contains = function (obj) {
     </div>
     <b-icon-arrow-right style="width: 35px; height: 35px"></b-icon-arrow-right>
     <div class="left" v-if="transaction.toAccount">
-      <p><b>To </b> {{ transaction.fromAccount }}</p>
+      <p><b>To </b> {{ transaction.toAccount }}</p>
       <p><b>To </b> {{ transaction.toAccount }}</p>
     </div>
     <div class="right">
