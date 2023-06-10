@@ -8,10 +8,10 @@ import TransactionTabWidget from '../TransactionTabWidget.vue';
       <!-- <b-input type="text" v-model="input" placeholder="Search Transactions" /> -->
       <div class="buttons">
         <b-button variant="black" v-on:click="setTransactionFilter('WEEK')"
-          >Last week</b-button
+          >Last 7 days</b-button
         >
         <b-button variant="black" v-on:click="setTransactionFilter('MONTH')"
-          >Last Month</b-button
+          >Last 30 days</b-button
         >
         <b-button variant="black" v-on:click="setTransactionFilter('YEAR')"
           >Last Year</b-button
@@ -120,19 +120,10 @@ export default {
     },
     setTransactionFilter(filter) {
       console.log(this.transactions);
-      switch (filter) {
-        case 'WEEK':
-          this.filteredTransactions = this.transactions.filter(
-            (t) => t.dateOfExecution
-          );
-          break;
-        case 'MONTH':
+      let limits = { 'WEEK': 7, 'MONTH': 30, 'YEAR': 365 }
+      let now = new Date();
 
-          break;
-        default:
-          break;
-      }
-
+      this.filteredTransactions = this.transactions.filter((t) => new Date(t.dateOfExecution) <= now && new Date(t.dateOfExecution) >= now.getDate() - limits[filter]);
       console.log(this.filteredTransactions);
     },
     exportPdf() {

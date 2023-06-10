@@ -19,12 +19,11 @@ Array.prototype.contains = function (obj) {
   >
     <div class="left" v-if="transaction.toAccount">
       <p><b>From </b> {{ transaction.fromAccount }}</p>
-      <p><b>From </b> {{ transaction.toAccount }}</p>
     </div>
     <b-icon-arrow-right style="width: 35px; height: 35px"></b-icon-arrow-right>
     <div class="left" v-if="transaction.toAccount">
       <p><b>To </b> {{ transaction.toAccount }}</p>
-      <p><b>To </b> {{ transaction.toAccount }}</p>
+      <p><b>date: </b> {{ getDate() }}</p>
     </div>
     <div class="right">
       <h5>€{{ transaction.amount }}</h5>
@@ -74,18 +73,20 @@ export default {
   },
   data() {
     return {
-      time: '',
       detailsPanelEnabled: false,
       transactionHeader: '',
       transactionAmount: '',
     };
   },
-  mounted() {
-    const parts = this.transaction.dateOfExecution.split(' ');
-    const timePart = parts[1];
-    const time = timePart.split(':').slice(0, 2).join(':');
-    this.time = time;
-  },
+
+  methods: {
+    getDate() {
+      let date = new Date(this.transaction.dateOfExecution);
+
+      
+      return date.toLocaleDateString();
+    }
+  }
 };
 </script>
 

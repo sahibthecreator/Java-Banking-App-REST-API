@@ -20,7 +20,7 @@
     <div class="left">
       <p>{{ transactionHeader }}</p>
       <p>{{ transaction.fromAccount }}</p>
-      <p class="dateTime">{{ time }}</p>
+      <p class="dateTime">{{ transaction.dateOfExecution }}</p>
     </div>
     <div class="right">
       <h5>{{ transactionAmount }}</h5>
@@ -67,10 +67,10 @@ export default {
     };
   },
   mounted() {
-    const parts = this.transaction.dateOfExecution.split(' ');
-    const timePart = parts[1];
-    const time = timePart.split(':').slice(0, 2).join(':');
-    this.time = time;
+    // const parts = this.transaction.dateOfExecution.split(' ');
+    // const timePart = parts[1];
+    // const time = timePart.split(':').slice(0, 2).join(':');
+    // this.time = time;
     this.updateTransactionDetails(this.accounts, this.transaction);
   },
   methods: {
