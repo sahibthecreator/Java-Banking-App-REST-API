@@ -3,7 +3,7 @@ Feature: Transaction Management
   Scenario: Retrieve transactions with parameters
     Given a TransactionController
     When I call the getTransactions endpoint with parameters
-    Then I should receive a response with status 200 and a list of transactions
+    Then I should receive a response with status 204 because there is no transactions
 
   Scenario: Retrieve a single transaction by ID
     Given a TransactionController
@@ -13,7 +13,7 @@ Feature: Transaction Management
   Scenario: Retrieve transactions by userId
     Given a TransactionController
     When I call the getTransactionsByUserId endpoint with userId "8b7bede9-5cb7-4c33-854f-bf5c2028567e"
-    Then I should receive a response with status 200 and a list of transactions by userId
+    Then I should receive a response with status 204 because there is no transactions by userId
 
   Scenario: Add a transaction
     Given a TransactionController
