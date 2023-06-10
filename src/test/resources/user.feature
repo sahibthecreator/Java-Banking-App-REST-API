@@ -4,16 +4,16 @@ Feature: User Management
     Given When the endpoint "users" is available for method "GET"
     When I retrieve all users
     Then the response should have status code 200
-    And the response should contain 1 users
+    And the response should contain 2 users
 
   Scenario: Create a new user
     Given When the endpoint "/users" is available for method "POST"
     When I request a creation of user with details
     """
   {
-  "firstName": "John",
+  "firstName": "Jane",
   "lastName": "Doe",
-  "email": "john.doe@example.com",
+  "email": "jane.doe@example.com",
   "password": "password1",
   "bsn": "569123041",
   "dateOfBirth": "23-03-2004"
@@ -26,9 +26,9 @@ Feature: User Management
     When I request a creation of user with details
     """
   {
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "john.doe@example.com",
+  "firstName": "Uncle",
+  "lastName": "Sam",
+  "email": "uncle.sam@example.com",
   "password": "password1",
   "bsn": "569123041",
   "dateOfBirth": "23-03-2004"
@@ -72,9 +72,9 @@ Feature: User Management
     When I request a creation of user with details
     """
   {
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "john.doe@example.com",
+  "firstName": "Jonny",
+  "lastName": "Depp",
+  "email": "jonny.depp@example.com",
   "password": "password1",
   "bsn": "569123041",
   "dateOfBirth": "23-03-2004"

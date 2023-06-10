@@ -1,4 +1,4 @@
- package com.bank.app.restapi.controller;
+ package com.bank.app.restapi.Controller;
 
   import com.bank.app.restapi.controller.UserController;
   import com.bank.app.restapi.dto.RegisterDTO;
@@ -68,7 +68,7 @@
                   .firstName(registerDTO.getFirstName())
                   .lastName(registerDTO.getLastName())
                   .email(registerDTO.getEmail())
-                  .password("hashedPassword")
+                  .password("11111")
                   .bsn(registerDTO.getBsn())
                   .dateOfBirth(registerDTO.getDateOfBirth())
                   .role(UserType.USER)
