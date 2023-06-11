@@ -1,4 +1,4 @@
-package com.bank.app.restapi.Controller;
+package com.bank.app.restapi.controller;
 
 import com.bank.app.restapi.controller.AccountController;
 import com.bank.app.restapi.dto.AccountBalanceDTO;

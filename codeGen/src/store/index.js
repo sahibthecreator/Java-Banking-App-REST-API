@@ -120,8 +120,6 @@ const store = new Vuex.Store({
         async updateUser({ commit, state }, { userId, userData }) {
             try {
                 const user = await updateUser(userId, userData, state.token);
-                //const updatedUsers = state.users.map((u) => (u.id === userId ? user : u));
-                //commit('setUsers', updatedUsers);
                 return user;
             } catch (error) {
                 throw new Error(error.message);

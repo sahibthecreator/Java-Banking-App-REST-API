@@ -19,7 +19,6 @@
   <div class="transaction" @click="detailsPanelEnabled = true" v-else>
     <div class="left">
       <p>{{ transactionHeader }}</p>
-      <p>{{ transaction.fromAccount }}</p>
       <p class="dateTime">{{ transaction.dateOfExecution }}</p>
     </div>
     <div class="right">
@@ -78,14 +77,22 @@ export default {
 
       const fromAccountExists = accounts.some(account => account.iban === transaction.fromAccount);
       const toAccountExists = accounts.some(account => account.iban === transaction.toAccount);
-      if (fromAccountExists && toAccountExists) {
+      if (transaction.fromAccount == "ATM") {
+        this.transactionHeader = `ATM Deposit`;
+        this.transactionAmount = `+ € ${transaction.amount}`;
+      }
+      else if (transaction.toAccount == "ATM") {
+        this.transactionHeader = `ATM Withdraw`;
+        this.transactionAmount = `- € ${transaction.amount}`;
+      }
+      else if (fromAccountExists && toAccountExists) {
         this.transactionHeader = `Exchanged from ${transaction.fromAccount} to ${transaction.toAccount}`;
         this.transactionAmount = `€ ${transaction.amount}`;
       } else if (toAccountExists) {
-        this.transactionHeader = `To ${transaction.toAccount}`;
+        this.transactionHeader = `From ${transaction.fromAccount}`;
         this.transactionAmount = `+ €${transaction.amount}`;
       } else if (fromAccountExists) {
-        this.transactionHeader = `From ${transaction.fromAccount}`;
+        this.transactionHeader = `To ${transaction.toAccount}`;
         this.transactionAmount = `- €${transaction.amount}`;
       }
     }

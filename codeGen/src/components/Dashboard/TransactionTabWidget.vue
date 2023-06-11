@@ -65,8 +65,10 @@ Array.prototype.contains = function (obj) {
 </template>
 
 <script>
+import moment from 'moment';
+
 export default {
-  name: 'TransactionWidget',
+  name: 'TransactionTabWidget',
   props: {
     transaction: Object,
     accounts: Array,
@@ -81,10 +83,8 @@ export default {
 
   methods: {
     getDate() {
-      let date = new Date(this.transaction.dateOfExecution);
-
-      
-      return date.toLocaleDateString();
+      let date = moment(this.transaction.dateOfExecution, 'DD-MM-yyyy HH:mm:ss');
+      return date.format('DD-MM-yyyy');
     }
   }
 };

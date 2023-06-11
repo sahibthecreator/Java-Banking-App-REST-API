@@ -27,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,6 +74,7 @@ public class UserService {
     public UserDTO register(RegisterDTO registerDTO) {
         emailIsRegistered(registerDTO.getEmail());
         bsnIsValid(registerDTO.getBsn());
+        olderThan18(registerDTO.getDateOfBirth());
         User user = userMapper.registerDTOToUser(registerDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
@@ -100,6 +102,9 @@ public class UserService {
         Optional<User> existingUserOptional = userRepository.findById(userId);
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
+
+            if (!existingUser.getEmail().equals(userDTO.getEmail()))
+                emailIsRegistered(userDTO.getEmail());
 
             BeanUtils.copyProperties(user, existingUser, "id", "password", "active"); // Exclude copying the id ,active,
                                                                                       // pass property
@@ -148,6 +153,7 @@ public class UserService {
 
     public double getRemainingDayLimit(UUID id) throws EntityNotFoundException {
         User user = getUserById(id); // to check if userid is valid
+        List<Account> accounts = accountRepository.findAccountsByUserId(id);
         List<Transaction> transactions = transactionRepository.findTransactionsByUserId(id);
 
         LocalDate currentDate = LocalDate.now();
@@ -155,7 +161,12 @@ public class UserService {
                 .filter(t -> {
                     LocalDate executionDate = t.getDateOfExecution().toLocalDate();
                     return executionDate.equals(currentDate);
-                }).toList();
+                })
+                .filter(t -> {
+                    return accounts.stream()
+                            .anyMatch(a -> a.getIban().equals(t.getFromAccount().getIban()));
+                })
+                .toList();
         double totalSpentToday = filteredTransactions.stream()
                 .mapToDouble(Transaction::getAmount)
                 .sum();
@@ -243,5 +254,14 @@ public class UserService {
 
         if (checksum % 11 == 0)
             throw new IllegalArgumentException("BSN is not valid");
+    }
+
+    private void olderThan18(LocalDate dateOfBirth) throws IllegalArgumentException {
+        LocalDate currentDate = LocalDate.now();
+        Period age = Period.between(dateOfBirth, currentDate);
+
+        if (age.getYears() < 18) {
+            throw new IllegalArgumentException("You must be older than 18 years");
+        }
     }
 }

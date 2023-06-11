@@ -146,7 +146,7 @@ export default {
         await this.delay(2000);
         this.loading = false;
       } catch (error) {
-        this.errorMsg = error;
+        this.errorMsg = error.message;
       }
 
     },

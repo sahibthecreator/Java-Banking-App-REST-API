@@ -49,21 +49,20 @@ import TransactionWidget from '../TransactionWidget.vue';
           <span v-else>Absolute limit</span>
           <b-icon-flag></b-icon-flag>
         </div>
-        <span class="contentBig" v-if="!currentAccount"> € {{ user?.transactionLimit }}</span>
+        <span class="contentBig" v-if="!currentAccount"> € {{ user ? user.transactionLimit : "0" }}</span>
         <span class="contentBig" v-else>
           € {{ formatPrice(currentAccount.absoluteLimit) }}</span>
-        <span class="contentSmall" v-if="!currentAccount && !user"> 109 </span>
       </div>
       <div class="card">
         <div class="header">
-          <span v-if="!currentAccount">monthly Balance Status</span>
+          <span v-if="!currentAccount">AVG Monthly Spendings</span>
           <span v-else>Latest Transaction</span>
           <b-icon-credit-card-fill></b-icon-credit-card-fill>
         </div>
         <span class="contentBig" v-if="!currentAccount">
-          - $213.47 (static)</span>
+          € {{ user ? calculateAverageSpendingForMonth() : "calculating" }}</span>
         <span class="contentBig" v-else>
-          <span v-if="currentTransactions[0]">{{ currentTransactions[0].amount }}</span>
+          <span v-if="currentTransactions[0]">€ {{ currentTransactions[currentTransactions.length - 1].amount }}</span>
           <span v-else>None</span>
         </span>
         <span class="contentSmall"> -2.1% from last month</span>
@@ -110,6 +109,8 @@ import TransactionWidget from '../TransactionWidget.vue';
 </template>
 
 <script>
+import moment from 'moment';
+
 var date = new Date();
 var second = date.getSeconds();
 var minute = date.getMinutes();
@@ -129,7 +130,7 @@ function updateTimer() {
   var m = Math.floor((leftTime - h * 3600) / 60);
   var s = Math.floor(leftTime % 60);
 
-  timer.innerHTML = h + ' : ' + m + ' : ' + (s + 1) + ' remaining';
+  timer.innerHTML = h + 'h : ' + m + 'm : ' + (s + 1) + 's remaining';
 
   leftTime--;
 }
@@ -186,6 +187,19 @@ export default {
           this.$store.getters.getUserId
         );
         this.transactions = transactions;
+        if (this.transactions.length > 0) {
+          this.transactions.sort((a, b) => {
+            const dateA = moment(a.dateOfExecution, 'DD-MM-YYYY HH:mm:ss');
+            const dateB = moment(b.dateOfExecution, 'DD-MM-YYYY HH:mm:ss');
+            return dateB - dateA;
+          });
+          this.transactions.map(t => {
+            if (t.fromAccount == "NL01INHO0000000001")
+              t.fromAccount = "ATM";
+            if (t.toAccount == "NL01INHO0000000001")
+              t.toAccount = "ATM";
+          })
+        }
         this.currentTransactions = this.transactions;
 
         let dayLimit = await this.$store.dispatch(
@@ -208,7 +222,34 @@ export default {
     relocate_to_request() {
       this.$router.push('dashboard/requestAccount');
     },
-  },
+    calculateAverageSpendingForMonth() {
+      if (this.transactions == null || this.transactions.length == 0)
+        return 0;
+      const currentMonth = moment().format('MM');
+
+      // Filter transactions for the current month and matching user's account IBAN
+      // To calculate only spendings
+      const transactionsForMonth = this.transactions.filter(transaction => {
+        const transactionMonth = moment(transaction.dateOfExecution, 'DD-MM-YYYY HH:mm:ss').format('MM');
+        const isMatchingAccount = this.accounts.some(account => account.iban === transaction.fromAccount || (account.iban == "NL01INHO0000000001" && transaction.fromAccount == "ATM"));
+        return transactionMonth === currentMonth && isMatchingAccount;
+      });
+      console.table(transactionsForMonth);
+
+      // Sum up the spendings for the month
+      const totalSpendingForMonth = transactionsForMonth.reduce((sum, transaction) => sum + transaction.amount, 0);
+
+      const averageSpendingForMonth = totalSpendingForMonth / transactionsForMonth.length;
+
+      const roundedAverage = averageSpendingForMonth.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      return roundedAverage | 0;
+    },
+  }
+
 };
 </script>
 

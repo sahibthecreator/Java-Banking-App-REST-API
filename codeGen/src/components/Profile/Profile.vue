@@ -53,6 +53,7 @@ import Navigation from '@/components/Navigation.vue';
                     <button class="button btn-warning" @click="updateUser()">{{ editBtnContent }}</button>
                     <button class="button btn-danger" @click="goToLogin()">Logout</button>
                 </div>
+                <p class="text-danger errorMsg">{{ errorMsg }}</p>
             </div>
         </div>
 
@@ -133,7 +134,6 @@ export default {
             }
         },
         async updateUser() {
-            console.table(this.user);
             let request = {
                 userId: this.$store.state.userId,
                 userData: this.user
@@ -150,7 +150,8 @@ export default {
                 await this.delay(500);
                 this.loading = false;
             } catch (error) {
-                alert(error.message);
+                console.log(error);
+                this.errorMsg = error.message;
             }
 
         },
@@ -253,7 +254,6 @@ export default {
 .button {
     position: absolute;
     bottom: 0;
-    margin-bottom: 50px;
 }
 
 .toggle-container {

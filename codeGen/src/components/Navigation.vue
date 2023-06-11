@@ -19,7 +19,7 @@ import AccountIcon from '@/components/Dashboard/AccountIcon.vue';
         <b-dropdown id="dropdown-offset" offset="-w" size="lg" variant="link" toggle-class="text-decoration-none"
           no-caret>
           <template #button-content>
-            <AccountIcon accountName="Root" style="width: 57.59px; height: 57.59px;"></AccountIcon>
+            <AccountIcon :accountName="user? user.firstName : ''" style="width: 57.59px; height: 57.59px;"></AccountIcon>
           </template>
           <b-dropdown-item to="/dashboard/profile">Profile</b-dropdown-item>
           <b-dropdown-item to="/dashboard">Dashboard</b-dropdown-item>
@@ -43,26 +43,24 @@ export default {
       user: null,
     };
   },
+  mounted() {
+    this.getUser();
+  },
   methods: {
     logout() {
       this.$store.dispatch('logout');
       this.$router.push("/login");
     },
-    mounted() {
-      this.getUser();
-    },
-    methods: {
-      async getUser() {
-        try {
-          let user = await this.$store.dispatch('getUser', this.$store.getters.getUserId);
-          this.user = user;
-        } catch (error) {
-          console.log(error);
-          if (this.user == null) {
-            this.$store.dispatch('logout');
-          }
-m         }
-      },
+    async getUser() {
+      try {
+        let user = await this.$store.dispatch('getUser', this.$store.getters.getUserId);
+        this.user = user;
+      } catch (error) {
+        console.log(error);
+        if (this.user == null) {
+          this.logout();
+        }
+      }
     },
   },
 };

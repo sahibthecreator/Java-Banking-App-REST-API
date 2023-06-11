@@ -3,6 +3,7 @@ package com.bank.app.restapi.config;
 import com.bank.app.restapi.dto.AccountDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
+import com.bank.app.restapi.model.Account;
 import com.bank.app.restapi.model.AccountType;
 import com.bank.app.restapi.model.User;
 import com.bank.app.restapi.model.UserType;
@@ -31,20 +32,31 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         @Override
         public void run(String... args) throws ParseException {
-                User user = new User();
-                user.setFirstName("Root");
-                user.setLastName("Admin");
-                user.setEmail("root@gmail.com");
-                user.setPassword("11111");
-                user.setBsn("832698734");
-                user.setDateOfBirth(LocalDate.of(2004, 3, 23));
-                user.setRole(UserType.EMPLOYEE);
-                user.setDayLimit(100);
-                user.setTransactionLimit(50);
-                UserDTO userDto = userService.register(userMapper.userToRegisterDTO(user));
-                userDto.setDayLimit(2000);
-                userDto.setTransactionLimit(1000);
-                userService.update(userDto.getId(), userDto);
+                User bankOwner = new User();
+                bankOwner.setFirstName("WAVR");
+                bankOwner.setLastName("BANKING");
+                bankOwner.setEmail("wavr@bank.com");
+                bankOwner.setPassword("11111");
+                bankOwner.setBsn("832698734");
+                bankOwner.setDateOfBirth(LocalDate.of(2004, 3, 23));
+                bankOwner.setRole(UserType.EMPLOYEE);
+                UserDTO bankOwnerDTO = userService.register(userMapper.userToRegisterDTO(bankOwner));
+                bankOwnerDTO.setDayLimit(5000000);
+                bankOwnerDTO.setTransactionLimit(5000); // 5000 limit for ATM
+                userService.update(bankOwnerDTO.getId(), bankOwnerDTO);
+
+                User employee = new User();
+                employee.setFirstName("Root");
+                employee.setLastName("Admin");
+                employee.setEmail("root@gmail.com");
+                employee.setPassword("11111");
+                employee.setBsn("832698734");
+                employee.setDateOfBirth(LocalDate.of(2004, 3, 23));
+                employee.setRole(UserType.EMPLOYEE);
+                UserDTO employeeDTO = userService.register(userMapper.userToRegisterDTO(employee));
+                employeeDTO.setDayLimit(10000);
+                employeeDTO.setTransactionLimit(5000);
+                userService.update(employeeDTO.getId(), employeeDTO);
 
                 User customer = new User();
                 customer.setFirstName("Test");
@@ -54,18 +66,16 @@ public class DatabaseInitializer implements CommandLineRunner {
                 customer.setBsn("832698724");
                 customer.setDateOfBirth(LocalDate.of(2004, 3, 23));
                 customer.setRole(UserType.CUSTOMER);
-                customer.setDayLimit(100);
-                customer.setTransactionLimit(50);
                 UserDTO customerDto = userService.register(userMapper.userToRegisterDTO(customer));
-                customerDto.setDayLimit(2000);
-                customerDto.setTransactionLimit(1000);
+                customerDto.setDayLimit(1000);
+                customerDto.setTransactionLimit(500);
                 userService.update(customerDto.getId(), customerDto);
 
                 AccountDTO account1 = new AccountDTO();
                 account1.setIban("NL01ABNA1032456789");
                 account1.setBalance(220);
                 account1.setTypeOfAccount(AccountType.CURRENT);
-                account1.setUserId(userDto.getId());
+                account1.setUserId(employeeDTO.getId());
                 account1.setDateOfOpening(LocalDate.now());
                 account1.setAbsoluteLimit(0);
                 account1.setActive(true);
@@ -83,6 +93,6 @@ public class DatabaseInitializer implements CommandLineRunner {
 
                 accountService.createAccount(account2);
 
-                accountService.createBankAccount(userDto.getId());
+                accountService.createBankAccount(bankOwnerDTO.getId());
         }
 }

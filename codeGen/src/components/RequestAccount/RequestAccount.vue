@@ -83,7 +83,7 @@ export default {
         await this.delay(1500);
         this.loading = false;
       } catch (error) {
-        this.errorMsg = error;
+        this.errorMsg = error.message;
       }
     },
   },

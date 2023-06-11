@@ -79,7 +79,9 @@ export default {
   methods: {
     async deposit() {
       try {
-        this.$store.dispatch("depositATM", this.data);
+        if (!this.validFields())
+          return;
+        await this.$store.dispatch("depositATM", this.data);
         this.loading = true;
         this.responsePopupEnabled = true;
         this.responseMsg = `You successfully added €${this.data.amount} to ${this.data.iban} account`;
@@ -90,15 +92,17 @@ export default {
         await this.delay(1000);
         this.loading = false;
       } catch (e) {
-        console.error(e.message);
+        this.errorMsg = e.message;
       }
     },
     async widraw() {
       try {
-        this.$store.dispatch("withdrawATM", this.data);
+        if (!this.validFields())
+          return;
+        await this.$store.dispatch("withdrawATM", this.data);
         this.loading = true;
         this.responsePopupEnabled = true;
-        this.responseMsg = `You successfully added €${this.data.amount} to ${this.data.iban} account`;
+        this.responseMsg = `You successfully withdrawed €${this.data.amount} from ${this.data.iban} account`;
         document.getElementById("atmPage").style.filter = "blur(5px)";
         document.getElementById("atmPage").style.cursor = "default";
         document.getElementById("depositBtn").disabled = true;
@@ -106,9 +110,16 @@ export default {
         await this.delay(1000);
         this.loading = false;
       } catch (e) {
-        console.error(e.message);
+        this.errorMsg = e.message;
       }
     },
+    validFields() {
+      if (this.data.iban == null || this.data.amount == null || this.data.iban == "" || this.data.amount == "") {
+        this.errorMsg = 'Please fill all the fields';
+        return false;
+      }
+      return true;
+    }
   },
 };
 </script>
