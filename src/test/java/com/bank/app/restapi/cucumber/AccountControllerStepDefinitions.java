@@ -1,10 +1,6 @@
 package com.bank.app.restapi.cucumber;
 
-import com.bank.app.restapi.dto.AccountDTO;
-import com.bank.app.restapi.dto.LoginDTO;
-import com.bank.app.restapi.dto.LoginResponseDTO;
-import com.bank.app.restapi.dto.UserDTO;
-import com.bank.app.restapi.model.AccountType;
+import com.bank.app.restapi.dto.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -28,30 +24,39 @@ import java.util.UUID;
 public class AccountControllerStepDefinitions {
     @Autowired
     private TestRestTemplate restTemplate;
-    private ResponseEntity<List<AccountDTO>> accountsResponse;
-    private ResponseEntity<AccountDTO> accountResponse;
-
-    private ResponseEntity response;
-    private AccountDTO accountDTO = new AccountDTO();
+    private ResponseEntity<List<AccountDTO>> allAccountsResponse;
+    private ResponseEntity<AccountDTO> createdAccountResponse;
+    private ResponseEntity<AccountDTO> retrievedAccountResponse;
+    private ResponseEntity<List<CustomerIbanDTO>> customerIbansResponse;
+    String ibanToRetrieve;
+    private AccountDTO createdAccountDTO;
+    private AccountDTO retrievedAccountDTO ;
     HttpHeaders headers;
 
-    private UUID accountId = UUID.randomUUID();
+    private final ObjectMapper objectMapper;
+    private final AuthControllerStepDefinitions authControllerStepDefinitions;
 
-    private ObjectMapper objectMapper;
-
-    public AccountControllerStepDefinitions() {
+    public AccountControllerStepDefinitions(AuthControllerStepDefinitions authControllerStepDefinitions) {
+        this.authControllerStepDefinitions = authControllerStepDefinitions;
         objectMapper = new ObjectMapper();
         headers = new HttpHeaders();
         objectMapper.registerModule(new JavaTimeModule());
     }
-    @Given("The endpoint for {string} is available for method {string}")
-    public void theEndpointForIsAvailableForMethod(String endpoint, String method) {
+
+    private void loggedInUser() {
         LoginDTO loginDTO = new LoginDTO("root@gmail.com", "11111");
         ResponseEntity<LoginResponseDTO> loginResponse = restTemplate.postForEntity("/auth/login", loginDTO, LoginResponseDTO.class);
 
         String jwtToken = Objects.requireNonNull(loginResponse.getBody()).getJwtToken();
 
-        headers.setBearerAuth(jwtToken);
+        headers.set("Authorization", "Bearer " + jwtToken);
+
+    }
+
+    @Given("The endpoint for {string} is available for method {string}")
+    public void theEndpointForIsAvailableForMethod(String endpoint, String method) {
+
+        loggedInUser();
 
         ResponseEntity<String> response = restTemplate.exchange("/" + endpoint, HttpMethod.OPTIONS,
                 new HttpEntity<>(null, headers), String.class);
@@ -68,85 +73,52 @@ public class AccountControllerStepDefinitions {
     // get all accounts
     @When("I retrieve all accounts")
     public void iRetrieveAllAccounts() {
-        ParameterizedTypeReference<List<AccountDTO>> responseType = new ParameterizedTypeReference<List<AccountDTO>>() {};
-        accountsResponse = restTemplate.exchange("/accounts", HttpMethod.GET, new HttpEntity<>(null, headers), responseType);
+        System.out.println(headers);
+        allAccountsResponse = restTemplate.exchange("/accounts",
+                HttpMethod.GET,
+                new HttpEntity<>(null, headers),
+                new ParameterizedTypeReference<List<AccountDTO>>() {});
+
 
     }
 
     @Then("The response status should be {int}")
     public void theResponseStatusShouldBe(int statusCode) {
-        Assertions.assertEquals(statusCode, accountsResponse.getStatusCodeValue());
+        Assertions.assertEquals(statusCode, allAccountsResponse.getStatusCode().value());
     }
 
     @And("The response should be a list of accounts")
     public void theResponseShouldBeAListOfAccounts() {
-        Assertions.assertNotNull(accountsResponse.getBody());
+        Assertions.assertNotNull(allAccountsResponse.getBody());
     }
 
 
     // create account
-    @And("I have a request with account details")
-    public void iHaveARequestWithAccountDetails(String requestJson) throws JsonProcessingException {
-        accountDTO = objectMapper.readValue(requestJson, AccountDTO.class);
-
-    }
 
     @When("I send a POST request to the {string} endpoint with the account details")
-    public void iSendAPOSTRequestToTheEndpointWithTheAccountDetails(String endpoint) {
-        accountResponse = restTemplate.postForEntity(endpoint, new HttpEntity<>(accountDTO, headers), AccountDTO.class);
+    public void iSendAPOSTRequestToTheEndpointWithTheAccountDetails(String endpoint, String requestJson) throws JsonProcessingException {
+        System.out.println(requestJson);
+        System.out.println(headers);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        createdAccountDTO = objectMapper.readValue(requestJson, AccountDTO.class);
+        System.out.println(createdAccountDTO);
+        createdAccountResponse = restTemplate.postForEntity(
+                "/" + endpoint,
+                new HttpEntity<>(createdAccountDTO, headers),
+                AccountDTO.class);
+
+        createdAccountDTO = createdAccountResponse.getBody();
+        assert createdAccountDTO != null;
+        ibanToRetrieve = createdAccountResponse.getBody().getIban();
     }
 
     @Then("A new account should be created")
     public void aNewAccountShouldBeCreated() {
-        Assertions.assertEquals(201, accountResponse.getStatusCode().value());
-        AccountDTO newAccount = accountResponse.getBody();
-        Assertions.assertNotNull(accountDTO);
-        Assertions.assertNotNull(accountDTO.getUserId());
-        accountId = newAccount.getId();
-
-    }
-
-    // retrieve account info
-
-    @When("I retrieve the account info for IBAN {string}")
-    public void iRetrieveTheAccountInfoForIBAN(String iban) {
-        accountResponse = restTemplate.exchange("/accounts/" + iban, HttpMethod.GET, new HttpEntity<>(null, headers), AccountDTO.class);
-    }
-
-    @And("The response body should contain the account details")
-    public void theResponseBodyShouldContainTheAccountDetails() {
-        Assertions.assertNotNull(accountResponse.getBody());
+        Assertions.assertNotNull(createdAccountResponse.getBody());
+        Assertions.assertEquals(createdAccountDTO, createdAccountResponse.getBody());
     }
 
 
 
-    //retrieve ibans by customer name
 
-    @When("I retrieve IBANs by customer name with the following details:")
-    public void iRetrieveIBANsByCustomerNameWithTheFollowingDetails() {
-        ParameterizedTypeReference<List<AccountDTO>> responseType = new ParameterizedTypeReference<List<AccountDTO>>() {};
-        accountsResponse = restTemplate.exchange("/accounts/iban?firstname=John%20%lastname=Doe", HttpMethod.GET, new HttpEntity<>(null, headers), responseType);
-    }
-    @And("The response body should contain a list of CustomerIbanDTOs")
-    public void theResponseBodyShouldContainAListOfCustomerIbanDTOs() {
-        Assertions.assertNotNull(accountsResponse.getBody());
-    }
-
-
-    // deactivate account
-    @When("I deactivate the account with IBAN {string}")
-    public void iDeactivateTheAccountWithIBAN(String iban) {
-        response = restTemplate.patchForObject("/accounts/" + iban, null, ResponseEntity.class);
-    }
-
-    @Then("The response status fro deactivating account should be {int}")
-    public void theResponseStatusFroDeactivatingAccountShouldBe(int statusCode) {
-        Assertions.assertEquals(statusCode, response.getStatusCodeValue());
-    }
-    @And("The response body should contain a success message")
-    public void theResponseBodyShouldContainASuccessMessage() {
-        Assertions.assertNotNull(response.getBody());
-    }
-
-    
 }

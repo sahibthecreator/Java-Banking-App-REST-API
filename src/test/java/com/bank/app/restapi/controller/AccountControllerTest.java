@@ -1,7 +1,9 @@
-package com.bank.app.restapi.controller;
+package com.bank.app.restapi.Controller;
 
+import com.bank.app.restapi.controller.AccountController;
 import com.bank.app.restapi.dto.AccountBalanceDTO;
 import com.bank.app.restapi.dto.AccountDTO;
+import com.bank.app.restapi.dto.AccountRequestDTO;
 import com.bank.app.restapi.dto.CustomerIbanDTO;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.model.AccountType;
@@ -21,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -105,7 +108,7 @@ class AccountControllerTest {
 
         ResponseEntity<?> response = accountController.getAccountBalance("NL01INHO0000000001");
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(accountDTO.getBalance(), response.getBody());
+        assertEquals(accountDTO, response.getBody());
         verify(accountService, times(1)).getBalanceByIban("NL01INHO0000000001");
     }
 
@@ -134,25 +137,112 @@ class AccountControllerTest {
         verify(accountService, times(1)).getAccountsByUserId(userId);
     }
 
-//    TODO: fix this test
-//    @Test
-//    void deactivateAccountShouldChangeAccountStatusToNotActive() {
-//
-//        AccountDTO accountDTO = AccountDTO.builder()
-//                .iban("NL01INHO0000000001")
-//                .balance(1000.0f)
-//                .typeOfAccount(AccountType.CURRENT)
-//                .userId(UUID.randomUUID())
-//                .dateOfOpening(LocalDate.now())
-//                .active(false)
-//                .build();
-//
-//        when(accountService.updateAccountStatus(accountDTO, false, accountDTO.getIban())).thenReturn(true);
-//
-//        ResponseEntity<String> response = accountController.deactivateAccount(accountDTO.getIban());
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals("Account with iban: " + accountDTO.getIban() + " deactivated", response.getBody());
-//        verify(accountService, times(1)).deactivateAccount(accountDTO.getIban());
-//
-//    }
+    @Test
+    void deactivateAccountShouldChangeAccountStatusToNotActive() {
+        AccountDTO accountDTO = AccountDTO.builder()
+                .iban("NL01INHO0000000001")
+                .balance(1000.0f)
+                .typeOfAccount(AccountType.CURRENT)
+                .userId(UUID.randomUUID())
+                .dateOfOpening(LocalDate.now())
+                .active(true)
+                .build();
+
+        String message = "Account with iban: " + accountDTO.getIban() + " deactivated";
+        when(accountService.deactivateAccount(accountDTO.getIban())).thenReturn(message);
+
+        ResponseEntity<String> response = accountController.deactivateAccount(accountDTO.getIban());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(message, response.getBody());
+
+        verify(accountService, times(1)).deactivateAccount(accountDTO.getIban());
+    }
+
+    @Test
+    void activateAccountShouldChangeAccountStatusToActive() {
+        AccountDTO accountDTO = AccountDTO.builder()
+                .iban("NL01INHO0000000001")
+                .balance(1000.0f)
+                .typeOfAccount(AccountType.CURRENT)
+                .userId(UUID.randomUUID())
+                .dateOfOpening(LocalDate.now())
+                .active(false)
+                .build();
+
+        String message = "Account with iban: " + accountDTO.getIban() + " activated";
+        when(accountService.activateAccount(accountDTO.getIban())).thenReturn(message);
+
+        ResponseEntity<String> response = accountController.activateAccount(accountDTO.getIban());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(message, response.getBody());
+
+        verify(accountService, times(1)).activateAccount(accountDTO.getIban());
+    }
+
+    //TODO: if status becomes enum, change this test
+    @Test
+    void submitAccountRequestShouldReturnCreatedAccountRequest() {
+        AccountRequestDTO accountRequestDTO = AccountRequestDTO.builder()
+                .accountType(AccountType.CURRENT)
+                .userId(UUID.randomUUID())
+                .fullName("Root Admin")
+                .status("PENDING")
+                .build();
+
+        when(accountService.submitAccountRequest(accountRequestDTO)).thenReturn(accountRequestDTO);
+
+        ResponseEntity<AccountRequestDTO> response = accountController.submitAccountRequest(accountRequestDTO);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(accountRequestDTO, response.getBody());
+        verify(accountService, times(1)).submitAccountRequest(accountRequestDTO);
+    }
+
+    @Test
+    void getAccountRequestsShouldReturnListOfAccountRequests() {
+        List<AccountRequestDTO> mockAccountRequests = Arrays.asList(new AccountRequestDTO(), new AccountRequestDTO());
+
+        when(accountService.getAllRequests()).thenReturn(mockAccountRequests);
+
+        ResponseEntity<List<AccountRequestDTO>> response = accountController.getAllRequests();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockAccountRequests, response.getBody());
+        verify(accountService, times(1)).getAllRequests();
+    }
+
+    @Test
+    void approveAccountRequestShouldReturnApprovedAccountRequest() {
+        AccountDTO accountDTO = AccountDTO.builder()
+                .iban("NL01INHO0000000001")
+                .balance(1000.0f)
+                .typeOfAccount(AccountType.CURRENT)
+                .userId(UUID.fromString("a03a7dd6-5fc8-4b95-b575-9f286f35088d"))
+                .dateOfOpening(LocalDate.now())
+                .active(true)
+                .build();
+
+        when(accountService.approveAccountRequest(accountDTO.getId())).thenReturn(accountDTO);
+
+        ResponseEntity<AccountDTO> response = accountController.approveBankAccountRequest(accountDTO.getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(accountDTO, response.getBody());
+        verify(accountService, times(1)).approveAccountRequest(accountDTO.getId());
+    }
+
+    @Test
+    void denyAccountRequestShouldReturnNoContent() {
+        UUID requestId = UUID.randomUUID();
+        AccountRequestDTO accountRequestDTO = AccountRequestDTO.builder()
+                .accountType(AccountType.CURRENT)
+                .userId(UUID.randomUUID())
+                .fullName("Root Admin")
+                .status("PENDING")
+                .build();
+
+        when(accountService.denyBankAccountRequest(requestId)).thenReturn(accountRequestDTO);
+
+        ResponseEntity<AccountRequestDTO> response = accountController.denyBankAccountRequest(requestId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(accountService, times(1)).denyBankAccountRequest(requestId);
+    }
 }
