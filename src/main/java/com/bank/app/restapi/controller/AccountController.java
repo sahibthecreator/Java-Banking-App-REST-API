@@ -105,7 +105,7 @@ public class AccountController {
     @PreAuthorize("@securityExpressions.loggedIn(authentication)")
     public ResponseEntity<AccountRequestDTO> submitAccountRequest(@RequestBody @Valid AccountRequestDTO requestDto) {
         AccountRequestDTO accountRequestDTO = accountService.submitAccountRequest(requestDto);
-        return ResponseEntity.status(200).body(accountRequestDTO);
+        return ResponseEntity.status(201).body(accountRequestDTO);
     }
 
     @GetMapping("/requests")
