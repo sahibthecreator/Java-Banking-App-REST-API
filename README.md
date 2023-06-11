@@ -1,5 +1,34 @@
 # WAVR Banking API
 
+### Github Link
+[Repository](https://github.com/sahibthecreator/Java-Banking-App-REST-API)
+
+### SwaggerHub API Documentation Link
+[SwaggerHub](https://app.swaggerhub.com/apis-docs/PINTHEPENGUINNFT/Banking-API/1.0.0#/)
+
+### Website (clientside)
+https://wavr-bank.sahibthecreator.com/
+
+### Backend 
+https://wavr-backend.serveo.net
+
+## Usage
+#### Bank Employee
+<b>Login: root@gmail.com</b> <br>
+<b>Pass: 11111</b>
+#### Test Customer
+<b>Login: test@gmail.com</b> <br>
+<b>Pass: 0000</b>
+#### Valid BSN for registration
+<b>569123041</b>
+
+## design
+
+<b> PS: codeGen folder is frontend directory</b>
+
+
+
+
 
 ## design
 
