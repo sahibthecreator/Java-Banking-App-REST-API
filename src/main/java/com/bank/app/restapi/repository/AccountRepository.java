@@ -20,6 +20,10 @@ public interface AccountRepository extends JpaRepository<Account, UUID>, JpaSpec
     @Query("SELECT a FROM Account a WHERE a.user.id = :userId")
     List<Account> findAccountsByUserId(@Param("userId") UUID userId);
 
+    @Query("SELECT a.iban FROM Account a WHERE a.user.id = :userId")
+    List<String> findIbanByUserId(@Param("userId") UUID userId);
+
+
     Account findByIban(String iban);
 
     // float findBalanceByIban(String iban);

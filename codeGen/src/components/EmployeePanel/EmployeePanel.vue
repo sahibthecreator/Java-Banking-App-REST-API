@@ -25,19 +25,19 @@ import AccountWidgetExpandable from './AccountWidgetExpandable.vue';
         <div class="roleFilterBtns">
           <div class="options">
             <option v-bind:id="currentTab == 0 ? 'selected' : ''" @click="currentTab = 0">Users</option>
-            <option v-bind:id="currentTab == 1 ? 'selected' : ''" @click="currentTab = 1">Accounts
-            </option>
+            <option v-bind:id="currentTab == 1 ? 'selected' : ''" @click="currentTab = 1">Accounts</option>
           </div>
-          <div>
+          <div class="userFilterBtns">
+            <div>
+              <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'USER' }"
+                v-on:click="setRoleFilter('USER')">User</b-button>
+
+              <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'CUSTOMER' }"
+                v-on:click="setRoleFilter('CUSTOMER')">Customer</b-button>
+              <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'EMPLOYEE' }"
+                v-on:click="setRoleFilter('EMPLOYEE')">Employee</b-button>
+            </div>
             <b-input v-if="userPanelExpanded" placeholder="enter username" v-model="search" @input="searchUsers" />
-
-            <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'USER' }"
-              v-on:click="setRoleFilter('USER')">User</b-button>
-
-            <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'CUSTOMER' }"
-              v-on:click="setRoleFilter('CUSTOMER')">Customer</b-button>
-            <b-button variant="dark_primary" :class="{ 'selected': roleFilter == 'EMPLOYEE' }"
-              v-on:click="setRoleFilter('EMPLOYEE')">Employee</b-button>
           </div>
         </div>
 
@@ -60,9 +60,9 @@ import AccountWidgetExpandable from './AccountWidgetExpandable.vue';
             <option v-bind:id="currentTab == 1 ? 'selected' : ''" @click="currentTab = 1">Accounts
             </option>
           </div>
-          <b-input v-if="userPanelExpanded" placeholder="enter iban" v-model="search" @input="searchUsers" />
+          <b-input v-if="userPanelExpanded" placeholder="enter IBAN" v-model="searchAccount" @input="searchAccounts" />
         </div>
-        <AccountWidgetExpandable v-for="(account, index) in accounts" :account="account"
+        <AccountWidgetExpandable v-for="(account, index) in filteredAccounts" :account="account"
           :user="mapAccountToUser(account)" />
       </div>
 
@@ -81,10 +81,6 @@ import AccountWidgetExpandable from './AccountWidgetExpandable.vue';
           <h1>Account Requests</h1>
           <div class="accountRequests">
             <RequestWidget v-for="(request, index) in requests" :request="request" />
-            <RequestWidget v-for="(request, index) in requests" :request="request" />
-            <RequestWidget v-for="(request, index) in requests" :request="request" />
-            <RequestWidget v-for="(request, index) in requests" :request="request" />
-
           </div>
         </div>
       </div>
@@ -100,11 +96,13 @@ export default {
       users: null,
       accounts: null,
       filteredUsers: null,
+      filteredAccounts: null,
       requests: null,
       roleFilter: null,
       userPanelExpanded: false,
       accountsPanelEnabled: false,
       search: "",
+      searchAccount: "",
       currentTab: 0
     };
   },
@@ -147,7 +145,7 @@ export default {
       try {
         let accounts = await this.$store.dispatch('getAccounts');
         this.accounts = accounts;
-        console.table(accounts[0]);
+        this.filteredAccounts = accounts;
       } catch (error) {
         console.log(error);
         if (this.users == null) {
@@ -182,9 +180,13 @@ export default {
     mapAccountToUser(account) {
       const user = this.users.find(u => u.id === account.userId);
       return user;
-    }
-
+    },
+    searchAccounts() {
+      const searchResults = this.accounts.filter(a => a.iban.toLowerCase().includes(this.searchAccount.toLowerCase()));
+      this.filteredAccounts = searchResults;
+    },
   },
+
 };
 </script>
 
@@ -349,6 +351,20 @@ export default {
   align-items: center;
   height: auto;
   gap: 5%;
+
+  .userFilterBtns {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 0.7rem;
+
+    div {
+      width: fit-content;
+      display: flex;
+      gap: 5%;
+    }
+  }
 
   .btn {
     &:focus {

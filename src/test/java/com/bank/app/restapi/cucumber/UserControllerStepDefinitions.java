@@ -84,6 +84,7 @@ public class UserControllerStepDefinitions {
 
         String jwtToken = loginResponse.getBody().getJwtToken();
 
+        System.out.println("Headers:          " + endpoint);
         headers.setBearerAuth(jwtToken);
 
         ResponseEntity<String> response = restTemplate.exchange("/" + endpoint, HttpMethod.OPTIONS,
@@ -110,13 +111,13 @@ public class UserControllerStepDefinitions {
 
     @Then("the response should have status code {int}")
     public void thenResponseShouldHaveStatusCode(int expectedStatusCode) {
-        Assertions.assertTrue(getAllResponse.getStatusCode().value() == expectedStatusCode);
+        Assertions.assertEquals(getAllResponse.getStatusCode().value(), expectedStatusCode);
     }
 
     @And("the response should contain {int} users")
     public void thenResponseShouldContainUsers(int number) {
         int actual = JsonPath.read(getAllResponse.getBody(), "$.size()");
-        Assertions.assertTrue(number == actual);
+        Assertions.assertEquals(number, actual);
     }
 
 

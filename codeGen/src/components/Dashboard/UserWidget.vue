@@ -1,7 +1,7 @@
 <script setup>
 
 import AccountIcon from '../Dashboard/AccountIcon.vue'
-</script >
+</script>
 
 <template>
   <div class="user">

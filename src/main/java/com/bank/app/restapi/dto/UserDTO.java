@@ -34,7 +34,6 @@ public class UserDTO {
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    //@NotBlank(message = "Password can't be empty")
     private String password;
 
     @NotBlank(message = "BSN can't be empty")

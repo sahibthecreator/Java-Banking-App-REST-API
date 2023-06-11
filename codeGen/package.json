@@ -12,6 +12,8 @@
     "apexcharts": "^3.40.0",
     "axios": "^1.4.0",
     "bootstrap-vue": "^2.23.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.5.29",
     "pinia": "^2.0.36",
     "sass": "^1.62.1",
     "vue": "^3.3.2",

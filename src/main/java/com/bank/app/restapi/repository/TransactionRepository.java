@@ -10,9 +10,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
+//Extending with JpaSpecificationExecutor because I use Specifications to build my queries
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID>, JpaSpecificationExecutor<Transaction> {
 
+    //Finding transactions related with a user
     @Query("SELECT t FROM Transaction t WHERE (t.fromAccount.iban IN " +
             "(SELECT DISTINCT a.iban FROM Account a WHERE a.user.id = :userId) " +
             "OR t.toAccount.iban IN " +

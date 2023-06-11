@@ -3,7 +3,6 @@ package com.bank.app.restapi.service;
 import com.bank.app.restapi.dto.LoginDTO;
 import com.bank.app.restapi.dto.LoginResponseDTO;
 import com.bank.app.restapi.dto.RegisterDTO;
-import com.bank.app.restapi.dto.TransactionDTO;
 import com.bank.app.restapi.dto.UserDTO;
 import com.bank.app.restapi.dto.mapper.UserMapper;
 import com.bank.app.restapi.model.Account;
@@ -16,8 +15,6 @@ import com.bank.app.restapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
-
-import org.modelmapper.internal.bytebuddy.dynamic.TypeResolutionStrategy.Active;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,7 +26,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.Console;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,11 +59,12 @@ public class UserService {
             String bsn,
             String role,
             String sortDirection,
-            int limit) {
+            int limit,
+            int offset) {
         Specification<User> specification = buildSpecification(firstName, lastName, email, dateOfBirth, bsn, role);
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "lastName", "firstName");
 
-        Page<User> userPage = userRepository.findAll(specification, PageRequest.of(0, limit, sort));
+        Page<User> userPage = userRepository.findAll(specification, PageRequest.of(offset, limit, sort));
         List<User> userList = userPage.getContent();
 
         return userList.stream().map(userMapper::toDTO).toList();
@@ -80,6 +77,8 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID());
         user.setActive(true);
+        user.setDayLimit(0);
+        user.setTransactionLimit(0);
         user = this.userRepository.saveAndFlush(user);
         return userMapper.toDTO(user);
     }
@@ -102,23 +101,12 @@ public class UserService {
         if (existingUserOptional.isPresent()) {
             User existingUser = existingUserOptional.get();
 
-            BeanUtils.copyProperties(user, existingUser, "id", "password", "active"); // Exclude copying the id ,active, pass property
+            BeanUtils.copyProperties(user, existingUser, "id", "password", "active"); // Exclude copying the id ,active,
+                                                                                      // pass property
             System.out.println(existingUser.isActive());
-            
+
             User savedUser = userRepository.save(existingUser);
             return userMapper.toDTO(savedUser);
-        } else {
-            throw new EntityNotFoundException("No user with following id " + userId + " exists");
-        }
-    }
-
-    public String updateUserEmail(UUID userId, String email) throws EntityNotFoundException {
-        Optional<User> existingUserOptional = userRepository.findById(userId);
-        if (existingUserOptional.isPresent()) {
-            User existingUser = existingUserOptional.get();
-            existingUser.setEmail(email);
-            userRepository.save(existingUser);
-            return "Email has been updated";
         } else {
             throw new EntityNotFoundException("No user with following id " + userId + " exists");
         }

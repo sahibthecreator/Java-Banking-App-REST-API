@@ -1,112 +1,129 @@
-package com.bank.app.restapi.cucumber;
+ package com.bank.app.restapi.cucumber;
 
-import com.bank.app.restapi.controller.TransactionController;
-import com.bank.app.restapi.dto.TransactionDTO;
-import com.bank.app.restapi.model.TransactionType;
-import com.bank.app.restapi.service.TransactionService;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import org.junit.jupiter.api.Assertions;
-import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+ import com.bank.app.restapi.config.UserData;
+ import com.bank.app.restapi.controller.TransactionController;
+ import com.bank.app.restapi.dto.TransactionDTO;
+ import com.bank.app.restapi.model.TransactionType;
+ import com.bank.app.restapi.service.TransactionService;
+ import io.cucumber.java.en.Given;
+ import io.cucumber.java.en.Then;
+ import io.cucumber.java.en.When;
+ import org.junit.jupiter.api.Assertions;
+ import org.mockito.Mockito;
+ import org.springframework.boot.test.context.SpringBootTest;
+ import org.springframework.http.HttpStatus;
+ import org.springframework.http.ResponseEntity;
+ import org.springframework.security.core.Authentication;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.UUID;
 
-@SpringBootTest
-public class TransactionControllerStepDefinitions {
+ import static org.mockito.Mockito.mock;
+ import static org.mockito.Mockito.when;
 
-    private TransactionController transactionController;
-    private TransactionService transactionService;
-    private ResponseEntity<TransactionDTO> singleTransactionResponse;
-    private ResponseEntity<List<TransactionDTO>> multipleTransactionsResponse;
+ @SpringBootTest
+ public class TransactionControllerStepDefinitions {
 
-    @Given("a TransactionController")
-    public void createTransactionController() {
-        transactionService = Mockito.mock(TransactionService.class);
-        transactionController = new TransactionController(transactionService);
-    }
+     private TransactionController transactionController;
+     private TransactionService transactionService;
+     private ResponseEntity<TransactionDTO> singleTransactionResponse;
+     private ResponseEntity<List<TransactionDTO>> multipleTransactionsResponse;
 
-    @When("I call the getTransactions endpoint with parameters")
-    public void callGetTransactionsEndpoint() {
-        String iban = "NL16INHO76255591";
+     @Given("a TransactionController")
+     public void createTransactionController() {
+         transactionService = Mockito.mock(TransactionService.class);
+         transactionController = new TransactionController(transactionService);
+     }
 
-        List<TransactionDTO> transactions = new ArrayList<>();
-        Mockito.when(transactionService.getTransactions(iban, null, null, null, null, null, null, null))
-                .thenReturn(transactions);
+     @When("I call the getTransactions endpoint with parameters")
+     public void callGetTransactionsEndpoint() {
+         String iban = "NL16INHO76255591";
 
-        multipleTransactionsResponse = transactionController.getTransactions(iban, null, null, null, null, null, null, null);
-    }
+         List<TransactionDTO> transactions = new ArrayList<>();
+         Mockito.when(transactionService.getTransactions(iban, null, null, null, null, null, null))
+                 .thenReturn(transactions);
 
-    @Then("I should receive a response with status {int} and a list of transactions")
-    public void checkGetTransactionsResponse(int expectedStatus) {
-        HttpStatus status = (HttpStatus) multipleTransactionsResponse.getStatusCode();
-        Assertions.assertEquals(expectedStatus, status.value());
+         multipleTransactionsResponse = transactionController.getTransactions(iban, null, null, null, null, null, null);
+     }
 
-        List<TransactionDTO> transactions = multipleTransactionsResponse.getBody();
-        Assertions.assertNotNull(transactions);
-    }
+     @Then("I should receive a response with status {int} because there is no transactions")
+     public void checkGetTransactionsResponse(int expectedStatus) {
+         HttpStatus status = (HttpStatus) multipleTransactionsResponse.getStatusCode();
+         Assertions.assertEquals(expectedStatus, status.value());
 
-    @When("I call the getTransactionById endpoint with transactionId {string}")
-    public void callGetTransactionByIdEndpoint(String transactionId) {
-        UUID uuid = UUID.fromString(transactionId);
+         List<TransactionDTO> transactions = multipleTransactionsResponse.getBody();
+         Assertions.assertNotNull(transactions);
+     }
 
-        TransactionDTO transactionDTO = new TransactionDTO();
-        Mockito.when(transactionService.getTransactionById(uuid)).thenReturn(transactionDTO);
+     @When("I call the getTransactionById endpoint with transactionId {string}")
+     public void callGetTransactionByIdEndpoint(String transactionId) {
+         UUID uuid = UUID.fromString(transactionId);
 
-        singleTransactionResponse = transactionController.getTransactionById(uuid);
-    }
+         TransactionDTO transactionDTO = new TransactionDTO();
+         Mockito.when(transactionService.getTransactionById(uuid)).thenReturn(transactionDTO);
 
-    @Then("I should receive a response with status {int} and a single transaction")
-    public void checkGetTransactionByIdResponse(int expectedStatus) {
-        HttpStatus status = (HttpStatus) singleTransactionResponse.getStatusCode();
-        Assertions.assertEquals(expectedStatus, status.value());
+         singleTransactionResponse = transactionController.getTransactionById(uuid);
+     }
 
-        TransactionDTO transaction = singleTransactionResponse.getBody();
-        Assertions.assertNotNull(transaction);
-    }
+     @Then("I should receive a response with status {int} and a single transaction")
+     public void checkGetTransactionByIdResponse(int expectedStatus) {
+         HttpStatus status = (HttpStatus) singleTransactionResponse.getStatusCode();
+         Assertions.assertEquals(expectedStatus, status.value());
 
-    @When("I call the getTransactionsByUserId endpoint with userId {string}")
-    public void callGetTransactionsByUserIdEndpoint(String userId) {
-        UUID uuid = UUID.fromString(userId);
+         TransactionDTO transaction = singleTransactionResponse.getBody();
+         Assertions.assertNotNull(transaction);
+     }
 
-        List<TransactionDTO> transactions = new ArrayList<>();
-        Mockito.when(transactionService.getTransactionsByUserId(uuid)).thenReturn(transactions);
+     @When("I call the getTransactionsByUserId endpoint with userId {string}")
+     public void callGetTransactionsByUserIdEndpoint(String userId) {
+         UUID uuid = UUID.fromString(userId);
 
-        multipleTransactionsResponse = transactionController.getTransactionsByUserId(uuid);
-    }
+         Authentication authentication = mock(Authentication.class);
+         UserData userData = mock(UserData.class);
+         when(userData.getId()).thenReturn(uuid);
+         when(authentication.getPrincipal()).thenReturn(userData);
 
-    @Then("I should receive a response with status {int} and a list of transactions by userId")
-    public void checkGetTransactionsByUserIdResponse(int expectedStatus) {
-        HttpStatus status = (HttpStatus) multipleTransactionsResponse.getStatusCode();
-        Assertions.assertEquals(expectedStatus, status.value());
+         List<TransactionDTO> transactions = new ArrayList<>();
+         Mockito.when(transactionService.getTransactionsByUserId(uuid, null, null, null, null, null, null, null, uuid)).thenReturn(transactions);
 
-        List<TransactionDTO> transactions = multipleTransactionsResponse.getBody();
-        Assertions.assertNotNull(transactions);
-    }
+         multipleTransactionsResponse = transactionController.getTransactionsByUserId(uuid, null, null, null, null, null, null, null, authentication);
+     }
+
+     @Then("I should receive a response with status {int} because there is no transactions by userId")
+     public void checkGetTransactionsByUserIdResponse(int expectedStatus) {
+         HttpStatus status = (HttpStatus) multipleTransactionsResponse.getStatusCode();
+         Assertions.assertEquals(expectedStatus, status.value());
+
+         List<TransactionDTO> transactions = multipleTransactionsResponse.getBody();
+         Assertions.assertNotNull(transactions);
+     }
 
 
-    @When("I call the addTransaction endpoint with transaction type {string}")
-    public void callAddTransactionEndpoint(String transactionType) {
-        TransactionDTO transactionDTO = new TransactionDTO();
-        TransactionType type = TransactionType.valueOf(transactionType.toUpperCase());
+     @When("I call the addTransaction endpoint with transaction type {string}")
+     public void callAddTransactionEndpoint(String transactionType) {
 
-        Mockito.when(transactionService.addTransaction(transactionDTO, type, null)).thenReturn(transactionDTO);
+         UUID performingUserId = UUID.randomUUID();
+         Authentication authentication = mock(Authentication.class);
+         UserData userData = mock(UserData.class);
+         when(userData.getId()).thenReturn(performingUserId);
+         when(authentication.getPrincipal()).thenReturn(userData);
 
-        singleTransactionResponse = transactionController.addTransaction(null, transactionDTO, null);
-    }
+         TransactionDTO transactionDTO = new TransactionDTO();
+         TransactionType type = TransactionType.valueOf(transactionType.toUpperCase());
 
-    @Then("I should receive a response with status {int} and the added transaction")
-    public void checkAddTransactionResponse(int expectedStatus) {
-        HttpStatus status = (HttpStatus) singleTransactionResponse.getStatusCode();
-        Assertions.assertEquals(expectedStatus, status.value());
+         Mockito.when(transactionService.addTransaction(transactionDTO, type, performingUserId)).thenReturn(transactionDTO);
 
-        TransactionDTO transaction = singleTransactionResponse.getBody();
-        Assertions.assertNotNull(transaction);
-    }
+         singleTransactionResponse = transactionController.addTransaction(null, transactionDTO, authentication);
+     }
 
-}
+     @Then("I should receive a response with status {int} and the added transaction")
+     public void checkAddTransactionResponse(int expectedStatus) {
+         HttpStatus status = (HttpStatus) singleTransactionResponse.getStatusCode();
+         Assertions.assertEquals(expectedStatus, status.value());
+
+         TransactionDTO transaction = singleTransactionResponse.getBody();
+         Assertions.assertNotNull(transaction);
+     }
+
+ }

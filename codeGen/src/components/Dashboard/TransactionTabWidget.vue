@@ -1,20 +1,34 @@
+<script setup>
+//include
+Array.prototype.contains = function (obj) {
+  var i = this.length;
+  while (i--) {
+    if (this[i] === obj) {
+      return true;
+    }
+  }
+  return false;
+};
+</script>
+
 <template>
-  <div class="transaction" @click="detailsPanelEnabled = true" v-if="currentAccount">
-    <div class="left" v-if="currentAccount.iban == transaction.toAccount">
+  <div
+    class="transaction"
+    @click="detailsPanelEnabled = true"
+    v-if="transaction"
+  >
+    <div class="left" v-if="transaction.toAccount">
       <p><b>From </b> {{ transaction.fromAccount }}</p>
-      <p>{{ transaction.fromAccount }}</p>
-      <p class="dateTime">{{ time }}</p>
     </div>
-    <div class="left" v-else>
+    <b-icon-arrow-right style="width: 35px; height: 35px"></b-icon-arrow-right>
+    <div class="left" v-if="transaction.toAccount">
       <p><b>To </b> {{ transaction.toAccount }}</p>
-      <p>{{ transaction.fromAccount }}</p>
-      <p class="dateTime">{{ time }}</p>
+      <p><b>date: </b> {{ getDate() }}</p>
     </div>
     <div class="right">
-      <h5>{{ currentAccount.iban == transaction.toAccount ? "+" : "-" }} €{{ transaction.amount }}</h5>
+      <h5>€{{ transaction.amount }}</h5>
     </div>
   </div>
-
 
   <div class="transaction" @click="detailsPanelEnabled = true" v-else>
     <div class="left">
@@ -30,7 +44,7 @@
   <div class="card" v-if="detailsPanelEnabled">
     <div class="content">
       <p class="heading">
-        {{ accounts.some(account => account.iban === transaction.toAccount) ? "+" : "-" }} €{{ transaction.amount }}
+        €{{ transaction.amount }}
         {{ transaction.typeOfTransaction.toLowerCase() }}
       </p>
       <p class="para">
@@ -55,39 +69,22 @@ export default {
   name: 'TransactionWidget',
   props: {
     transaction: Object,
-    currentAccount: String,
-    accounts: Array
+    accounts: Array,
   },
   data() {
     return {
-      time: '',
       detailsPanelEnabled: false,
-      transactionHeader: "",
-      transactionAmount: "",
+      transactionHeader: '',
+      transactionAmount: '',
     };
   },
-  mounted() {
-    const parts = this.transaction.dateOfExecution.split(' ');
-    const timePart = parts[1];
-    const time = timePart.split(':').slice(0, 2).join(':');
-    this.time = time;
 
-  },
   methods: {
-    updateTransactionDetails(accounts, transaction) {
+    getDate() {
+      let date = new Date(this.transaction.dateOfExecution);
 
-      const fromAccountExists = accounts.some(account => account.iban === transaction.fromAccount);
-      const toAccountExists = accounts.some(account => account.iban === transaction.toAccount);
-      if (fromAccountExists && toAccountExists) {
-        this.transactionHeader = `Exchanged from ${transaction.fromAccount} to ${transaction.toAccount}`;
-        this.transactionAmount = `€ ${transaction.amount}`;
-      } else if (toAccountExists) {
-        this.transactionHeader = `To ${transaction.toAccount}`;
-        this.transactionAmount = `+ €${transaction.amount}`;
-      } else if (fromAccountExists) {
-        this.transactionHeader = `From ${transaction.fromAccount}`;
-        this.transactionAmount = `- €${transaction.amount}`;
-      }
+      
+      return date.toLocaleDateString();
     }
   }
 };
@@ -98,6 +95,7 @@ export default {
   position: relative;
   display: flex;
   flex-direction: row;
+  gap: 20px;
   padding: 15px;
   cursor: pointer;
   border-bottom: 1px var(--gray-light) solid;

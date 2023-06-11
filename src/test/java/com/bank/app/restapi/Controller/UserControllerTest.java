@@ -1,4 +1,4 @@
- package com.bank.app.restapi.controller;
+ package com.bank.app.restapi.Controller;
 
   import com.bank.app.restapi.controller.UserController;
   import com.bank.app.restapi.dto.RegisterDTO;
@@ -45,12 +45,12 @@
       void getAllShouldReturnListOfUsers() {
           List<UserDTO> userDTOList = Arrays.asList(new UserDTO(), new UserDTO());
 
-          when(userService.getAll(null, null, null, null, null, null, null, 10)).thenReturn(userDTOList);
+          when(userService.getAll(null, null, null, null, null, null, null, 10, 0)).thenReturn(userDTOList);
 
-          ResponseEntity<List<UserDTO>> response = userController.getAll(null, null, null, null, null, null, null, 10);
+          ResponseEntity<List<UserDTO>> response = userController.getAll(null, null, null, null, null, null, null, 10, 0);
           assertEquals(HttpStatus.OK, response.getStatusCode());
           assertEquals(userDTOList, response.getBody());
-          verify(userService, times(1)).getAll(null, null, null, null, null, null, null, 10);
+          verify(userService, times(1)).getAll(null, null, null, null, null, null, null, 10, 0);
       }
 
       @Test
@@ -68,7 +68,7 @@
                   .firstName(registerDTO.getFirstName())
                   .lastName(registerDTO.getLastName())
                   .email(registerDTO.getEmail())
-                  .password("hashedPassword")
+                  .password("11111")
                   .bsn(registerDTO.getBsn())
                   .dateOfBirth(registerDTO.getDateOfBirth())
                   .role(UserType.USER)

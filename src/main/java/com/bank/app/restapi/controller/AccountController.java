@@ -67,7 +67,10 @@ public class AccountController {
     public ResponseEntity<List<CustomerIbanDTO>> getIbanByCustomerName(@RequestParam(required = false) String firstname,
             @RequestParam(required = false) String lastname) {
         List<CustomerIbanDTO> customerIbanDTOs = accountService.getIbanByUsername(firstname, lastname);
-        return ResponseEntity.status(200).body(customerIbanDTOs);
+
+        int statusCode = customerIbanDTOs.isEmpty() ? 204 : 200;
+
+        return ResponseEntity.status(statusCode).body(customerIbanDTOs);
     }
 
     @GetMapping("/{userId}")
@@ -109,7 +112,9 @@ public class AccountController {
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
     public ResponseEntity<List<AccountRequestDTO>> getAllRequests() {
         List<AccountRequestDTO> requests = accountService.getAllRequests();
-        return ResponseEntity.status(200).body(requests);
+
+        int statusCode = requests.isEmpty() ? 204 : 200;
+        return ResponseEntity.status(statusCode).body(requests);
     }
 
     @PutMapping("/requests/{requestId}/approve")
@@ -125,5 +130,4 @@ public class AccountController {
         accountService.denyBankAccountRequest(requestId);
         return ResponseEntity.status(200).build();
     }
-
 }
