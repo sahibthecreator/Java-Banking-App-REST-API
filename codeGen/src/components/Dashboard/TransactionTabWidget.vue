@@ -12,11 +12,7 @@ Array.prototype.contains = function (obj) {
 </script>
 
 <template>
-  <div
-    class="transaction"
-    @click="detailsPanelEnabled = true"
-    v-if="transaction"
-  >
+  <div class="transaction" @click="detailsPanelEnabled = true" v-if="transaction">
     <div class="left" v-if="transaction.toAccount">
       <p><b>From </b> {{ transaction.fromAccount }}</p>
     </div>
@@ -65,7 +61,7 @@ Array.prototype.contains = function (obj) {
 </template>
 
 <script>
-import moment from 'moment';
+// import moment from 'moment';
 
 export default {
   name: 'TransactionTabWidget',

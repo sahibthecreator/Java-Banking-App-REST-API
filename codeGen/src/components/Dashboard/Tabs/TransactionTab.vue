@@ -77,9 +77,9 @@ import TransactionTabWidget from '../TransactionTabWidget.vue';
 </template>
 
 <script>
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import moment from 'moment';
+// import jsPDF from 'jspdf';
+// import 'jspdf-autotable';
+// import moment from 'moment';
 
 
 export default {

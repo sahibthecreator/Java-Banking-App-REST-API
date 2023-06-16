@@ -1,9 +1,6 @@
 package com.bank.app.restapi.service;
 
-import com.bank.app.restapi.dto.AccountBalanceDTO;
-import com.bank.app.restapi.dto.AccountDTO;
-import com.bank.app.restapi.dto.AccountRequestDTO;
-import com.bank.app.restapi.dto.CustomerIbanDTO;
+import com.bank.app.restapi.dto.*;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.dto.mapper.AccountRequestMapper;
 import com.bank.app.restapi.model.*;
@@ -94,7 +91,7 @@ public class AccountService {
         accountDTO.setActive(true);
 
         Account account = accountMapper.toEntity(accountDTO);
-        account = accountRepository.saveAndFlush(account);
+        accountRepository.saveAndFlush(account);
 
         return accountMapper.toDTO(account);
     }
@@ -123,26 +120,32 @@ public class AccountService {
         accountRepository.save(existingAccount);
     }
 
-    public String deactivateAccount(String iban) {
+    public AccountStatusDTO deactivateAccount(String iban) {
         AccountDTO accountDTO = getAccountDTOByIban(iban);
+        AccountStatusDTO accountStatusDTO = new AccountStatusDTO();
         if (updateAccountStatus(accountDTO, false, iban)) {
-            return "Account with iban: " + iban + " deactivated";
+            accountStatusDTO.setIban(iban);
+            accountStatusDTO.setActive(false);
+            return accountStatusDTO;
         } else {
-            return "Account with iban: " + iban + " could not be deactivated";
+            throw new IllegalArgumentException("Account with iban: " + iban + " could not be deactivated");
         }
 
     }
 
-    public String activateAccount(String iban) {
+    public AccountStatusDTO activateAccount(String iban) {
         AccountDTO accountDTO = getAccountDTOByIban(iban);
+        AccountStatusDTO accountStatusDTO = new AccountStatusDTO();
         if (updateAccountStatus(accountDTO, true, iban)) {
-            return "Account with iban: " + iban + " activated";
+            accountStatusDTO.setIban(iban);
+            accountStatusDTO.setActive(true);
+            return accountStatusDTO;
         } else {
-            return "Account with iban: " + iban + " could not be activated";
+            throw new IllegalArgumentException("Account with iban: " + iban + " could not be activated");
         }
     }
 
-    public List<CustomerIbanDTO> getIbanByUsername(String firstname, String lastname) {
+    public List<CustomerIbanDTO> getIbansByUsername(String firstname, String lastname) {
         firstname = firstname == null ? "" : firstname.toLowerCase();
         lastname = lastname == null ? "" : lastname.toLowerCase();
         List<CustomerIbanDTO> customerIbanDTOs = accountRepository.findIbanByFirstNameAndLastName(firstname, lastname);
@@ -272,7 +275,7 @@ public class AccountService {
         return false;
     }
 
-    private void setLimitsAccordingToUserType(User user) {
+    private void  setLimitsAccordingToUserType(User user) {
         if (user.getRole().equals(UserType.USER)) {
             user.setRole(UserType.CUSTOMER);
             setLimits(user);

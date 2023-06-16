@@ -1,10 +1,7 @@
 package com.bank.app.restapi.controller;
 
 import com.bank.app.restapi.controller.AccountController;
-import com.bank.app.restapi.dto.AccountBalanceDTO;
-import com.bank.app.restapi.dto.AccountDTO;
-import com.bank.app.restapi.dto.AccountRequestDTO;
-import com.bank.app.restapi.dto.CustomerIbanDTO;
+import com.bank.app.restapi.dto.*;
 import com.bank.app.restapi.dto.mapper.AccountMapper;
 import com.bank.app.restapi.model.AccountType;
 import com.bank.app.restapi.repository.AccountRepository;
@@ -117,12 +114,12 @@ class AccountControllerTest {
     void getIbanByCustomerNameShouldReturnListOfIbans() {
         List<CustomerIbanDTO> ibans = accountRepository.findIbanByFirstNameAndLastName("Root", "Admin");
 
-        when(accountService.getIbanByUsername("Root", "Admin")).thenReturn(ibans);
+        when(accountService.getIbansByUsername("Root", "Admin")).thenReturn(ibans);
 
-        ResponseEntity<List<CustomerIbanDTO>> response = accountController.getIbanByCustomerName("Root", "Admin");
+        ResponseEntity<List<CustomerIbanDTO>> response = accountController.getIbansByCustomerName("Root", "Admin");
         // assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(ibans, response.getBody());
-        verify(accountService, times(1)).getIbanByUsername("Root", "Admin");
+        verify(accountService, times(1)).getIbansByUsername("Root", "Admin");
     }
 
     @Test
@@ -149,12 +146,14 @@ class AccountControllerTest {
                 .active(true)
                 .build();
 
-        String message = "Account with iban: " + accountDTO.getIban() + " deactivated";
-        when(accountService.deactivateAccount(accountDTO.getIban())).thenReturn(message);
+        AccountStatusDTO accountStatusDTO = AccountStatusDTO.builder()
+                .active(false)
+                .build();
+        when(accountService.deactivateAccount(accountDTO.getIban())).thenReturn(accountStatusDTO);
 
-        ResponseEntity<String> response = accountController.deactivateAccount(accountDTO.getIban());
+        ResponseEntity<AccountStatusDTO> response = accountController.deactivateAccount(accountDTO.getIban());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(message, response.getBody());
+        assertEquals(accountStatusDTO, response.getBody());
 
         verify(accountService, times(1)).deactivateAccount(accountDTO.getIban());
     }
@@ -170,12 +169,14 @@ class AccountControllerTest {
                 .active(false)
                 .build();
 
-        String message = "Account with iban: " + accountDTO.getIban() + " activated";
-        when(accountService.activateAccount(accountDTO.getIban())).thenReturn(message);
+        AccountStatusDTO accountStatusDTO = AccountStatusDTO.builder()
+                .active(false)
+                .build();
+        when(accountService.activateAccount(accountDTO.getIban())).thenReturn(accountStatusDTO);
 
-        ResponseEntity<String> response = accountController.activateAccount(accountDTO.getIban());
+        ResponseEntity<AccountStatusDTO> response = accountController.activateAccount(accountDTO.getIban());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(message, response.getBody());
+        assertEquals(accountStatusDTO, response.getBody());
 
         verify(accountService, times(1)).activateAccount(accountDTO.getIban());
     }

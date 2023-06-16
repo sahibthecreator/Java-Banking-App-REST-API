@@ -1,9 +1,6 @@
 package com.bank.app.restapi.controller;
 
-import com.bank.app.restapi.dto.AccountBalanceDTO;
-import com.bank.app.restapi.dto.AccountDTO;
-import com.bank.app.restapi.dto.AccountRequestDTO;
-import com.bank.app.restapi.dto.CustomerIbanDTO;
+import com.bank.app.restapi.dto.*;
 import com.bank.app.restapi.service.AccountService;
 
 import jakarta.validation.Valid;
@@ -64,9 +61,9 @@ public class AccountController {
 
     @GetMapping("/iban")
     @PreAuthorize("@securityExpressions.loggedIn(authentication)")
-    public ResponseEntity<List<CustomerIbanDTO>> getIbanByCustomerName(@RequestParam(required = false) String firstname,
+    public ResponseEntity<List<CustomerIbanDTO>> getIbansByCustomerName(@RequestParam(required = false) String firstname,
             @RequestParam(required = false) String lastname) {
-        List<CustomerIbanDTO> customerIbanDTOs = accountService.getIbanByUsername(firstname, lastname);
+        List<CustomerIbanDTO> customerIbanDTOs = accountService.getIbansByUsername(firstname, lastname);
 
         int statusCode = customerIbanDTOs.isEmpty() ? 204 : 200;
 
@@ -89,15 +86,15 @@ public class AccountController {
 
     @PatchMapping("/{iban}")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
-    public ResponseEntity<String> deactivateAccount(@PathVariable String iban) {
-        String response = accountService.deactivateAccount(iban);
+    public ResponseEntity<AccountStatusDTO> deactivateAccount(@PathVariable String iban) {
+        AccountStatusDTO response = accountService.deactivateAccount(iban);
         return ResponseEntity.status(200).body(response);
     }
 
     @PatchMapping("/{iban}/activate")
     @PreAuthorize("@securityExpressions.hasEmployeeRole(authentication)")
-    public ResponseEntity<String> activateAccount(@PathVariable String iban) {
-        String response = accountService.activateAccount(iban);
+    public ResponseEntity<AccountStatusDTO> activateAccount(@PathVariable String iban) {
+        AccountStatusDTO response = accountService.activateAccount(iban);
         return ResponseEntity.status(200).body(response);
     }
 

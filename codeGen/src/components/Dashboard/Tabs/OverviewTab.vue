@@ -109,7 +109,7 @@ import TransactionWidget from '../TransactionWidget.vue';
 </template>
 
 <script>
-import moment from 'moment';
+// import moment from 'moment';
 
 var date = new Date();
 var second = date.getSeconds();
